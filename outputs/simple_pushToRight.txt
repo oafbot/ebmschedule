@@ -1,0 +1,2 @@
+assetId, taskId, start, end
+1, 1, '1/1/2010', '1/3/2010'
