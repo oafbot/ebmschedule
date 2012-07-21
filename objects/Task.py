@@ -1,5 +1,7 @@
 class Task:
     def __init__(self, id, name, unit, threshold, interval, manpowers, conflicts):
+        
+        #Added to supress warnings -- Jun.2012
         import warnings
         warnings.filterwarnings('ignore', '.*the sets module is deprecated.*')
         
