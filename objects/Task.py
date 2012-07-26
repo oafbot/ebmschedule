@@ -1,19 +1,18 @@
 class Task:
     def __init__(self, id, name, unit, threshold, interval, manpowers, conflicts):
         
-        #Added to supress warnings -- Jun.2012
-        import warnings
-        warnings.filterwarnings('ignore', '.*the sets module is deprecated.*')
-        
-        from sets import Set
-        
+        # Added to supress warnings -- Jun.2012
+        # import warnings
+        # warnings.filterwarnings('ignore', '.*the sets module is deprecated.*')
+        # from sets import Set
+                
         self.id = id
         self.name = name
         self.unit = unit
         self.threshold = threshold
         self.interval = interval
         self.manpowers = manpowers
-        self.conflicts = Set(conflicts)
+        self.conflicts = set(conflicts)
         self.locked = False
         self.hoursPerDay = 8
         self.skills = [] #init value
@@ -21,6 +20,14 @@ class Task:
         self.manhours = 0 #init value
         self.totalAvailableHours = 0 #init value  
         if len(manpowers): self.precal() #TODO: Should come from sequencing
+                
+        # Console Output -----------------------------------------------------
+        print "Task: ", self.name
+        print "Unit: ", self.unit
+        print "Threshold: ", self.threshold
+        print "Interval: ", self.interval
+        print "------------------------------------------------------------\n"
+        # --------------------------------------------------------------------
         
     def next(self, asset, date):
         #TODO: Add usage units
@@ -44,6 +51,7 @@ class Task:
         days -= 1
         return date + timedelta(days=floor(days)) #todo: decrement precision if decimal
     
+    # Round to the next interger day for required skill    
     def precal(self):
         from math import ceil
         for manpower in self.manpowers:

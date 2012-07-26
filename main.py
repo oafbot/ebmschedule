@@ -1,3 +1,4 @@
+#!/usr/bin/python
 import inputs, algorithms, outputs, tests, metrics
 
 #Load Input Data

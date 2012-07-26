@@ -1,10 +1,17 @@
 class PushToRight:
     def __init__(self, input):
-
+        
         from datetime import timedelta
         
         weight = 1.0 #0<=weight<=1
         totalTasks = len(input.tasks)
+        
+        """
+        Prioritze the tasks that require higher percentage of resources.
+        How many of the skills for the task are available.
+        Divide manhours cost with total available manhours
+        Schedule the complex (conflict heavy) task first.
+        """
         input.tasks.sort(key=lambda task: 
             (     
                 (weight * ((task.manhours / (task.totalAvailableHours *1.0)) if task.totalAvailableHours else 0)) 
@@ -40,13 +47,13 @@ class PushToRight:
                     
         print "PushToRight", input.schedule.dataSource, "Manhours:", input.schedule.totalManhours, " Counts:", conflicts
                     
-                #TODO: 
-                #No Maintenance Period
-                #planned usage
-                #task start/end dates
-                #number per a year FY
-                #configuration
-                #pre/post/conflicting tasks
-                #pre tasks
-                #schedule precision
-                #order tasks by largest size / availability
+                # TODO: 
+                # No Maintenance Period
+                # planned usage
+                # task start/end dates
+                # number per a year FY
+                # configuration
+                # pre/post/conflicting tasks
+                # pre tasks
+                # schedule precision
+                # order tasks by largest size / availability
