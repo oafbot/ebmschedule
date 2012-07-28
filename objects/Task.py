@@ -19,13 +19,21 @@ class Task:
                 
         # Console Output -----------------------------------------------------
         print "Task:            ", self.name
+        print "ID:              ", self.id
         print "Unit:            ", self.unit
         print "Threshold:       ", self.threshold
         print "Interval:        ", self.interval
         print "Days:            ", self.days
         for m in self.manpowers:
             print "Manpower:        ",m.hours, "x", m.skill.name 
-        print "------------------------------------------------------------\n"
+        print "Conflicts:"
+        i = 0
+        for c in sorted(self.conflicts):
+            if i % 8 == 0:
+                print ""    
+            print str.ljust(str(c),10),
+            i += 1
+        print "\n------------------------------------------------------------\n"
         # --------------------------------------------------------------------
         
     def next(self, asset, date):

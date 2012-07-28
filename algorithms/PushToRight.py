@@ -15,7 +15,7 @@ class PushToRight:
         input.tasks.sort(key=lambda task: 
             (     
                 (weight * ((task.manhours / (task.totalAvailableHours *1.0)) 
-                if task.totalAvailableHours else 0)) 
+                 if task.totalAvailableHours else 0)) 
                 + ((1-weight) * (len(task.conflicts) / (totalTasks *1.0)))
              ), 
             reverse=True)
