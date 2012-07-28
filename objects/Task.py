@@ -1,4 +1,5 @@
 class Task:
+    
     def __init__(self, id, name, unit, threshold, interval, manpowers, conflicts):
         self.id                  = id
         self.name                = name
@@ -56,7 +57,7 @@ class Task:
         from math import floor
         days -= 1
         return date + timedelta(days=floor(days)) #todo: decrement precision if decimal
-       
+
     def precal(self):
         """Round to the next interger day for required skill."""
         from math import ceil

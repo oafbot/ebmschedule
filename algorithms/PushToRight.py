@@ -1,4 +1,5 @@
 class PushToRight:
+    
     def __init__(self, input):
         from datetime import timedelta
         weight = 1.0 # 0 <= weight <= 1
@@ -39,16 +40,17 @@ class PushToRight:
                             conflicts += 1
                         end = input.schedule.add(asset, task, start) # Add to schedule
                         
-                        # print str.ljust(asset.name, 8), str.ljust(task.name, 96),            \
-                        #       str.ljust(str.replace(str(start), "00:00:00",""), 10), "-- ",  \
-                        #       str.ljust(str.replace(str(end), " 00:00:00",""), 10)
-                        print str.ljust(asset.name, 16),                                       \
-                              str.ljust(task.name, 16),                                        \
-                              str.ljust(str.replace(str(start), "00:00:00", ""), 10), "-- ",   \
-                              str.ljust(str.replace(str(end), " 00:00:00", ""), 10)
+                        if input.name == "iSUMO":
+                            print str.ljust(asset.name, 8), str.ljust(task.name, 112),         \
+                                  str.ljust(str(start)[:-16], 10), "--",                       \
+                                  str.ljust(str(end)[:-16], 10)
+                        else:
+                            print str.ljust(asset.name, 16),                                   \
+                                  str.ljust(task.name, 16),                                    \
+                                  str.ljust(str.replace(str(start), "00:00:00", ""), 10), "--",\
+                                  str.ljust(str.replace(str(end), "00:00:00", ""), 10)
                         
                         start = task.next(asset, end)
-        
         print "\n",                                                                            \
               "PushToRight", input.schedule.dataSource,                                        \
               "Manhours:", input.schedule.totalManhours,                                       \

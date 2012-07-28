@@ -1,13 +1,14 @@
 class Asset:
+    
     def __init__(self, id, name, start):
         self.id    = id
         self.name  = name
         self.start = start        
         
         # Console Output -----------------------------------------------------
-        # print "Asset: ", self.name 
-        # print "Start: ", self.start
-        # print "------------------------------------------------------------\n"
+        print "Asset: ", self.name 
+        print "Start: ", self.start
+        print "------------------------------------------------------------\n"
         # --------------------------------------------------------------------
                 
     def __contains__(self, assets): 
@@ -18,6 +19,7 @@ class Asset:
 
 
 class Skill:
+    
     def __init__(self, id, name, available, hoursPerDay):
         self.id             = id
         self.name           = name
@@ -39,6 +41,7 @@ class Skill:
 
 
 class Manpower:
+    
     def __init__(self, id, skill, hours):
         self.id    = id
         self.skill = skill

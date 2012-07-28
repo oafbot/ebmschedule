@@ -1,4 +1,5 @@
 class Schedule:
+    
     def __init__(self, dataSource, dateRange, maxAssetsInWork):        
         self.dataSource      = dataSource
         self.dateRange       = dateRange
@@ -36,7 +37,7 @@ class Schedule:
         return _task.dateRange.end
 
     def blocked(self, asset, task, date):
-        """Return true if task can be scheduled on that day"""
+        """Return true if task can be scheduled on that day."""
         _task = task.schedule(date) #Create scheduled task (prevent threading issues)
         
         for date in _task.dateRange.range():
@@ -66,31 +67,27 @@ class Schedule:
         return False
 
     def last(self, asset, task):
-        """
-        Last time task was performed on the asset.
-        Return end date.
-        """
+        """Last time task was performed on the asset. Return end date."""
         if asset.id in self._schedule.keys():
             for _task in self._schedule[asset.id]:
                 if _task.id == task.id:
                     return _task.dateRange.end
     
     def _addToSchedule(self, asset, task):        
-        """
-        Add a task to an asset in the schedule.
-        
-        """
+        """Add a task to an asset in the schedule."""
         if asset.id not in self._schedule: 
             self._schedule[asset.id] = []
         self._schedule[asset.id].append(task)
         
         for date in task.dateRange.range():            
+            """Assign asset to the date."""
             if date not in self._assetsInWork.keys(): 
                 self._assetsInWork[date] = [asset.id]
             elif asset.id not in self._assetsInWork[date]: 
                 self._assetsInWork[date].append(asset.id)
-                
+               
             for skill in task.skills:
+                """Assign skills to the date."""
                 if date not in self._skillsInWork.keys(): 
                     self._skillsInWork[date] = { skill.id:skill.hoursPerDay }
                 elif skill.id not in self._skillsInWork[date].keys():
@@ -99,13 +96,15 @@ class Schedule:
                     self._skillsInWork[date][skill.id] += skill.hoursPerDay
                     
             if asset.id not in self._scheduledTasks.keys(): 
+                """Assign asset, date, and task to list of scheduled tasks."""
                 self._scheduledTasks[asset.id] = { date: [task.id] }
             elif date not in self._scheduledTasks[asset.id]: 
                 self._scheduledTasks[asset.id][date] = [task.id]
             else:
                 self._scheduledTasks[asset.id][date].append(task.id)
  
-            if asset.id not in self._conflictTasks.keys(): 
+            if asset.id not in self._conflictTasks.keys():
+                """Assign conflict to list of conflicts.""" 
                 self._conflictTasks[asset.id] = { date: task.conflicts }
             elif date not in self._conflictTasks[asset.id]: 
                 self._conflictTasks[asset.id][date] = task.conflicts
