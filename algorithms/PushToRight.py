@@ -1,16 +1,15 @@
 class PushToRight:
     def __init__(self, input):
-        
         from datetime import timedelta
-        
-        weight = 1.0 #0<=weight<=1
+        weight = 1.0 # 0 <= weight <= 1
         totalTasks = len(input.tasks)
+        conflicts = 0
         
         """
         Prioritze the tasks that require higher percentage of resources.
         How many of the skills for the task are available.
-        Divide manhours cost with total available manhours
-        Schedule the complex (conflict heavy) task first.
+        Divide manhours cost with total available manhours.
+        Schedule the complex ( i.e. conflict heavy ) task first.
         """
         input.tasks.sort(key=lambda task: 
             (     
@@ -18,34 +17,42 @@ class PushToRight:
                 + ((1-weight) * (len(task.conflicts) / (totalTasks *1.0)))
              ), 
             reverse=True)
-
-        conflicts = 0
-        
-        for asset in input.assets:
-        
+                    
+        for asset in input.assets:        
             for task in input.tasks:
-                
                 if(task.interval):
-                
+                    """ 
+                    If the task is to be performed at a set interval,
+                    Set the new start date to the later of either:
+                      A. The last time a task was performed on a given asset
+                      B. The start date of the given date range.
+                    """
                     start = task.next(asset, input.schedule.last(asset, task))
-                    
                     start = max(start, input.schedule.dateRange.start)
-                    
                     while(start <= input.schedule.dateRange.end):
-                        
-                        while(input.schedule.blocked(asset, task, start)): 
-                        
-                            start += timedelta(days=1) #Shift to the right one day when blocked
-                            
+                        while(input.schedule.blocked(asset, task, start)):
+                            """
+                            While the start date is within the date range,
+                            Keep Shifting one day forward as long as a schedule conflict exists.
+                            """ 
+                            start += timedelta(days=1) # Shift to the right one day when blocked
                             conflicts += 1
-                            
-                        end = input.schedule.add(asset, task, start)
-                    
-                        #print asset.name, task.name, start, end
+                        end = input.schedule.add(asset, task, start) # Add to schedule
+                        
+                        # print str.ljust(asset.name, 8), str.ljust(task.name, 96),            \
+                        #       str.ljust(str.replace(str(start), "00:00:00",""), 10), "-- ",  \
+                        #       str.ljust(str.replace(str(end), " 00:00:00",""), 10)
+                        print str.ljust(asset.name, 16),                                       \
+                              str.ljust(task.name, 16),                                        \
+                              str.ljust(str.replace(str(start), "00:00:00", ""), 10), "-- ",   \
+                              str.ljust(str.replace(str(end), " 00:00:00", ""), 10)
                         
                         start = task.next(asset, end)
-                    
-        print "PushToRight", input.schedule.dataSource, "Manhours:", input.schedule.totalManhours, " Counts:", conflicts
+        
+        print "\n",                                                                            \
+              "PushToRight", input.schedule.dataSource,                                        \
+              "Manhours:", input.schedule.totalManhours,                                       \
+              " Counts:", conflicts
                     
                 # TODO: 
                 # No Maintenance Period

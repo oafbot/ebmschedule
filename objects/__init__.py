@@ -1,12 +1,13 @@
 class Asset:
     def __init__(self, id, name, start):
-        self.id = id
-        self.name = name
+        self.id    = id
+        self.name  = name
         self.start = start        
+        
         # Console Output -----------------------------------------------------
-        print "Asset: ", self.name 
-        print "Start: ", self.start
-        print "------------------------------------------------------------\n"
+        # print "Asset: ", self.name 
+        # print "Start: ", self.start
+        # print "------------------------------------------------------------\n"
         # --------------------------------------------------------------------
                 
     def __contains__(self, assets): 
@@ -18,15 +19,16 @@ class Asset:
 
 class Skill:
     def __init__(self, id, name, available, hoursPerDay):
-        self.id = id
-        self.name = name
-        self.available = available
-        self.hoursPerDay = hoursPerDay
+        self.id             = id
+        self.name           = name
+        self.available      = available
+        self.hoursPerDay    = hoursPerDay
         self.availableHours = available * hoursPerDay
+        
         # Console Output -----------------------------------------------------
-        print "Skill: ", self.name
-        print "Availability: ", self.available
-        print "Hours per day: ", self.hoursPerDay
+        print "Skill:           ", self.name
+        print "Availability:    ", self.available
+        print "Hours per day:   ", self.hoursPerDay
         print "Available hours: ", self.availableHours
         print "------------------------------------------------------------\n"
         # --------------------------------------------------------------------
@@ -38,9 +40,10 @@ class Skill:
 
 class Manpower:
     def __init__(self, id, skill, hours):
-        self.id = id
+        self.id    = id
         self.skill = skill
         self.hours = hours
+        
         # Console Output -----------------------------------------------------
         # print "Manpower skill", self.skill.name
         # print "Manpower hours", self.hours

@@ -9,54 +9,77 @@ class Schedule:
         self._scheduledTasks = {}   # assets >> date >> tasks
         self._conflictTasks  = {}   # assets >> date >> conflicts
         self.totalManhours   = 0        
+
         # Console Output -----------------------------------------------------
-        print "Data source: ", self.dataSource
-        print "Date range: ", self.dateRange.start, ' - ', self.dateRange.end
-        print "Max assets in work: ", self.maxAssetsInWork
-        print "------------------------------------------------------------\n"
+        # print "Schedule"
+        # print "Data source: ", self.dataSource
+        # print "Date range:  ", self.dateRange.start, ' ~ ', self.dateRange.end
+        # print "Max assets in work: ", self.maxAssetsInWork
+        # print "------------------------------------------------------------\n"
         # --------------------------------------------------------------------
-    
+
     def force(self, asset, task, dateRange):
+        """Force an asset to be scheduled for specified task to be performed."""
         self._addToSchedule(asset, task.forceSchedule(dateRange))
+        # Console Output -----------------------------------------------------
+        # print "Force Schedule"
+        # print "Asset: ", asset.name
+        # print "Task:  ", task.name
+        # print "Dates: ", dateRange.start, " - ", dateRange.end
+        # print "------------------------------------------------------------\n"
+        # --------------------------------------------------------------------
 
     def add(self, asset, task, date):
+        """Add a task to a schedule and return the end date for the task."""
         _task = task.schedule(date) #Create scheduled task
         self._addToSchedule(asset, _task)
         return _task.dateRange.end
 
     def blocked(self, asset, task, date):
+        """Return true if task can be scheduled on that day"""
         _task = task.schedule(date) #Create scheduled task (prevent threading issues)
+        
         for date in _task.dateRange.range():
+            """
+            difference: If Asset Foo is already in set, 
+            then take it out before running this logic. i.e. If already scheduled, 
+            one can schedule additional tasks for that asset on that day.
+            
+            LHS is the number of assets *already* scheduled, so if >= maxAssets cannot 
+            schedule any additional assets
+            """
             if  date in self._assetsInWork.keys() and \
                 len(set(self._assetsInWork[date]).difference([asset.id])) >= self.maxAssetsInWork:
-                # difference: if Asset XYZ is already in set, then take it out before making this 
-				# logic (in other words, if already scheduled in that day you can schedule additional 
-				# tasks for that asset on that day
-                # LHS is the number of assets *already* scheduled, so if >= maxAssets cannot schedule 
-				# any additional assets
                 return True
+            
             for skill in task.skills:
                 if  date in self._skillsInWork.keys() and \
                     skill.id in self._skillsInWork[date].keys() and \
                     self._skillsInWork[date][skill.id] + skill.hoursPerDay > skill.availableHours:
-                    #print task.id, self._skillsInWork[date][skill.id], skill.hoursPerDay, skill.availableHours
+                    # print task.id, self._skillsInWork[date][skill.id], skill.hoursPerDay, skill.availableHours
                     return True
 
             if  asset.id in self._conflictTasks.keys() and \
                 date in self._conflictTasks[asset.id].keys() and \
                 task.id in self._conflictTasks[asset.id][date]:
-                return True           
-            
+                return True
         return False
-    
-    # Last time task was performed on the asset
+
     def last(self, asset, task):
+        """
+        Last time task was performed on the asset.
+        Return end date.
+        """
         if asset.id in self._schedule.keys():
             for _task in self._schedule[asset.id]:
                 if _task.id == task.id:
                     return _task.dateRange.end
     
     def _addToSchedule(self, asset, task):        
+        """
+        Add a task to an asset in the schedule.
+        
+        """
         if asset.id not in self._schedule: 
             self._schedule[asset.id] = []
         self._schedule[asset.id].append(task)
