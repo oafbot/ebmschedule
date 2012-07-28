@@ -4,4 +4,5 @@
 .pydevproject
 inputs/*
 *.sql
+.ropeproject
 .ropeproject/*
