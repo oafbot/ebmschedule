@@ -14,7 +14,8 @@ class PushToRight:
         """
         input.tasks.sort(key=lambda task: 
             (     
-                (weight * ((task.manhours / (task.totalAvailableHours *1.0)) if task.totalAvailableHours else 0)) 
+                (weight * ((task.manhours / (task.totalAvailableHours *1.0)) 
+                if task.totalAvailableHours else 0)) 
                 + ((1-weight) * (len(task.conflicts) / (totalTasks *1.0)))
              ), 
             reverse=True)
@@ -44,6 +45,10 @@ class PushToRight:
                             print str.ljust(asset.name, 8), str.ljust(task.name, 112),         \
                                   str.ljust(str(start)[:-16], 10), "--",                       \
                                   str.ljust(str(end)[:-16], 10)
+                        elif input.name == "iSUMOe6Random":
+                            print str.ljust(asset.name, 8), str.ljust(task.name, 112),         \
+                                  str.ljust(str(start)[:-9], 10), "--",                        \
+                                  str.ljust(str(end)[:-9], 10)
                         else:
                             print str.ljust(asset.name, 16),                                   \
                                   str.ljust(task.name, 16),                                    \
