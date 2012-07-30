@@ -63,7 +63,7 @@ class Task:
         """Return the sum of the date and the time difference between today and 'days'-1."""
         from datetime import timedelta
         from math import floor
-        days -= 1
+        days -= 1 #commented out because of scheduling paradox for end date.
         return date + timedelta(days=floor(days)) #todo: decrement precision if decimal
 
     def precal(self):

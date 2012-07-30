@@ -12,22 +12,22 @@ class Schedule:
         self.totalManhours   = 0        
 
         # Console Output -----------------------------------------------------
-        # print "Schedule"
-        # print "Data source: ", self.dataSource
-        # print "Date range:  ", self.dateRange.start, ' ~ ', self.dateRange.end
-        # print "Max assets in work: ", self.maxAssetsInWork
-        # print "------------------------------------------------------------\n"
+        print "Schedule"
+        print "Data source: ", self.dataSource
+        print "Date range:  ", self.dateRange.start, ' ~ ', self.dateRange.end
+        print "Max assets in work: ", self.maxAssetsInWork
+        print "------------------------------------------------------------\n"
         # --------------------------------------------------------------------
 
     def force(self, asset, task, dateRange):
         """Force an asset to be scheduled for specified task to be performed."""
         self._addToSchedule(asset, task.forceSchedule(dateRange))
         # Console Output -----------------------------------------------------
-        # print "Force Schedule"
-        # print "Asset: ", asset.name
-        # print "Task:  ", task.name
-        # print "Dates: ", dateRange.start, " - ", dateRange.end
-        # print "------------------------------------------------------------\n"
+        print "Force Schedule"
+        print "Asset: ", asset.name
+        print "Task:  ", task.name
+        print "Dates: ", dateRange.start, " - ", dateRange.end
+        print "------------------------------------------------------------\n"
         # --------------------------------------------------------------------
 
     def add(self, asset, task, date):

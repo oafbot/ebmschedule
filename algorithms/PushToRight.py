@@ -19,7 +19,7 @@ class PushToRight:
                 + ((1-weight) * (len(task.conflicts) / (totalTasks *1.0)))
              ), 
             reverse=True)
-                    
+        
         for asset in input.assets:        
             for task in input.tasks:
                 if(task.interval):
