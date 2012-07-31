@@ -5,6 +5,7 @@ class PushToRight:
         weight = 1.0 # 0 <= weight <= 1
         totalTasks = len(input.tasks)
         conflicts = 0
+        prev = 0
         
         """
         Prioritze the tasks that require higher percentage of resources.
@@ -29,8 +30,11 @@ class PushToRight:
                       A. The last time a task was performed on a given asset
                       B. The start date of the given date range.
                     """
+                    task.checkConstraints()
+
                     start = task.next(asset, input.schedule.last(asset, task))
                     start = max(start, input.schedule.dateRange.start)
+                    
                     while(start <= input.schedule.dateRange.end):
                         while(input.schedule.blocked(asset, task, start)):
                             """
@@ -40,7 +44,7 @@ class PushToRight:
                             start += timedelta(days=1) # Shift to the right one day when blocked
                             conflicts += 1
                         end = input.schedule.add(asset, task, start) # Add to schedule
-                        
+
                         if input.name == "iSUMO":
                             print str.ljust(asset.name, 8), str.ljust(task.name, 112),         \
                                   str.ljust(str(start)[:-16], 10), "--",                       \
@@ -50,12 +54,15 @@ class PushToRight:
                                   str.ljust(str(start)[:-9], 10), "--",                        \
                                   str.ljust(str(end)[:-9], 10)
                         else:
+                            if prev != asset.name: print ""
                             print str.ljust(asset.name, 16),                                   \
                                   str.ljust(task.name, 16),                                    \
                                   str.ljust(str.replace(str(start), "00:00:00", ""), 10), "--",\
                                   str.ljust(str.replace(str(end), "00:00:00", ""), 10)
+                            prev = asset.name
                         
                         start = task.next(asset, end)
+                    task.reset()
         print "\n",                                                                            \
               "PushToRight", input.schedule.dataSource,                                        \
               "Manhours:", input.schedule.totalManhours,                                       \

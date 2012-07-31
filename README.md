@@ -1,5 +1,5 @@
-ebmschedule
-===========
+EBM Scheduler
+=============
 
 Objects:
 --------
