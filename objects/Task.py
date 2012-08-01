@@ -20,7 +20,6 @@ class Task:
         self.days                = 0  #init value
         self.manhours            = 0  #init value
         self.totalAvailableHours = 0  #init value
-        self.bundledTasks        = []
         
         if len(manpowers): self.precal() #TODO: Should come from sequencing
                 
@@ -84,7 +83,7 @@ class Task:
         """Return the sum of the date and the time difference between today and 'days'-1."""
         from datetime import timedelta
         from math import floor
-        #days -= 1 #commented out because of scheduling paradox for end date.
+        days -= 1 #commented out because of scheduling paradox for end date.
         return date + timedelta(days=floor(days)) #todo: decrement precision if decimal
 
     def precal(self):
@@ -122,45 +121,22 @@ class Task:
         _task.locked = True
         return _task
     
-    def checkConstraints(self):
-        if self.prereq: 
-            self.bundledTasks = self.bundle(self.bundledTasks, self.prereq, True)
-        if self.prep: 
-            self.bundledTasks = self.bundle(self.bundledTasks, self.prep, True) 
-        # self.bundledTasks.append(self)      
-        if self.subseq: 
-            self.bundledTasks = self.bundle(self.bundledTasks, self.subseq, False)
+    def checkConstraints(self, bundle):
+        #if self.prereq: bundle = self.bundle(bundle, self.prereq) # if prerequisite tasks exist
+        if self.prep: bundle = self.bundle(bundle, self.prep)     # if prepatory tasks exist
+        if not bundle or self not in bundle: bundle.append(self)  # append primary task
+        if self.subseq: bundle = self.bundle(bundle, self.subseq) # if subsequent tasks exist
+        return bundle
         
-        if self.bundledTasks: 
-            for task in self.bundledTasks: print "--------------  ", task.name
-        
-    def schedulePrep(self):
-        self.bundle(self.prep)
-        if self not in self.bundledTasks:
-            self.bundledTasks.append(self)
-    
-    def schedulePrereq(self):
-        self.bundle(self.prereq)
-        if self not in self.bundledTasks:
-            self.bundledTasks.append(self)
-    
-    def scheduleSubseq(self):
-        if self not in self.bundledTasks:
-            self.bundledTasks.append(self)
-        self.bundle(self.subseq)
-        
-    def bundle(self, bundle, constraints, prepend):
+    def bundle(self, bundle, tasks):
         import main
-        input = main.inputs.inputs[0]
-        for c in constraints:
-            for task in input.tasks:
-                if task.id == c: 
-                    task.checkConstraints()
-                    if task not in bundle and prepend: 
-                        return bundle.insert(0,task)
-                    elif task not in bundle and not prepend: 
-                        return bundle.append(task)
-    
-    def reset(self):
-        self.bundledTasks = []
+        input = main.inputs.inputs[0].tasks
+        for n in tasks:
+            for task in input:
+                if task.id == n: 
+                    task.checkConstraints(bundle)
+                    if bundle and task not in bundle: return bundle.append(task)
+        return bundle 
         
+    def reset(self):
+        pass

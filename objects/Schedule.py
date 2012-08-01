@@ -10,7 +10,7 @@ class Schedule:
         self._scheduledTasks = {}   # assets >> date >> tasks
         self._conflictTasks  = {}   # assets >> date >> conflicts
         self.totalManhours   = 0        
-
+        
         # Console Output -----------------------------------------------------
         print ""
         print "Schedule"
@@ -116,3 +116,22 @@ class Schedule:
                 self._conflictTasks[asset.id][date].union(task.conflicts)
                 
         self.totalManhours += task.manhours
+    
+    def scheduleAsBundle(self, bundle, asset):
+        from objects.Task import Task
+        total = 0
+        mp = []
+        cf = []
+        name = ""
+        for task in bundle:
+            for manpower in task.manpowers:
+                total += manpower.hours
+                mp += task.manpowers
+                cf += task.conflicts
+                name += str(task.id) + " "
+            #print task.name, task.manhours, total
+        days = total / task.hoursPerDay
+        bundled_task = Task(0, "Bundle: "+name, 1, 0, 0, mp, cf, list(), list(), list(), list()) 
+        block = self.blocked(asset, bundled_task, asset.start)
+        #print "Bocked?", str(block)
+        
