@@ -24,35 +24,36 @@ class Task:
         if len(manpowers): self.precal() #TODO: Should come from sequencing
                 
         # Console Output -----------------------------------------------------
-        print "Task:            ", self.name
-        print "ID:              ", self.id
-        print "Unit:            ", self.unit
-        print "Threshold:       ", self.threshold
-        print "Interval:        ", self.interval
-        print "Days:            ", self.days
-        for m in self.manpowers:
-            print "Manpower:        ",m.hours, "x", m.skill.name 
-        if self.conflicts:
-            print "Conflicts:       ",
-            for n in sorted(self.conflicts):
-                print str.ljust(str(n), 3),
-        if self.prep:
-            print "\nPrep:            ",
-            for n in sorted(self.prep):
-                print str.ljust(str(n), 3),
-        if self.prereq:
-            print "\nPrerequisite:    ",
-            for n in sorted(self.prereq):
-                print str.ljust(str(n), 3),
-        if self.subseq:
-            print "\nSubsequent:      ",
-            for p in sorted(self.subseq):
-                print str.ljust(str(p), 3),
-        if self.concur:
-            print "\nConcur:          ",
-            for n in sorted(self.concur):
-                print str.ljust(str(n), 3),        
-        print "\n------------------------------------------------------------\n"
+        if self.id is not 0:
+            print "Task:            ", self.name
+            print "ID:              ", self.id
+            print "Unit:            ", self.unit
+            print "Threshold:       ", self.threshold
+            print "Interval:        ", self.interval
+            print "Days:            ", self.days
+            for m in self.manpowers:
+                print "Manpower:        ",m.hours, "x", m.skill.name 
+            if self.conflicts:
+                print "Conflicts:       ",
+                for n in sorted(self.conflicts):
+                    print str.ljust(str(n), 3),
+            if self.prep:
+                print "\nPrep:            ",
+                for n in sorted(self.prep):
+                    print str.ljust(str(n), 3),
+            if self.prereq:
+                print "\nPrerequisite:    ",
+                for n in sorted(self.prereq):
+                    print str.ljust(str(n), 3),
+            if self.subseq:
+                print "\nSubsequent:      ",
+                for p in sorted(self.subseq):
+                    print str.ljust(str(p), 3),
+            if self.concur:
+                print "\nConcur:          ",
+                for n in sorted(self.concur):
+                    print str.ljust(str(n), 3),        
+            print "\n------------------------------------------------------------\n"
         # --------------------------------------------------------------------
         
     def next(self, asset, date):
@@ -123,9 +124,9 @@ class Task:
     
     def checkConstraints(self, bundle):
         #if self.prereq: bundle = self.bundle(bundle, self.prereq) # if prerequisite tasks exist
-        if self.prep: bundle = self.bundle(bundle, self.prep)     # if prepatory tasks exist
-        if not bundle or self not in bundle: bundle.append(self)  # append primary task
-        if self.subseq: bundle = self.bundle(bundle, self.subseq) # if subsequent tasks exist
+        if self.prep: bundle = self.bundle(bundle, self.prep)      # if prepatory tasks exist
+        if not bundle or self not in bundle: bundle.append(self)   # append primary task
+        if self.subseq: bundle = self.bundle(bundle, self.subseq)  # if subsequent tasks exist
         return bundle
         
     def bundle(self, bundle, tasks):
@@ -137,6 +138,23 @@ class Task:
                     task.checkConstraints(bundle)
                     if bundle and task not in bundle: return bundle.append(task)
         return bundle 
-        
-    def reset(self):
-        pass
+
+    def bundleAsTask(self, bundle, asset):
+        from objects.Task import Task
+        total = 0
+        mp = []
+        cf = []
+        name = ""
+        threshold = 0
+        interval = 0
+        for task in bundle:
+            for manpower in task.manpowers:
+                total += manpower.hours
+                mp += task.manpowers
+            cf += task.conflicts
+            name += str(task.id) + " "
+            if task.threshold > threshold: threshold = task.threshold
+            if task.interval > interval: interval = task.interval
+            #print task.name, task.manhours, total
+        days = total / task.hoursPerDay
+        return Task(0, "Bundle: "+name, 1, threshold, interval, mp, cf, list(), list(), list(), list())
