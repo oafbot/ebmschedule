@@ -123,7 +123,7 @@ class Task:
         return _task
     
     def checkConstraints(self, bundle):
-        #if self.prereq: bundle = self.bundle(bundle, self.prereq) # if prerequisite tasks exist
+        if self.prereq: bundle = self.bundle(bundle, self.prereq) # if prerequisite tasks exist
         if self.prep: bundle = self.bundle(bundle, self.prep)      # if prepatory tasks exist
         if not bundle or self not in bundle: bundle.append(self)   # append primary task
         if self.subseq: bundle = self.bundle(bundle, self.subseq)  # if subsequent tasks exist

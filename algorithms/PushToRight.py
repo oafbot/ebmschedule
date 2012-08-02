@@ -68,15 +68,37 @@ class PushToRight:
         from datetime import timedelta
         bundled_task = task.bundleAsTask(bundle, asset)
         start = task.next(asset, input.schedule.last(asset, task))
-        start = max(start, input.schedule.dateRange.start)
+        start = max(start, input.schedule.dateRange.start)        
         while(start <= input.schedule.dateRange.end):
             while(input.schedule.blocked(asset, bundled_task, start)):
                 start += timedelta(days=1)
                 self.conflicts += 1
+            remainder_hours = 0
+            maxhours = task.hoursPerDay
+            longest = 0
             for bundle_task in bundle:
+                overhours  = False
                 end = input.schedule.add(asset, bundle_task, start)
                 self.output(asset, bundle_task, input, start, end)           
-                start = end
+                
+                for manpower in bundle_task.manpowers:
+                    if manpower.hours > longest: longest = manpower.hours                    
+                
+                if longest <= maxhours: 
+                    hours = longest
+                    if hours + remainder_hours >= maxhours: overhours = True         
+                else: hours = longest % maxhours                                
+                
+                if hours + remainder_hours == maxhours: 
+                    remainder_hours = 0
+                elif hours + remainder_hours > maxhours: 
+                    remainder_hours = (remainder_hours + hours) - maxhours
+                else: 
+                    remainder_hours += hours                
+                
+                if overhours: start = end + timedelta(days=1)
+                else: start = end
+                                
             start = task.next(asset, end)
         # for task in bundle:
         #    bundled_task = task.bundleAsTask(bundle, asset)
