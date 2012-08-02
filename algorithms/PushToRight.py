@@ -29,7 +29,7 @@ class PushToRight:
                       A. The last time a task was performed on a given asset
                       B. The start date of the given date range.
                     """
-                    bundle = task.checkConstraints(bundle = [])
+                    bundle = task.checkConstraints(list(), asset, input)
                     if len(bundle) > 1:
                         self.bundleSchedule(bundle, asset, input, task)
                     else:
@@ -69,26 +69,33 @@ class PushToRight:
         bundled_task = task.bundleAsTask(bundle, asset)
         start = task.next(asset, input.schedule.last(asset, task))
         start = max(start, input.schedule.dateRange.start)        
+        
         while(start <= input.schedule.dateRange.end):
             while(input.schedule.blocked(asset, bundled_task, start)):
                 start += timedelta(days=1)
                 self.conflicts += 1
-            remainder_hours = 0
-            maxhours = task.hoursPerDay
-            longest = 0
+            
+            remainder_hours = 0            # The hours carried over from the preceding task
+            maxhours = task.hoursPerDay    # The work hours in a day
+            longest = 0                    # The task that takes the longest to perform
+            
+            """For each task in the bundle, schedule in order."""
             for bundle_task in bundle:
                 overhours  = False
                 end = input.schedule.add(asset, bundle_task, start)
                 self.output(asset, bundle_task, input, start, end)           
                 
+                """Find the the most costly task."""
                 for manpower in bundle_task.manpowers:
                     if manpower.hours > longest: longest = manpower.hours                    
                 
+                """If the task takes takes longer than the workday, carry over."""
                 if longest <= maxhours: 
                     hours = longest
                     if hours + remainder_hours >= maxhours: overhours = True         
                 else: hours = longest % maxhours                                
                 
+                """Determine the hours remaining on a task that need to be carried over."""
                 if hours + remainder_hours == maxhours: 
                     remainder_hours = 0
                 elif hours + remainder_hours > maxhours: 
@@ -96,14 +103,11 @@ class PushToRight:
                 else: 
                     remainder_hours += hours                
                 
+                """Set the start date. Push to next day if overtime."""
                 if overhours: start = end + timedelta(days=1)
                 else: start = end
                                 
             start = task.next(asset, end)
-        # for task in bundle:
-        #    bundled_task = task.bundleAsTask(bundle, asset)
-        #    if input.schedule.blocked(asset, bundled_task, asset.start):
-        #        self.output(asset, task, input, "0000-00-00 ", "0000-00-00")
 
     def output(self, asset, task, input, start, end):
         """Print out the output to the console."""

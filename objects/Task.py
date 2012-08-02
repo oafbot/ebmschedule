@@ -1,8 +1,7 @@
 class Task:
     
     def __init__(self, id, name, unit, threshold, interval, manpowers, 
-                 conflicts, prep, prereq, subseq, concur):
-                                 
+                 conflicts, prep, prereq, subseq, concur):                                 
         self.id                  = id
         self.name                = name
         self.unit                = unit
@@ -122,20 +121,34 @@ class Task:
         _task.locked = True
         return _task
     
-    def checkConstraints(self, bundle):
-        if self.prereq: bundle = self.bundle(bundle, self.prereq) # if prerequisite tasks exist
-        if self.prep: bundle = self.bundle(bundle, self.prep)      # if prepatory tasks exist
-        if not bundle or self not in bundle: bundle.append(self)   # append primary task
-        if self.subseq: bundle = self.bundle(bundle, self.subseq)  # if subsequent tasks exist
+    def checkConstraints(self, bundle, asset, input):
+        if self.prereq: self.satisfyRequisite(bundle, asset, input)              # prerequisite
+        if self.prep: bundle = self.bundle(bundle, self.prep, asset, input)      # prepatory
+        if not bundle or self not in bundle: bundle.append(self)                 # primary task
+        if self.concur: bundle = self.bundle(bundle, self.concur, asset, input)  # concurrent
+        if self.subseq: bundle = self.bundle(bundle, self.subseq, asset, input)  # subsequent
         return bundle
+    
+    def satisfyRequisite(self, bundle, asset, input):
+        from datetime import timedelta
+        start = self.next(asset, input.schedule.last(asset, self))
+        start = max(start, input.schedule.dateRange.start)
+        for t in input.tasks:
+            for r in self.prereq:
+                if t.id == r: require = t
+        if input.schedule.last(asset, require) == None: 
+            return self.bundle(bundle, self.prereq, asset, input)
+        elif input.schedule.last(asset, require) + timedelta(days=require.interval) <= start:        
+            return bundle.append(self)
+        else:
+            return self.bundle(bundle, self.prereq, asset, input)             
         
-    def bundle(self, bundle, tasks):
+    def bundle(self, bundle, tasks, asset, input):
         import main
-        input = main.inputs.inputs[0].tasks
         for n in tasks:
-            for task in input:
+            for task in input.tasks:
                 if task.id == n: 
-                    task.checkConstraints(bundle)
+                    task.checkConstraints(bundle, asset, input)
                     if bundle and task not in bundle: return bundle.append(task)
         return bundle 
 
@@ -157,4 +170,5 @@ class Task:
             if task.interval > interval: interval = task.interval
             #print task.name, task.manhours, total
         days = total / task.hoursPerDay
-        return Task(0, "Bundle: "+name, 1, threshold, interval, mp, cf, list(), list(), list(), list())
+        return Task(0, "Bundle: "+name, 1, threshold, interval, mp, cf, 
+                   list(), list(), list(), list())
