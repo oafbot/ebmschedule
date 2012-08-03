@@ -46,9 +46,3 @@ class Manpower:
         self.id    = id
         self.skill = skill
         self.hours = hours
-        
-        # Console Output -----------------------------------------------------
-        # print "Manpower skill", self.skill.name
-        # print "Manpower hours", self.hours
-        # print "------------------------------------------------------------\n"
-        # --------------------------------------------------------------------

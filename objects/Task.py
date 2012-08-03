@@ -122,37 +122,74 @@ class Task:
         return _task
     
     def checkConstraints(self, bundle, asset, input):
+        """Check the constrains and bundle tasks together when appropriate."""
         if self.prereq: self.satisfyRequisite(bundle, asset, input)              # prerequisite
         if self.prep: bundle = self.bundle(bundle, self.prep, asset, input)      # prepatory
         if not bundle or self not in bundle: bundle.append(self)                 # primary task
-        if self.concur: bundle = self.bundle(bundle, self.concur, asset, input)  # concurrent
+        if self.concur: bundle = self.concurrence(bundle, asset, input)          # concurrent
         if self.subseq: bundle = self.bundle(bundle, self.subseq, asset, input)  # subsequent
         return bundle
     
     def satisfyRequisite(self, bundle, asset, input):
+        """Find out if a prerequisite has been satisfied. If not schedule the prerequisite."""
         from datetime import timedelta
         start = self.next(asset, input.schedule.last(asset, self))
         start = max(start, input.schedule.dateRange.start)
+        requirelist = []
+        """Find the task associated with the requisite id"""
         for t in input.tasks:
             for r in self.prereq:
-                if t.id == r: require = t
-        if input.schedule.last(asset, require) == None: 
-            return self.bundle(bundle, self.prereq, asset, input)
-        elif input.schedule.last(asset, require) + timedelta(days=require.interval) <= start:        
-            return bundle.append(self)
-        else:
-            return self.bundle(bundle, self.prereq, asset, input)             
+                if t.id == r: requirelist.append(t)
+        """For every requirement, find out if it has been performed within the interval."""
+        for require in requirelist:
+            if input.schedule.last(asset, require) == None or (
+               input.schedule.last(asset, require) + timedelta(days=require.interval) <= start 
+               and input.schedule.last(asset, require) >= 
+               require.end(start) + timedelta(days=require.interval)
+            ): bundle = self.bundle(bundle, self.prereq, asset, input)
+            else:
+                bundle = bundle.append(self)
+        return bundle             
+    
+    def concurrence(self, bundle, asset, input):
+        """Negotiate the appropriate scheduling for concurrent tasks."""
+        from datetime import timedelta
+        start = self.next(asset, input.schedule.last(asset, self))
+        start = max(start, input.schedule.dateRange.start)
+        concurlist = []
+        tasks_set  = False
+        
+        for t in input.tasks:
+            for c in self.concur:
+                if t.id == c: concurlist.append(t)
+        """Check if tasks are already in the Bundle."""
+        for concurrent in concurlist:            
+            if concurrent in bundle: tasks_set = True 
+            else: tasks_set = False
+        for concurrent in concurlist:
+            """If all tasks are in the bundle return the bundle."""
+            if tasks_set and self in bundle:
+                return bundle
+            """If no prior scheduling or scheduled prior to interval."""
+            if input.schedule.last(asset, concurrent) == None or (
+               input.schedule.last(asset, concurrent) + 
+               timedelta(days=concurrent.interval) <= start and
+               input.schedule.last(asset, concurrent) > 
+               concurrent.end(start) + timedelta(days=concurrent.interval)
+            ): bundle = self.bundle(bundle, self.concur, asset, input)
+        return bundle
         
     def bundle(self, bundle, tasks, asset, input):
-        import main
-        for n in tasks:
+        """Bundle related tasks together."""
+        for t in tasks:
             for task in input.tasks:
-                if task.id == n: 
+                if task.id == t: 
                     task.checkConstraints(bundle, asset, input)
                     if bundle and task not in bundle: return bundle.append(task)
         return bundle 
 
     def bundleAsTask(self, bundle, asset):
+        """Convert a bundle into a meta-task for running schedule calculations."""
         from objects.Task import Task
         total = 0
         mp = []

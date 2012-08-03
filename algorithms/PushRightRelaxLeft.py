@@ -1,4 +1,4 @@
-class PushToRight:
+class PushRightRelaxLeft:
     
     def __init__(self, input):
         weight = 1.0 # 0 <= weight <= 1
@@ -48,11 +48,18 @@ class PushToRight:
         from datetime import timedelta
         start = task.next(asset, input.schedule.last(asset, task))
         start = max(start, input.schedule.dateRange.start)
-        
+        original = start
+        left = 7
         while(start <= input.schedule.dateRange.end):
-            while(input.schedule.blocked(asset, task, start)):
-                start += timedelta(days=1) # Shift to the right one day when blocked
+            while(input.schedule.blocked(asset, task, start) and left < 0):
+                start -= timedelta(days=1)
                 self.conflicts += 1
+                left -= 1
+            if input.schedule.blocked(asset, task, start):
+                start = original
+                while(input.schedule.blocked(asset, task, start)):
+                    start += timedelta(days=1) # Shift to the right one day when blocked
+                    self.conflicts += 1
             end = input.schedule.add(asset, task, start) # Add to schedule
             self.output(asset, task, input, start, end)
             start = task.next(asset, end)
@@ -117,14 +124,3 @@ class PushToRight:
               str.ljust(str.replace(str(start), "00:00:00", ""), 10), "--",                    \
               str.ljust(str.replace(str(end), "00:00:00", ""), 10)
         self.prev = asset.name
-            
-# TODO: 
-# No Maintenance Period
-# planned usage
-# task start/end dates
-# number per a year FY
-# configuration
-# pre/post/conflicting tasks
-# pre tasks
-# schedule precision
-# order tasks by largest size / availability
