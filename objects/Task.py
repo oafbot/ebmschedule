@@ -21,39 +21,6 @@ class Task:
         self.totalAvailableHours = 0  #init value
         
         if len(manpowers): self.precal() #TODO: Should come from sequencing
-                
-        # Console Output -----------------------------------------------------
-        if self.id is not 0:
-            print "Task:            ", self.name
-            print "ID:              ", self.id
-            print "Unit:            ", self.unit
-            print "Threshold:       ", self.threshold
-            print "Interval:        ", self.interval
-            print "Days:            ", self.days
-            for m in self.manpowers:
-                print "Manpower:        ",m.hours, "x", m.skill.name 
-            if self.conflicts:
-                print "Conflicts:       ",
-                for n in sorted(self.conflicts):
-                    print str.ljust(str(n), 3),
-            if self.prep:
-                print "\nPrep:            ",
-                for n in sorted(self.prep):
-                    print str.ljust(str(n), 3),
-            if self.prereq:
-                print "\nPrerequisite:    ",
-                for n in sorted(self.prereq):
-                    print str.ljust(str(n), 3),
-            if self.subseq:
-                print "\nSubsequent:      ",
-                for p in sorted(self.subseq):
-                    print str.ljust(str(p), 3),
-            if self.concur:
-                print "\nConcur:          ",
-                for n in sorted(self.concur):
-                    print str.ljust(str(n), 3),        
-            print "\n------------------------------------------------------------\n"
-        # --------------------------------------------------------------------
         
     def next(self, asset, date):
         """
@@ -136,7 +103,7 @@ class Task:
         start = self.next(asset, input.schedule.last(asset, self))
         start = max(start, input.schedule.dateRange.start)
         requirelist = []
-        """Find the task associated with the requisite id"""
+        """Find the task associated with the requisite id."""
         for t in input.tasks:
             for r in self.prereq:
                 if t.id == r: requirelist.append(t)
@@ -147,8 +114,6 @@ class Task:
                and input.schedule.last(asset, require) >= 
                require.end(start) + timedelta(days=require.interval)
             ): bundle = self.bundle(bundle, self.prereq, asset, input)
-            else:
-                bundle = bundle.append(self)
         return bundle             
     
     def concurrence(self, bundle, asset, input):

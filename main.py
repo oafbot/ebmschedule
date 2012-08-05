@@ -8,7 +8,7 @@ inputs
 algorithms
 
 #Output 
-#outputs
+outputs
 
 #Test Scheduling Output
 #tests

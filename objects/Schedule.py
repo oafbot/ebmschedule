@@ -9,16 +9,7 @@ class Schedule:
         self._skillsInWork   = {}   # date   >> skills
         self._scheduledTasks = {}   # assets >> date >> tasks
         self._conflictTasks  = {}   # assets >> date >> conflicts
-        self.totalManhours   = 0        
-        
-        # Console Output -----------------------------------------------------
-        print ""
-        print "Schedule"
-        print "Data source: ", self.dataSource
-        print "Date range:  ", self.dateRange.start, ' ~ ', self.dateRange.end
-        print "Max assets in work: ", self.maxAssetsInWork
-        print "------------------------------------------------------------\n"
-        # --------------------------------------------------------------------
+        self.totalManhours   = 0
 
     def force(self, asset, task, dateRange):
         """Force an asset to be scheduled for specified task to be performed."""

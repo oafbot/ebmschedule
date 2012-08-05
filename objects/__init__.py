@@ -4,13 +4,7 @@ class Asset:
         self.id    = id
         self.name  = name
         self.start = start        
-        
-        # Console Output -----------------------------------------------------
-        print "Asset: ", self.name 
-        print "Start: ", self.start
-        print "------------------------------------------------------------\n"
-        # --------------------------------------------------------------------
-                
+
     def __contains__(self, assets): 
         for _asset in assets: 
             if _asset.id == self.id: 
@@ -26,14 +20,6 @@ class Skill:
         self.available      = available
         self.hoursPerDay    = hoursPerDay
         self.availableHours = available * hoursPerDay
-        
-        # Console Output -----------------------------------------------------
-        print "Skill:           ", self.name
-        print "Availability:    ", self.available
-        print "Hours per day:   ", self.hoursPerDay
-        print "Available hours: ", self.availableHours
-        print "------------------------------------------------------------\n"
-        # --------------------------------------------------------------------
         
     def copy(self):
         from copy import deepcopy

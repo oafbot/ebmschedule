@@ -124,7 +124,9 @@ class PushToRight:
 # task start/end dates
 # number per a year FY
 # configuration
-# pre/post/conflicting tasks
-# pre tasks
 # schedule precision
 # order tasks by largest size / availability
+
+# prerequisite separate interval
+
+# Form 1099
