@@ -1,0 +1,2 @@
+import Calendar
+Calendar().DeleteAll()    

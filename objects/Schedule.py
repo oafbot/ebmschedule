@@ -10,18 +10,13 @@ class Schedule:
         self._scheduledTasks = {}   # assets >> date >> tasks
         self._conflictTasks  = {}   # assets >> date >> conflicts
         self.totalManhours   = 0
-
+        self.forced          = []
+        
     def force(self, asset, task, dateRange):
         """Force an asset to be scheduled for specified task to be performed."""
         self._addToSchedule(asset, task.forceSchedule(dateRange))
-        
-        # Console Output -----------------------------------------------------
-        print "Force Schedule"
-        print "Asset: ", asset.name
-        print "Task:  ", task.name
-        print "Dates: ", dateRange.start, " - ", dateRange.end
-        print "------------------------------------------------------------\n"
-        # --------------------------------------------------------------------
+        self.forced.append({'asset':asset.name,'task':task.name,
+            'start':dateRange.start,'end':dateRange.end})
 
     def add(self, asset, task, date):
         """Add a task to a schedule and return the end date for the task."""
@@ -104,6 +99,25 @@ class Schedule:
                 self._conflictTasks[asset.id][date] = task.conflicts
             else:
                 self._conflictTasks[asset.id][date] = \
-                self._conflictTasks[asset.id][date].union(task.conflicts)
-                
+                self._conflictTasks[asset.id][date].union(task.conflicts)              
+        """Tally manhours."""
         self.totalManhours += task.manhours
+        """Call Google Calendar scheduler."""
+        # self.scheduleCalendar(task,asset)
+
+        
+    def scheduleCalendar(self,task,asset):
+        """Schedule to Google Calendar."""
+        from outputs.Calendar import Calendar
+        cal = Calendar()
+        calendar = cal.Select(asset.name)
+        #start = str.replace(str(task.dateRange.start), "00:00:00", "")
+        #end = str.replace(str(task.dateRange.end), "00:00:00", "")
+        start = task.dateRange.start.strftime('%Y-%m-%dT%H:%M:%S.000Z')
+        end = task.dateRange.end.strftime('%Y-%m-%dT%H:%M:%S.000Z')
+        #print start
+        #print end
+        if start == end:
+            cal.InsertSingleEvent(calendar, task.name, task.name, where=None, start_time=start )
+        else:
+            cal.InsertSingleEvent(calendar, task.name, task.name, where=None, start_time=start, end_time=end)

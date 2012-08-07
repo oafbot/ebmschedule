@@ -34,10 +34,7 @@ class PushToRight:
                         self.bundleSchedule(bundle, asset, input, task)
                     else:
                         self.regularSchedule(asset, task, input)
-        print "\n",                                                                            \
-              "PushToRight", input.schedule.dataSource,                                        \
-              "Manhours:", input.schedule.totalManhours,                                       \
-              " Counts:", self.conflicts
+        self.analysis(input)
 
     def regularSchedule(self, asset, task, input):
         """
@@ -110,14 +107,19 @@ class PushToRight:
             start = task.next(asset, end)
 
     def output(self, asset, task, input, start, end):
-        """Print out the output to the console."""
-        if self.prev != asset.name: print ""
-        print str.ljust(asset.name, 16),                                                       \
-              str.ljust(task.name, 32),                                                        \
-              str.ljust(str.replace(str(start), "00:00:00", ""), 10), "--",                    \
-              str.ljust(str.replace(str(end), "00:00:00", ""), 10)
-        self.prev = asset.name
-            
+        """Print out the scheduling output to the console."""
+        import main #if input.trace:        
+        main.outputs.output.printSchedule(self, asset, task, start, end) 
+
+    def analysis(self,input):
+        """Print out the cost analysis for the algorithm."""
+        print "\n",                                                                            \
+              "PushToRight", input.schedule.dataSource,                                        \
+              "Manhours:", input.schedule.totalManhours,                                       \
+              " Counts:", self.conflicts
+
+
+
 # TODO: 
 # No Maintenance Period
 # planned usage
@@ -127,6 +129,4 @@ class PushToRight:
 # schedule precision
 # order tasks by largest size / availability
 
-# prerequisite separate interval
-
-# Form 1099
+# prerequisite separate interval?

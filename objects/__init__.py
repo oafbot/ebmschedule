@@ -1,5 +1,4 @@
-class Asset:
-    
+class Asset:    
     def __init__(self, id, name, start):
         self.id    = id
         self.name  = name
@@ -12,8 +11,7 @@ class Asset:
         return False
 
 
-class Skill:
-    
+class Skill:    
     def __init__(self, id, name, available, hoursPerDay):
         self.id             = id
         self.name           = name
@@ -26,8 +24,7 @@ class Skill:
         return deepcopy(self)
 
 
-class Manpower:
-    
+class Manpower:    
     def __init__(self, id, skill, hours):
         self.id    = id
         self.skill = skill

@@ -15,10 +15,10 @@ class Task:
         self.concur              = set(concur)
         self.locked              = False
         self.hoursPerDay         = 8
-        self.skills              = [] #init value
-        self.days                = 0  #init value
-        self.manhours            = 0  #init value
-        self.totalAvailableHours = 0  #init value
+        self.skills              = []
+        self.days                = 0
+        self.manhours            = 0
+        self.totalAvailableHours = 0
         
         if len(manpowers): self.precal() #TODO: Should come from sequencing
         
