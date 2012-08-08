@@ -1,6 +1,6 @@
 class Schedule:
     
-    def __init__(self, dataSource, dateRange, maxAssetsInWork):        
+    def __init__(self, dataSource, dateRange, maxAssetsInWork):
         self.dataSource      = dataSource
         self.dateRange       = dateRange
         self.maxAssetsInWork = maxAssetsInWork        
@@ -10,7 +10,8 @@ class Schedule:
         self._scheduledTasks = {}   # assets >> date >> tasks
         self._conflictTasks  = {}   # assets >> date >> conflicts
         self.totalManhours   = 0
-        self.forced          = []
+        self.forced          = []        
+        self.cal             = None
         
     def force(self, asset, task, dateRange):
         """Force an asset to be scheduled for specified task to be performed."""
@@ -56,10 +57,12 @@ class Schedule:
         return False
 
     def last(self, asset, task):
-        """Last time task was performed on the asset. Return end date."""
+        """Last time task was performed on the asset. Return end date."""            
         if asset.id in self._schedule.keys():
             for _task in self._schedule[asset.id]:
                 if _task.id == task.id:
+                    if _task.bundled:
+                        return self.dateRange.start
                     return _task.dateRange.end
     
     def _addToSchedule(self, asset, task):        
@@ -91,7 +94,7 @@ class Schedule:
                 self._scheduledTasks[asset.id][date] = [task.id]
             else:
                 self._scheduledTasks[asset.id][date].append(task.id)
- 
+
             if asset.id not in self._conflictTasks.keys():
                 """Assign conflict to list of conflicts.""" 
                 self._conflictTasks[asset.id] = { date: task.conflicts }
@@ -99,25 +102,25 @@ class Schedule:
                 self._conflictTasks[asset.id][date] = task.conflicts
             else:
                 self._conflictTasks[asset.id][date] = \
-                self._conflictTasks[asset.id][date].union(task.conflicts)              
+                self._conflictTasks[asset.id][date].union(task.conflicts)
         """Tally manhours."""
         self.totalManhours += task.manhours
         """Call Google Calendar scheduler."""
         # self.scheduleCalendar(task,asset)
 
-        
+
     def scheduleCalendar(self,task,asset):
         """Schedule to Google Calendar."""
         from outputs.Calendar import Calendar
-        cal = Calendar()
-        calendar = cal.Select(asset.name)
-        #start = str.replace(str(task.dateRange.start), "00:00:00", "")
-        #end = str.replace(str(task.dateRange.end), "00:00:00", "")
+        if not self.cal: self.cal = Calendar()
+
+        calendar = self.cal.Select(asset.name)
         start = task.dateRange.start.strftime('%Y-%m-%dT%H:%M:%S.000Z')
         end = task.dateRange.end.strftime('%Y-%m-%dT%H:%M:%S.000Z')
-        #print start
-        #print end
+
         if start == end:
-            cal.InsertSingleEvent(calendar, task.name, task.name, where=None, start_time=start )
+            self.cal.InsertSingleEvent(calendar, task.name, task.name, None, start)
+            #self.cal.InsertEvents(calendar, task.name, task.name, None, start)
         else:
-            cal.InsertSingleEvent(calendar, task.name, task.name, where=None, start_time=start, end_time=end)
+            self.cal.InsertSingleEvent(calendar, task.name, task.name, None, start, end)
+            #self.cal.InsertEvents(calendar, task.name, task.name, None, start, end)

@@ -17,13 +17,13 @@ class PushToRight:
                 (weight * ((task.manhours / (task.totalAvailableHours *1.0)) 
                 if task.totalAvailableHours else 0)) + 
                 ((1-weight) * (len(task.conflicts) / (totalTasks *1.0)))
-            ), 
+            ),
             reverse=True)
-                    
-        for asset in input.assets:        
+
+        for asset in input.assets:
             for task in input.tasks:
                 if(task.interval):
-                    """ 
+                    """
                     If the task is to be performed at a set interval,
                     Set the new start date to the later of either:
                       A. The last time a task was performed on a given asset
@@ -34,6 +34,7 @@ class PushToRight:
                         self.bundleSchedule(bundle, asset, input, task)
                     else:
                         self.regularSchedule(asset, task, input)
+        # input.schedule.cal.PushBatchRequest()
         self.analysis(input)
 
     def regularSchedule(self, asset, task, input):
@@ -45,6 +46,7 @@ class PushToRight:
         from datetime import timedelta
         start = task.next(asset, input.schedule.last(asset, task))
         start = max(start, input.schedule.dateRange.start)
+        #start = input.schedule.dateRange.start
         
         while(start <= input.schedule.dateRange.end):
             while(input.schedule.blocked(asset, task, start)):
@@ -53,7 +55,7 @@ class PushToRight:
             end = input.schedule.add(asset, task, start) # Add to schedule
             self.output(asset, task, input, start, end)
             start = task.next(asset, end)
-    
+
     def bundleSchedule(self, bundle, asset, input, task):        
         """
         Schedule bundled tasks.
@@ -66,7 +68,8 @@ class PushToRight:
         bundled_task = task.bundleAsTask(bundle, asset)
         start = task.next(asset, input.schedule.last(asset, task))
         start = max(start, input.schedule.dateRange.start)        
-        
+        #start = input.schedule.dateRange.start
+                
         while(start <= input.schedule.dateRange.end):
             while(input.schedule.blocked(asset, bundled_task, start)):
                 start += timedelta(days=1)

@@ -19,6 +19,7 @@ class Task:
         self.days                = 0
         self.manhours            = 0
         self.totalAvailableHours = 0
+        self.bundled             = False # Ugly hack, but will have to do
         
         if len(manpowers): self.precal() #TODO: Should come from sequencing
         
@@ -106,7 +107,9 @@ class Task:
         """Find the task associated with the requisite id."""
         for t in input.tasks:
             for r in self.prereq:
-                if t.id == r: requirelist.append(t)
+                if t.id == r: 
+                    t.bundled = True # Ugly hack, but will have to do given the original code
+                    requirelist.append(t)
         """For every requirement, find out if it has been performed within the interval."""
         for require in requirelist:
             if input.schedule.last(asset, require) == None or (
@@ -126,7 +129,9 @@ class Task:
         
         for t in input.tasks:
             for c in self.concur:
-                if t.id == c: concurlist.append(t)
+                if t.id == c: 
+                    t.bundled = True # Ugly hack, but will have to do given the original code
+                    concurlist.append(t)
         """Check if tasks are already in the Bundle."""
         for concurrent in concurlist:            
             if concurrent in bundle: tasks_set = True 
@@ -174,3 +179,6 @@ class Task:
         days = total / task.hoursPerDay
         return Task(0, "Bundle: "+name, 1, threshold, interval, mp, cf, 
                    list(), list(), list(), list())
+                   
+    def withinInterval():
+        pass

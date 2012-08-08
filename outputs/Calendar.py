@@ -6,7 +6,6 @@ import gdata.calendar.service
 import gdata.service
 import atom.service
 import gdata.calendar
-# import gdata.calendar.data
 import atom
 import getopt
 import sys
@@ -16,20 +15,29 @@ sys.path.append( '../' )
 from inputs.Config import Config
 
 class Calendar:
-    """Class for scheduling to Google Calendars."""
+    """
+    Class for scheduling to Google Calendars.
+    Requires Google Data Service Client Library.
+    ------------------------------------------------------------------------------
+    Download:           http://code.google.com/p/google-api-python-client/
+    Setup Instructions: https://developers.google.com/google-apps/calendar/setup
+    Documentation:      https://developers.google.com/google-apps/calendar/       
+    """
+    
     def __init__(self):                
+        """Instantiate a Calendar Object. Log into Google Calendar"""
         self.calendar_service = gdata.calendar.service.CalendarService()
         self.config = Config()
         self.calendar_service.email = self.config.gmail
         self.calendar_service.password = self.config.password
         self.calendar_service.source = 'EBM-Scheduler'
         self.calendar_service.ProgrammaticLogin()
-
+        self.feed = gdata.calendar.CalendarEventFeed()
+        self.batch = 0
+        
         #self.PrintOwnCalendars()
         #cal = self.Select("EBM")
-        #self.InsertSingleEvent(cal, "test", "test text", where=None, start_time=None, end_time=None)
         #self.SelectEvent(self.Select("EBM"),'test')
-        #self.DeleteAll()
         
     def Select(self, name):
         """Select a calendar by name and assign to """
@@ -64,16 +72,16 @@ class Calendar:
         for i, a_calendar in enumerate(feed.entry):
             print '\t%s. %s' % (i, a_calendar.title.text,)
             
-    def NewCalendar(self):
+    def NewCalendar(self, title, summary, location, color='#2952A3', tz='America/New_York'):
         """Create a new Calendar."""
         calendar = gdata.calendar.CalendarListEntry()
-        calendar.title = atom.Title(text='Little League Schedule')
-        calendar.summary = atom.Summary(text='This calendar contains practice and game times')
-        calendar.where = gdata.calendar.Where(value_string='Oakland')
-        calendar.color = gdata.calendar.Color(value='#2952A3')
-        calendar.timezone = gdata.calendar.Timezone(value='America/Los_Angeles')
-        calendar.hidden = gdata.calendar.Hidden(value='false')
-
+        calendar.title = atom.Title(text=title)
+        calendar.summary = atom.Summary(text=summary)
+        calendar.where = gdata.calendar.Where(value_string=location)
+        calendar.color = gdata.calendar.Color(value=color)
+        calendar.timezone = gdata.calendar.Timezone(value=tz)
+        #calendar.hidden = gdata.calendar.Hidden(value='false')
+        print "Creating calendar: " + title
         new_calendar = self.calendar_service.InsertCalendar(new_calendar=calendar)
     
     def UpdateCalendar(self, calendar, name, color='#B1365F'):
@@ -83,9 +91,11 @@ class Calendar:
         updated_calendar = self.calendar_service.UpdateCalendar(calendar=calendar)
 
     def DeleteCalendar(self, calendar):
+        """Delete a specific calendar."""
         self.calendar_service.Delete(calendar.GetEditLink().href)
     
     def DeleteAll(self):
+        """Delete all events and calendars."""
         feed = self.calendar_service.GetOwnCalendarsFeed()
         for entry in feed.entry:
             if entry.title.text != "Default":
@@ -94,6 +104,7 @@ class Calendar:
         
     def InsertSingleEvent(self, calendar, title, content, 
                           where=None, start_time=None, end_time=None):
+        """Insert a single event."""
         event = gdata.calendar.CalendarEventEntry()
         event.title = atom.Title(text=title)
         event.content = atom.Content(text=content)
@@ -106,18 +117,37 @@ class Calendar:
         event.when.append(gdata.calendar.When(start_time=start_time, end_time=end_time))
         
         new_event = self.calendar_service.InsertEvent(event, calendar.content.src)        
-        # self.calendar_service.InsertEvent(event, '/calendar/feeds/default/private/full')
-        # print 'New single event inserted: %s' % (new_event.id.text,)
+        # print 'Event inserted: %s' % (new_event.id.text,)
         # print '\tEvent edit URL: %s' % (new_event.GetEditLink().href,)
         # print '\tEvent HTML URL: %s' % (new_event.GetHtmlLink().href,)
-
+        
         return new_event
 
     def DeleteEvent(self, event):
+        """Delete a specific event."""
         self.calendar_service.DeleteEvent(event.GetEditLink().href)
 
-
-
+    def InsertEvents(self, calendar, title, content, where=None, start_time=None, end_time=None):
+        """
+        Insert multiple events in a batch operation.
+        -----------------------------------------------------------------------------------
+        Google's Documentation on batch requests: 
+        https://developers.google.com/google-apps/calendar/v1/developers_guide_python#batch
+        """
+        insert = gdata.calendar.CalendarEventEntry()
+        insert.title = atom.Title(text=title)
+        insert.content = atom.Content(text=content)
+        insert.when.append(gdata.calendar.When(start_time=start_time, end_time=end_time))
+        insert.batch_id = gdata.BatchId(text='insert-request')
+        self.feed.AddInsert(entry=insert)
+        self.batch += 1
+        if self.batch > 49: self.PushBatchRequest()
+        
+    def PushBatchRequest(self):
+        # submit the batch request to the server
+        response_feed = self.calendar_service.ExecuteBatch(self.feed, 
+                        gdata.calendar.service.DEFAULT_BATCH_URL)
+        self.batch = 0
 
 #Calendar()
 
