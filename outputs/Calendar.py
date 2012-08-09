@@ -141,12 +141,11 @@ class Calendar:
         insert.batch_id = gdata.BatchId(text='insert-request')
         self.feed.AddInsert(entry=insert)
         self.batch += 1
-        if self.batch > 49: self.PushBatchRequest()
+        if self.batch > 49: self.PushBatchRequest(calendar)
         
-    def PushBatchRequest(self):
+    def PushBatchRequest(self, calendar):
         # submit the batch request to the server
-        response_feed = self.calendar_service.ExecuteBatch(self.feed, 
-                        gdata.calendar.service.DEFAULT_BATCH_URL)
+        response_feed = self.calendar_service.ExecuteBatch(self.feed, calendar.content.src + u'/batch')
         self.batch = 0
 
 #Calendar()

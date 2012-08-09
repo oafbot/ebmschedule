@@ -52,6 +52,10 @@ class PushToRight:
             while(input.schedule.blocked(asset, task, start)):
                 start += timedelta(days=1) # Shift to the right one day when blocked
                 self.conflicts += 1
+            while(task.withinInterval(input.schedule, asset, task, start)):
+                # print "pushing: "+ str(start)
+                start += timedelta(days=1)
+                self.conflicts += 1
             end = input.schedule.add(asset, task, start) # Add to schedule
             self.output(asset, task, input, start, end)
             start = task.next(asset, end)
@@ -74,7 +78,10 @@ class PushToRight:
             while(input.schedule.blocked(asset, bundled_task, start)):
                 start += timedelta(days=1)
                 self.conflicts += 1
-            
+            while(task.withinInterval(input.schedule, asset, task, start)):
+                # print "pushing: "+ str(start)
+                start += timedelta(days=1)
+                self.conflicts += 1
             remainder_hours = 0            # The hours carried over from the preceding task
             maxhours = task.hoursPerDay    # The work hours in a day
             longest = 0                    # The task that takes the longest to perform

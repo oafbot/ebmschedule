@@ -1,3 +1,4 @@
+from datetime import timedelta
 class Task:
     
     def __init__(self, id, name, unit, threshold, interval, manpowers, 
@@ -20,6 +21,8 @@ class Task:
         self.manhours            = 0
         self.totalAvailableHours = 0
         self.bundled             = False # Ugly hack, but will have to do
+        self.interval_first_run  = False
+        self.relax               = timedelta(days=2)
         
         if len(manpowers): self.precal() #TODO: Should come from sequencing
         
@@ -109,19 +112,17 @@ class Task:
             for r in self.prereq:
                 if t.id == r: 
                     t.bundled = True # Ugly hack, but will have to do given the original code
+                    self.interval_first_run = True
+                    input.schedule._asyncTasks[asset.id] = {t.id : start}
                     requirelist.append(t)
         """For every requirement, find out if it has been performed within the interval."""
         for require in requirelist:
-            if input.schedule.last(asset, require) == None or (
-               input.schedule.last(asset, require) + timedelta(days=require.interval) <= start 
-               and input.schedule.last(asset, require) >= 
-               require.end(start) + timedelta(days=require.interval)
-            ): bundle = self.bundle(bundle, self.prereq, asset, input)
+            if not self.withinInterval(input.schedule, asset, require, start):
+                bundle = self.bundle(bundle, self.prereq, asset, input)
         return bundle             
     
     def concurrence(self, bundle, asset, input):
         """Negotiate the appropriate scheduling for concurrent tasks."""
-        from datetime import timedelta
         start = self.next(asset, input.schedule.last(asset, self))
         start = max(start, input.schedule.dateRange.start)
         concurlist = []
@@ -131,6 +132,8 @@ class Task:
             for c in self.concur:
                 if t.id == c: 
                     t.bundled = True # Ugly hack, but will have to do given the original code
+                    self.interval_first_run = True
+                    input.schedule._asyncTasks[asset.id] = {t.id : start}
                     concurlist.append(t)
         """Check if tasks are already in the Bundle."""
         for concurrent in concurlist:            
@@ -141,12 +144,8 @@ class Task:
             if tasks_set and self in bundle:
                 return bundle
             """If no prior scheduling or scheduled prior to interval."""
-            if input.schedule.last(asset, concurrent) == None or (
-               input.schedule.last(asset, concurrent) + 
-               timedelta(days=concurrent.interval) <= start and
-               input.schedule.last(asset, concurrent) > 
-               concurrent.end(start) + timedelta(days=concurrent.interval)
-            ): bundle = self.bundle(bundle, self.concur, asset, input)
+            if not self.withinInterval(input.schedule, asset, concurrent, start):
+                bundle = self.bundle(bundle, self.concur, asset, input)
         return bundle
         
     def bundle(self, bundle, tasks, asset, input):
@@ -180,5 +179,28 @@ class Task:
         return Task(0, "Bundle: "+name, 1, threshold, interval, mp, cf, 
                    list(), list(), list(), list())
                    
-    def withinInterval():
-        pass
+    def withinInterval(self, schedule, asset, task, start):
+        """
+        If last is not set or
+        if last is earlier than start minus interval and
+        if last is later than end plus interval
+        """
+        import math
+        interval = timedelta(days=task.interval)
+        end = task.end(start)
+        date = None
+        
+        for _task in schedule._asyncTasks[asset.id]:
+            if _task == task.id:            
+                date = schedule._asyncTasks[asset.id][_task]
+        if start == date and self.interval_first_run: 
+            self.interval_first_run = False
+            return False
+        # elif date and start > date:
+        #     date = schedule.last(asset,task)
+        if not date: return False
+        elif (start > date) and (start - interval > date): return False
+        elif (start < date) and (end   + interval < date + self.relax): return False
+        return True
+        
+        

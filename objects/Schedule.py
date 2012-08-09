@@ -9,9 +9,11 @@ class Schedule:
         self._skillsInWork   = {}   # date   >> skills
         self._scheduledTasks = {}   # assets >> date >> tasks
         self._conflictTasks  = {}   # assets >> date >> conflicts
+        self._asyncTasks     = {}   # assets >> date >> tasks
         self.totalManhours   = 0
         self.forced          = []        
         self.cal             = None
+        # self.previous_asset  = None
         
     def force(self, asset, task, dateRange):
         """Force an asset to be scheduled for specified task to be performed."""
@@ -54,6 +56,9 @@ class Schedule:
                 date in self._conflictTasks[asset.id].keys() and \
                 task.id in self._conflictTasks[asset.id][date]:
                 return True
+                
+            # if task.withinInterval(self, asset, task, date):
+            #     return True                               
         return False
 
     def last(self, asset, task):
@@ -61,21 +66,20 @@ class Schedule:
         if asset.id in self._schedule.keys():
             for _task in self._schedule[asset.id]:
                 if _task.id == task.id:
-                    if _task.bundled:
-                        return self.dateRange.start
-                    return _task.dateRange.end
-    
-    def _addToSchedule(self, asset, task):        
+                    if _task.bundled: pass # <--- Ugly hack. 
+                    else: return _task.dateRange.end
+                    
+    def _addToSchedule(self, asset, task):
         """Add a task to an asset in the schedule."""
-        if asset.id not in self._schedule: 
+        if asset.id not in self._schedule:
             self._schedule[asset.id] = []
         self._schedule[asset.id].append(task)
         
-        for date in task.dateRange.range():            
+        for date in task.dateRange.range():
             """Assign asset to the date."""
-            if date not in self._assetsInWork.keys(): 
+            if date not in self._assetsInWork.keys():
                 self._assetsInWork[date] = [asset.id]
-            elif asset.id not in self._assetsInWork[date]: 
+            elif asset.id not in self._assetsInWork[date]:
                 self._assetsInWork[date].append(asset.id)
                
             for skill in task.skills:
@@ -113,14 +117,21 @@ class Schedule:
         """Schedule to Google Calendar."""
         from outputs.Calendar import Calendar
         if not self.cal: self.cal = Calendar()
-
+        #if not self.previous_asset: self.previous_asset = asset.name
         calendar = self.cal.Select(asset.name)
         start = task.dateRange.start.strftime('%Y-%m-%dT%H:%M:%S.000Z')
         end = task.dateRange.end.strftime('%Y-%m-%dT%H:%M:%S.000Z')
 
         if start == end:
             self.cal.InsertSingleEvent(calendar, task.name, task.name, None, start)
-            #self.cal.InsertEvents(calendar, task.name, task.name, None, start)
+            # if asset.name == self.previous_asset:
+            #     self.cal.InsertEvents(calendar, task.name, task.name, None, start)
+            # else:
+            #     self.cal.PushBatchRequest(calendar)
         else:
             self.cal.InsertSingleEvent(calendar, task.name, task.name, None, start, end)
-            #self.cal.InsertEvents(calendar, task.name, task.name, None, start, end)
+        #     if asset.name == self.previous_asset:    
+        #         self.cal.InsertEvents(calendar, task.name, task.name, None, start, end)
+        #     else:
+        #         self.cal.PushBatchRequest(calendar)
+        # self.previous_asset = asset.name
