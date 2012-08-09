@@ -2,7 +2,7 @@ from datetime import timedelta
 class Task:
     
     def __init__(self, id, name, unit, threshold, interval, manpowers, 
-                 conflicts, prep, prereq, subseq, concur):                                 
+                 conflicts, prep, prereq, subseq, concur):
         self.id                  = id
         self.name                = name
         self.unit                = unit
@@ -113,7 +113,12 @@ class Task:
                 if t.id == r: 
                     t.bundled = True # Ugly hack, but will have to do given the original code
                     self.interval_first_run = True
-                    input.schedule._asyncTasks[asset.id] = {t.id : start}
+                    if asset.id not in input.schedule._asyncTasks:
+                        input.schedule._asyncTasks[asset.id] = {}
+                    if t.id not in input.schedule._asyncTasks[asset.id]:
+                        input.schedule._asyncTasks[asset.id][t.id] = []
+                    if input.schedule._asyncTasks[asset.id][t.id] != start:
+                        input.schedule._asyncTasks[asset.id][t.id]=start
                     requirelist.append(t)
         """For every requirement, find out if it has been performed within the interval."""
         for require in requirelist:
@@ -133,7 +138,12 @@ class Task:
                 if t.id == c: 
                     t.bundled = True # Ugly hack, but will have to do given the original code
                     self.interval_first_run = True
-                    input.schedule._asyncTasks[asset.id] = {t.id : start}
+                    if asset.id not in input.schedule._asyncTasks:
+                        input.schedule._asyncTasks[asset.id] = {}
+                    if t.id not in input.schedule._asyncTasks[asset.id]:
+                        input.schedule._asyncTasks[asset.id][t.id] = []
+                    if input.schedule._asyncTasks[asset.id][t.id] != start:
+                        input.schedule._asyncTasks[asset.id][t.id] = start
                     concurlist.append(t)
         """Check if tasks are already in the Bundle."""
         for concurrent in concurlist:            
@@ -185,19 +195,18 @@ class Task:
         if last is earlier than start minus interval and
         if last is later than end plus interval
         """
-        import math
         interval = timedelta(days=task.interval)
         end = task.end(start)
         date = None
-        
         for _task in schedule._asyncTasks[asset.id]:
             if _task == task.id:            
                 date = schedule._asyncTasks[asset.id][_task]
         if start == date and self.interval_first_run: 
             self.interval_first_run = False
-            return False
-        # elif date and start > date:
-        #     date = schedule.last(asset,task)
+            return False        
+        # elif date and start >= date:
+        #     # date = schedule.last(asset,task)
+        #     schedule._asyncTasks[asset.id][_task] = end
         if not date: return False
         elif (start > date) and (start - interval > date): return False
         elif (start < date) and (end   + interval < date + self.relax): return False

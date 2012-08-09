@@ -127,6 +127,8 @@ class PushToRight:
               "PushToRight", input.schedule.dataSource,                                        \
               "Manhours:", input.schedule.totalManhours,                                       \
               " Counts:", self.conflicts
+        import pprint
+        pprint.pprint(input.schedule._asyncTasks)
 
 
 
