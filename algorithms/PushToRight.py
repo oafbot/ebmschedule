@@ -1,3 +1,4 @@
+from datetime import timedelta
 class PushToRight:
     
     def __init__(self, input):
@@ -29,25 +30,22 @@ class PushToRight:
                       A. The last time a task was performed on a given asset
                       B. The start date of the given date range.
                     """
-                    bundle = task.checkConstraints(list(), asset, input)
+                    start = task.next(asset, input.schedule.last(asset, task))
+                    start = max(start, input.schedule.dateRange.start)
+                    bundle = task.checkConstraints(list(), asset, input, start)
                     if len(bundle) > 1:
-                        self.bundleSchedule(bundle, asset, input, task)
+                        self.bundleSchedule(bundle, asset, input, task, start)
                     else:
-                        self.regularSchedule(asset, task, input)
+                        self.regularSchedule(asset, task, input, start)
         # input.schedule.cal.PushBatchRequest()
         self.analysis(input)
 
-    def regularSchedule(self, asset, task, input):
+    def regularSchedule(self, asset, task, input, start):
         """
         Schedule single tasks.
         While the start date is within the date range,
         Keep Shifting one day forward as long as a schedule conflict exists.
         """
-        from datetime import timedelta
-        start = task.next(asset, input.schedule.last(asset, task))
-        start = max(start, input.schedule.dateRange.start)
-        #start = input.schedule.dateRange.start
-        
         while(start <= input.schedule.dateRange.end):
             while(input.schedule.blocked(asset, task, start)):
                 start += timedelta(days=1) # Shift to the right one day when blocked
@@ -60,7 +58,7 @@ class PushToRight:
             self.output(asset, task, input, start, end)
             start = task.next(asset, end)
 
-    def bundleSchedule(self, bundle, asset, input, task):        
+    def bundleSchedule(self, bundle, asset, input, task, start):        
         """
         Schedule bundled tasks.
         While the start date is within the date range,
@@ -68,11 +66,7 @@ class PushToRight:
         Check against the length of the entire bundle of tasks.
         Schedule individual tasks in consecutive order once an empty slot is found.
         """
-        from datetime import timedelta
-        bundled_task = task.bundleAsTask(bundle, asset)
-        start = task.next(asset, input.schedule.last(asset, task))
-        start = max(start, input.schedule.dateRange.start)        
-        #start = input.schedule.dateRange.start
+        bundled_task = task.bundleAsTask(bundle, asset)     
                 
         while(start <= input.schedule.dateRange.end):
             while(input.schedule.blocked(asset, bundled_task, start)):

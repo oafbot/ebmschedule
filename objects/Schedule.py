@@ -66,6 +66,7 @@ class Schedule:
         if asset.id in self._schedule.keys():
             for _task in self._schedule[asset.id]:
                 if _task.id == task.id:
+                    # print _task.dateRange.end
                     if _task.bundled: pass # <--- Ugly hack. 
                     else: return _task.dateRange.end
                     

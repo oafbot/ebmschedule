@@ -20,6 +20,7 @@ class Task:
         self.days                = 0
         self.manhours            = 0
         self.totalAvailableHours = 0
+        
         self.bundled             = False # Ugly hack, but will have to do
         self.interval_first_run  = False
         self.relax               = timedelta(days=2)
@@ -92,41 +93,43 @@ class Task:
         _task.locked = True
         return _task
     
-    def checkConstraints(self, bundle, asset, input):
+    def checkConstraints(self, bundle, asset, input, start):
         """Check the constrains and bundle tasks together when appropriate."""
-        if self.prereq: self.satisfyRequisite(bundle, asset, input)              # prerequisite
-        if self.prep: bundle = self.bundle(bundle, self.prep, asset, input)      # prepatory
+        if self.prereq: self.satisfyRequisite(bundle, asset, input, start)              # prerequisite
+        if self.prep: bundle = self.bundle(bundle, self.prep, asset, input, start)      # prepatory
         if not bundle or self not in bundle: bundle.append(self)                 # primary task
-        if self.concur: bundle = self.concurrence(bundle, asset, input)          # concurrent
-        if self.subseq: bundle = self.bundle(bundle, self.subseq, asset, input)  # subsequent
+        if self.concur: bundle = self.concurrence(bundle, asset, input, start)          # concurrent
+        if self.subseq: bundle = self.bundle(bundle, self.subseq, asset, input, start)  # subsequent
         return bundle
+
+    def asyncTasksList(self, asset, task, async, start):
+        task.bundled = True # Ugly hack, but will have to do given the original code
+        self.interval_first_run = True
+        if asset.id not in async:
+            async[asset.id] = {}
+        if task.id not in async[asset.id]:
+            async[asset.id][task.id] = []
+        if async[asset.id][task.id] != start:
+            async[asset.id][task.id] = start
     
-    def satisfyRequisite(self, bundle, asset, input):
+    def satisfyRequisite(self, bundle, asset, input, start):
         """Find out if a prerequisite has been satisfied. If not schedule the prerequisite."""
         from datetime import timedelta
-        start = self.next(asset, input.schedule.last(asset, self))
-        start = max(start, input.schedule.dateRange.start)
         requirelist = []
+        
         """Find the task associated with the requisite id."""
         for t in input.tasks:
             for r in self.prereq:
-                if t.id == r: 
-                    t.bundled = True # Ugly hack, but will have to do given the original code
-                    self.interval_first_run = True
-                    if asset.id not in input.schedule._asyncTasks:
-                        input.schedule._asyncTasks[asset.id] = {}
-                    if t.id not in input.schedule._asyncTasks[asset.id]:
-                        input.schedule._asyncTasks[asset.id][t.id] = []
-                    if input.schedule._asyncTasks[asset.id][t.id] != start:
-                        input.schedule._asyncTasks[asset.id][t.id]=start
+                if t.id == r:
+                    self.asyncTasksList(asset, t, input.schedule._asyncTasks, start)
                     requirelist.append(t)
         """For every requirement, find out if it has been performed within the interval."""
         for require in requirelist:
             if not self.withinInterval(input.schedule, asset, require, start):
-                bundle = self.bundle(bundle, self.prereq, asset, input)
+                bundle = self.bundle(bundle, self.prereq, asset, input, start)
         return bundle             
     
-    def concurrence(self, bundle, asset, input):
+    def concurrence(self, bundle, asset, input, start):
         """Negotiate the appropriate scheduling for concurrent tasks."""
         start = self.next(asset, input.schedule.last(asset, self))
         start = max(start, input.schedule.dateRange.start)
@@ -136,14 +139,7 @@ class Task:
         for t in input.tasks:
             for c in self.concur:
                 if t.id == c: 
-                    t.bundled = True # Ugly hack, but will have to do given the original code
-                    self.interval_first_run = True
-                    if asset.id not in input.schedule._asyncTasks:
-                        input.schedule._asyncTasks[asset.id] = {}
-                    if t.id not in input.schedule._asyncTasks[asset.id]:
-                        input.schedule._asyncTasks[asset.id][t.id] = []
-                    if input.schedule._asyncTasks[asset.id][t.id] != start:
-                        input.schedule._asyncTasks[asset.id][t.id] = start
+                    self.asyncTasksList(asset, t, input.schedule._asyncTasks, start)
                     concurlist.append(t)
         """Check if tasks are already in the Bundle."""
         for concurrent in concurlist:            
@@ -155,15 +151,15 @@ class Task:
                 return bundle
             """If no prior scheduling or scheduled prior to interval."""
             if not self.withinInterval(input.schedule, asset, concurrent, start):
-                bundle = self.bundle(bundle, self.concur, asset, input)
+                bundle = self.bundle(bundle, self.concur, asset, input, start)
         return bundle
         
-    def bundle(self, bundle, tasks, asset, input):
+    def bundle(self, bundle, tasks, asset, input, start):
         """Bundle related tasks together."""
         for t in tasks:
             for task in input.tasks:
                 if task.id == t: 
-                    task.checkConstraints(bundle, asset, input)
+                    task.checkConstraints(bundle, asset, input, start)
                     if bundle and task not in bundle: return bundle.append(task)
         return bundle 
 
