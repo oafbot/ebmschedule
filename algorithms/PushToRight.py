@@ -37,6 +37,7 @@ class PushToRight:
                         self.bundleSchedule(bundle, asset, input, task, start)
                     else:
                         self.regularSchedule(asset, task, input, start)
+            input.schedule.processed = []
         # input.schedule.cal.PushBatchRequest()
         self.analytics(input)
 
@@ -62,10 +63,9 @@ class PushToRight:
         Check against the length of the entire bundle of tasks.
         Schedule individual tasks in consecutive order once an empty slot is found.
         """
-        bundled_task = task.bundleAsTask(bundle, asset)
-        task.first_run = True
+        metatask = task.bundleAsTask(bundle, asset)
         while(start <= input.schedule.dateRange.end):
-            while(input.schedule.blocked(asset, bundled_task, start)):
+            while(input.schedule.blocked(asset, metatask, start)):
                 start += timedelta(days=1)
                 self.conflicts += 1
                 # print "push"
@@ -86,23 +86,24 @@ class PushToRight:
                         if manpower.hours > longest: longest = manpower.hours
                 
                     """If the task takes takes longer than the workday, carry over."""
-                    if longest <= maxhours: 
+                    if longest <= maxhours:
                         hours = longest
                         if hours + remainder_hours >= maxhours: overhours = True
                     else: hours = longest % maxhours
                 
                     """Determine the hours remaining on a task that need to be carried over."""
-                    if hours + remainder_hours == maxhours: 
+                    if hours + remainder_hours == maxhours:
                         remainder_hours = 0
-                    elif hours + remainder_hours > maxhours: 
+                    elif hours + remainder_hours > maxhours:
                         remainder_hours = (remainder_hours + hours) - maxhours
-                    else: 
-                        remainder_hours += hours                
+                    else:
+                        remainder_hours += hours
                 
                     """Set the start date. Push to next day if overtime."""
                     if overhours: start = end + timedelta(days=1)
                     else: start = end
-                else: end = start                
+                else: end = start
+                # input.schedule.processed.append(bundle_task.id)
             start = task.next(asset, end)
 
     def output(self, asset, task, input, start, end):

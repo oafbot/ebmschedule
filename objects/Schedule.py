@@ -12,6 +12,7 @@ class Schedule:
         self.totalManhours   = 0
         self.forced          = []        
         self.cal             = None
+        self.processed       = []
         
     def force(self, asset, task, dateRange):
         """Force an asset to be scheduled for specified task to be performed."""
@@ -54,8 +55,8 @@ class Schedule:
                 date in self._conflictTasks[asset.id].keys() and \
                 task.id in self._conflictTasks[asset.id][date]:
                 return True
-            
-            if task.withinInterval(self, asset, date):
+            """If not a metatask check if task falls within the interval."""
+            if task.id != 0 and task.withinInterval(self, asset, date):
                 return True
         return False
     
@@ -64,8 +65,6 @@ class Schedule:
         if asset.id in self._schedule.keys():
             for _task in self._schedule[asset.id]:
                 if _task.id == task.id:
-                    # if _task.bundled:
-                    #     return asset.start # <--- Ugly Hack!!! 
                     return _task.dateRange.end
                     
     def _addToSchedule(self, asset, task):

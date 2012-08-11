@@ -2,7 +2,8 @@ from datetime import timedelta
 class Task:
     
     def __init__(self, id, name, unit, threshold, interval, manpowers, 
-                 conflicts, prep, prereq, subseq, concur):
+                 conflicts=list(), prep=list(), prereq=list(), subseq=list(), concur=list()):
+        
         self.id                  = id
         self.name                = name
         self.unit                = unit
@@ -21,8 +22,8 @@ class Task:
         self.manhours            = 0
         self.totalAvailableHours = 0
         
-        self.bundled             = False # Ugly hack, but will have to do
-        self.concurbundle        = False
+        self.required            = False
+        self.concurrent          = False
         self.first_run           = False
         self.relax               = timedelta(days=2)
         
@@ -40,10 +41,10 @@ class Task:
         #TODO: Add task start/end
         #TODO: Add schedule start/end/active
         if date == None: return self.addDays(asset.start, self.threshold)
-        elif self.bundled and self.first_run: 
+        elif self.required and self.first_run: 
             self.first_run = False
             return asset.start
-        elif self.bundled: return self.addDays(date, self.interval)
+        elif self.required or self.concurrent: return self.addDays(date, self.interval)
         return max(self.addDays(date, self.interval), self.addDays(asset.start, self.threshold))
         # without rebasing it would be: return self.addDays(date, self.interval) 
     
@@ -115,15 +116,15 @@ class Task:
         for t in input.tasks:
             for r in self.prereq:
                 if t.id == r:
-                    t.bundled = True
+                    t.required = True
                     t.first_run = True
                     start = self.next(asset, input.schedule.last(asset, t))
                     start = max(start, input.schedule.dateRange.start)
                     requirelist.append(t)
         """For every requirement, find out if it has been performed within the interval."""
         for require in requirelist:
-            if not require.withinInterval(input.schedule, asset, start):
-                bundle = self.bundle(bundle, self.prereq, asset, input)
+            # if not require.withinInterval(input.schedule, asset, start):
+            bundle = self.bundle(bundle, self.prereq, asset, input)
         return bundle
     
     def concurrence(self, bundle, asset, input):
@@ -134,11 +135,12 @@ class Task:
         for t in input.tasks:
             for c in self.concur:
                 if t.id == c:
-                    t.bundled = True
+                    t.concurrent = True
                     t.first_run = True
                     start = self.next(asset, input.schedule.last(asset, t))
                     start = max(start, input.schedule.dateRange.start)
                     concurlist.append(t)
+                    input.schedule.processed.append(t.id)
         """Check if tasks are already in the Bundle."""
         for concurrent in concurlist:
             if concurrent in bundle: tasks_set = True
@@ -148,8 +150,8 @@ class Task:
             if tasks_set and self in bundle:
                 return bundle
             """If no prior scheduling or scheduled prior to interval."""
-            if not concurrent.withinInterval(input.schedule, asset, start):
-                bundle = self.bundle(bundle, self.concur, asset, input)
+            # if not concurrent.withinInterval(input.schedule, asset, start):                
+            bundle = self.bundle(bundle, self.concur, asset, input)
         return bundle
     
     def bundle(self, bundle, tasks, asset, input):
@@ -161,9 +163,13 @@ class Task:
                     if bundle and task not in bundle: return bundle.append(task)
         return bundle
     
+    def unbundle(self, bundle):
+        bundle = bundle.reverse().remove(self)
+        return bundle.reverse()
+    
     def bundleAsTask(self, bundle, asset):
         """Convert a bundle into a meta-task for running schedule calculations."""
-        from objects.Task import Task
+        # from objects.Task import Task
         total = 0
         mp = []
         cf = []
@@ -179,33 +185,19 @@ class Task:
             if task.threshold > threshold: threshold = task.threshold
             if task.interval > interval: interval = task.interval
         days = total / task.hoursPerDay
-        return Task(0, "Bundle: "+name, 1, threshold, interval, mp, cf, 
-                    list(), list(), list(), list())
+        return Task(0, "Bundle: "+name, 1, threshold, interval, mp, cf)
     
     def withinInterval(self, schedule, asset, start):
         """
         If last is not set or
-        if last is earlier than start minus interval and
+        if last is earlier than start minus interval
         if last is later than end plus interval
         """
         interval = timedelta(days=self.interval)
         end = self.end(start)
         date = schedule.last(asset, self)
+        if self.concurrent and schedule.processed.count(self.id) > 1: return True        
         if not date: return False
-        """Traverse Schedule, find next asynchronously scheduled instance."""
-        # if asset.id in schedule._schedule.keys():
-        #     prev = asset.start
-        #     for task in schedule._schedule[asset.id]:
-        #         if task.id in self.concur:
-        #             """"""
-        #             async = task.dateRange.end
-        #             if async > date + interval:
-        #                 if prev < async:
-        #                     date = async
-        #                 prev = async
-        #                 print interval
-
-        # if date == asset.start: return True
         if (start > date) and (start - interval > date - self.relax): return False
         elif (start < date) and (end   + interval < date + self.relax): return False
         return True

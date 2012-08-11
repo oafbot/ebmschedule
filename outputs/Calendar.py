@@ -35,14 +35,12 @@ class Calendar:
         self.feed = gdata.calendar.CalendarEventFeed()
         self.batch = 0
         
-        #self.PrintOwnCalendars()
-        #cal = self.Select("EBM")
-        #self.SelectEvent(self.Select("EBM"),'test')
+        # self.PrintOwnCalendars()
         # self.DeleteAll()
         # print "..."
-        # self.NewCalendar('E-6B 01', 'E-6B 01', 'VQ-3', '#1B887A', 'America/New_York')
-        # self.NewCalendar('E-6B 02', 'E-6B 01', 'VQ-3', '#BE6D00', 'America/New_York')
-        # self.NewCalendar('E-6B 03', 'E-6B 01', 'VQ-3', '#528800', 'America/New_York')
+        # self.NewCalendar('E-6B 01', 'E-6B 01', 'VQ-3', '#1B887A')
+        # self.NewCalendar('E-6B 02', 'E-6B 01', 'VQ-3', '#BE6D00')
+        # self.NewCalendar('E-6B 03', 'E-6B 01', 'VQ-3', '#528800')
         # print "Done."
         
         
