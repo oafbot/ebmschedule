@@ -169,7 +169,6 @@ class Task:
     
     def bundleAsTask(self, bundle, asset):
         """Convert a bundle into a meta-task for running schedule calculations."""
-        # from objects.Task import Task
         total = 0
         mp = []
         cf = []
@@ -181,11 +180,11 @@ class Task:
                 total += manpower.hours
                 mp += task.manpowers
             cf += task.conflicts
-            name += str(task.id) + " "
+            name += str(task.id) + "-"
             if task.threshold > threshold: threshold = task.threshold
             if task.interval > interval: interval = task.interval
         days = total / task.hoursPerDay
-        return Task(0, "Bundle: "+name, 1, threshold, interval, mp, cf)
+        return Task(0, name, 1, threshold, interval, mp, cf)
     
     def withinInterval(self, schedule, asset, start):
         """

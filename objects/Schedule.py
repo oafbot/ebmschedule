@@ -52,12 +52,19 @@ class Schedule:
                     return True
             
             if  asset.id in self._conflictTasks.keys() and \
-                date in self._conflictTasks[asset.id].keys() and \
-                task.id in self._conflictTasks[asset.id][date]:
-                return True
+                date in self._conflictTasks[asset.id].keys():
+                    if task.id in self._conflictTasks[asset.id][date]:
+                        return True
+                    """Catch outside case where task is a Meta-task."""
+                    if task.id == 0:
+                        meta = task.name.split("-")
+                        for meta_id in meta:
+                            if int(meta_id) in self._conflictTasks[asset.id][date]: return True
+            
             """If not a metatask check if task falls within the interval."""
             if task.id != 0 and task.withinInterval(self, asset, date):
                 return True
+        
         return False
     
     def last(self, asset, task):
@@ -105,19 +112,22 @@ class Schedule:
             else:
                 self._conflictTasks[asset.id][date] = \
                 self._conflictTasks[asset.id][date].union(task.conflicts)
+        
         """Tally manhours."""
         self.totalManhours += task.manhours
         """Call Google Calendar scheduler."""
-        #self.scheduleCalendar(task,asset)
+        # self.scheduleCalendar(task,asset)
     
     def scheduleCalendar(self,task,asset):
         """Schedule to Google Calendar."""
         from outputs.Calendar import Calendar
+        from datetime import timedelta
         if not self.cal: self.cal = Calendar()
         #if not self.previous_asset: self.previous_asset = asset.name
-        calendar = self.cal.Select(asset.name)
+        calendar = self.cal.Select(asset.name)        
         start = task.dateRange.start.strftime('%Y-%m-%dT%H:%M:%S.000Z')
-        end = task.dateRange.end.strftime('%Y-%m-%dT%H:%M:%S.000Z')
+        end = task.dateRange.end + timedelta(minutes=1) #shift time for Google calendar display
+        end = end.strftime('%Y-%m-%dT%H:%M:%S.000Z')
         
         if start == end:
             self.cal.InsertSingleEvent(calendar, task.name, task.name, None, start)
