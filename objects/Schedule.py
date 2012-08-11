@@ -9,24 +9,22 @@ class Schedule:
         self._skillsInWork   = {}   # date   >> skills
         self._scheduledTasks = {}   # assets >> date >> tasks
         self._conflictTasks  = {}   # assets >> date >> conflicts
-        self._asyncTasks     = {}   # assets >> date >> tasks
         self.totalManhours   = 0
         self.forced          = []        
         self.cal             = None
-        # self.previous_asset  = None
         
     def force(self, asset, task, dateRange):
         """Force an asset to be scheduled for specified task to be performed."""
         self._addToSchedule(asset, task.forceSchedule(dateRange))
         self.forced.append({'asset':asset.name,'task':task.name,
             'start':dateRange.start,'end':dateRange.end})
-
+    
     def add(self, asset, task, date):
         """Add a task to a schedule and return the end date for the task."""
         _task = task.schedule(date) #Create scheduled task
         self._addToSchedule(asset, _task)
         return _task.dateRange.end
-
+    
     def blocked(self, asset, task, date):
         """Return true if task can be scheduled on that day."""
         _task = task.schedule(date) #Create scheduled task (prevent threading issues)
@@ -51,24 +49,24 @@ class Schedule:
                     self._skillsInWork[date][skill.id] + \
                         skill.hoursPerDay > skill.availableHours:
                     return True
-
+            
             if  asset.id in self._conflictTasks.keys() and \
                 date in self._conflictTasks[asset.id].keys() and \
                 task.id in self._conflictTasks[asset.id][date]:
                 return True
-                
-            # if task.withinInterval(self, asset, task, date):
-            #     return True                               
+            
+            if task.withinInterval(self, asset, date):
+                return True
         return False
-
+    
     def last(self, asset, task):
-        """Last time task was performed on the asset. Return end date."""            
+        """Last time task was performed on the asset. Return end date."""
         if asset.id in self._schedule.keys():
             for _task in self._schedule[asset.id]:
                 if _task.id == task.id:
-                    # print _task.dateRange.end
-                    if _task.bundled: pass # <--- Ugly hack. 
-                    else: return _task.dateRange.end
+                    # if _task.bundled:
+                    #     return asset.start # <--- Ugly Hack!!! 
+                    return _task.dateRange.end
                     
     def _addToSchedule(self, asset, task):
         """Add a task to an asset in the schedule."""
@@ -82,7 +80,7 @@ class Schedule:
                 self._assetsInWork[date] = [asset.id]
             elif asset.id not in self._assetsInWork[date]:
                 self._assetsInWork[date].append(asset.id)
-               
+            
             for skill in task.skills:
                 """Assign skills to the date."""
                 if date not in self._skillsInWork.keys(): 
@@ -91,7 +89,7 @@ class Schedule:
                     self._skillsInWork[date][skill.id] = skill.hoursPerDay
                 else:
                     self._skillsInWork[date][skill.id] += skill.hoursPerDay
-                    
+            
             if asset.id not in self._scheduledTasks.keys(): 
                 """Assign asset, date, and task to list of scheduled tasks."""
                 self._scheduledTasks[asset.id] = { date: [task.id] }
@@ -99,7 +97,7 @@ class Schedule:
                 self._scheduledTasks[asset.id][date] = [task.id]
             else:
                 self._scheduledTasks[asset.id][date].append(task.id)
-
+            
             if asset.id not in self._conflictTasks.keys():
                 """Assign conflict to list of conflicts.""" 
                 self._conflictTasks[asset.id] = { date: task.conflicts }
@@ -111,9 +109,8 @@ class Schedule:
         """Tally manhours."""
         self.totalManhours += task.manhours
         """Call Google Calendar scheduler."""
-        # self.scheduleCalendar(task,asset)
-
-
+        #self.scheduleCalendar(task,asset)
+    
     def scheduleCalendar(self,task,asset):
         """Schedule to Google Calendar."""
         from outputs.Calendar import Calendar
@@ -122,7 +119,7 @@ class Schedule:
         calendar = self.cal.Select(asset.name)
         start = task.dateRange.start.strftime('%Y-%m-%dT%H:%M:%S.000Z')
         end = task.dateRange.end.strftime('%Y-%m-%dT%H:%M:%S.000Z')
-
+        
         if start == end:
             self.cal.InsertSingleEvent(calendar, task.name, task.name, None, start)
             # if asset.name == self.previous_asset:

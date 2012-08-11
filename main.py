@@ -7,7 +7,7 @@ inputs
 #Run Scheduling Algorithms
 algorithms
 
-#Output 
+#Output
 outputs
 
 #Test Scheduling Output

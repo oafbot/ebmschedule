@@ -38,6 +38,14 @@ class Calendar:
         #self.PrintOwnCalendars()
         #cal = self.Select("EBM")
         #self.SelectEvent(self.Select("EBM"),'test')
+        # self.DeleteAll()
+        # print "..."
+        # self.NewCalendar('E-6B 01', 'E-6B 01', 'VQ-3', '#1B887A', 'America/New_York')
+        # self.NewCalendar('E-6B 02', 'E-6B 01', 'VQ-3', '#BE6D00', 'America/New_York')
+        # self.NewCalendar('E-6B 03', 'E-6B 01', 'VQ-3', '#528800', 'America/New_York')
+        # print "Done."
+        
+        
         
     def Select(self, name):
         """Select a calendar by name and assign to """
@@ -80,7 +88,7 @@ class Calendar:
         calendar.where = gdata.calendar.Where(value_string=location)
         calendar.color = gdata.calendar.Color(value=color)
         calendar.timezone = gdata.calendar.Timezone(value=tz)
-        #calendar.hidden = gdata.calendar.Hidden(value='false')
+        calendar.hidden = gdata.calendar.Hidden(value='false')
         print "Creating calendar: " + title
         new_calendar = self.calendar_service.InsertCalendar(new_calendar=calendar)
     
