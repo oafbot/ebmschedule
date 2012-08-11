@@ -1,4 +1,5 @@
 from datetime import timedelta
+import main
 class PushToRight:
     
     def __init__(self, input):
@@ -107,8 +108,7 @@ class PushToRight:
             start = task.next(asset, end)
 
     def output(self, asset, task, input, start, end):
-        """Print out the scheduling output to the console."""
-        import main #if input.trace:        
+        """Print out the scheduling output to the console."""       
         main.outputs.output.printSchedule(self, asset, task, start, end) 
 
     def analytics(self,input):
@@ -117,6 +117,7 @@ class PushToRight:
               "PushToRight", input.schedule.dataSource,                                        \
               "Manhours:", input.schedule.totalManhours,                                       \
               " Counts:", self.conflicts
+        # main.outputs.output.writeMetrics(input, self.conflicts)
 
 
 

@@ -127,3 +127,16 @@ class Output:
                   str.ljust(str.replace(str(start), "00:00:00", ""), 10), "--",                \
                   str.ljust(str.replace(str(end), "00:00:00", ""), 10)
             algorithm.prev = asset.name
+    
+    def writeMetrics(self, input, conflicts):
+        import os
+        if 'tools' in os.getcwd():
+            path = "../metrics/"
+        else: 
+            path = "metrics/"
+        fo = open(path + input.schedule.dataSource + ".txt", "ab+")
+        out = "PushToRight: " + input.schedule.dataSource + ", Manhours: " +                   \
+              str(input.schedule.totalManhours) + " Counts: " + str(conflicts) + "\n"
+
+        fo.write( out )
+        fo.close()

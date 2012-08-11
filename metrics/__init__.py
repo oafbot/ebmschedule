@@ -1,4 +1,4 @@
 # import main
+# from Metrics import Metrics
 # 
-# for input in main.inputs.inputs:
-#    print input.schedule.dataSource, "Manhours:", input.schedule.totalManhours, " ",
+# metrics = Metrics()

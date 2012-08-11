@@ -58,6 +58,8 @@ class Schedule:
                     """Catch outside case where task is a Meta-task."""
                     if task.id == 0:
                         meta = task.name.split("-")
+                        while '' in meta:
+                            meta.remove('')
                         for meta_id in meta:
                             if int(meta_id) in self._conflictTasks[asset.id][date]: return True
             

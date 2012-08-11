@@ -1,0 +1,37 @@
+-- 40 Days --
+PushToRight: Simple-Model, Manhours: 926 Counts: 36
+PushToRight: Simple-Model, Manhours: 917 Counts: 61
+PushToRight: Simple-Model, Manhours: 916 Counts: 52
+PushToRight: Simple-Model, Manhours: 886 Counts: 44
+PushToRight: Simple-Model, Manhours: 918 Counts: 66
+PushToRight: Simple-Model, Manhours: 917 Counts: 45
+PushToRight: Simple-Model, Manhours: 909 Counts: 49
+PushToRight: Simple-Model, Manhours: 917 Counts: 50
+PushToRight: Simple-Model, Manhours: 903 Counts: 53
+PushToRight: Simple-Model, Manhours: 917 Counts: 45
+PushToRight: Simple-Model, Manhours: 909 Counts: 65
+PushToRight: Simple-Model, Manhours: 910 Counts: 61
+PushToRight: Simple-Model, Manhours: 924 Counts: 51
+PushToRight: Simple-Model, Manhours: 918 Counts: 62
+PushToRight: Simple-Model, Manhours: 910 Counts: 53
+PushToRight: Simple-Model, Manhours: 880 Counts: 67
+PushToRight: Simple-Model, Manhours: 888 Counts: 77
+PushToRight: Simple-Model, Manhours: 886 Counts: 67
+PushToRight: Simple-Model, Manhours: 886 Counts: 36
+PushToRight: Simple-Model, Manhours: 901 Counts: 62
+PushToRight: Simple-Model, Manhours: 916 Counts: 37
+PushToRight: Simple-Model, Manhours: 903 Counts: 40
+PushToRight: Simple-Model, Manhours: 899 Counts: 66
+PushToRight: Simple-Model, Manhours: 903 Counts: 57
+PushToRight: Simple-Model, Manhours: 917 Counts: 51
+PushToRight: Simple-Model, Manhours: 903 Counts: 65
+PushToRight: Simple-Model, Manhours: 903 Counts: 66
+PushToRight: Simple-Model, Manhours: 872 Counts: 55
+PushToRight: Simple-Model, Manhours: 895 Counts: 90
+PushToRight: Simple-Model, Manhours: 901 Counts: 60
+PushToRight: Simple-Model, Manhours: 917 Counts: 43
+
+-- 1 YEAR --
+PushToRight: Simple-Model, Manhours: 5654 Counts: 364
+
+

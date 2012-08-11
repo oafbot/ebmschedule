@@ -1,5 +1,5 @@
 #!/usr/bin/python
-import inputs, algorithms, outputs, tests, metrics
+import inputs, algorithms, outputs
 
 #Load Input Data
 inputs
@@ -13,5 +13,5 @@ outputs
 #Test Scheduling Output
 #tests
 
-#Display Metrics
-#metrics
+# Display Metrics
+# metrics
