@@ -1,17 +1,17 @@
 #!/usr/bin/python
 import inputs, algorithms, outputs
 
-#Load Input Data
+# Load Input Data
 inputs
 
-#Run Scheduling Algorithms
+# Run Scheduling Algorithms
 algorithms
 
-#Output
+# Output
 outputs
 
-#Test Scheduling Output
-#tests
+# Test Scheduling Output
+# tests
 
 # Display Metrics
 # metrics

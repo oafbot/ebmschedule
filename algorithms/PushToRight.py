@@ -7,6 +7,7 @@ class PushToRight:
         totalTasks = len(input.tasks)
         self.conflicts = 0
         self.prev = 0
+        self.name = "PushRight"
         
         """
         Prioritize the tasks that require higher percentage of resources.
@@ -114,7 +115,7 @@ class PushToRight:
     def analytics(self,input):
         """Print out the cost analysis for the algorithm."""
         print "\n",                                                                            \
-              "PushToRight", input.schedule.dataSource,                                        \
+              self.name+":", input.schedule.dataSource,                                        \
               "Manhours:", input.schedule.totalManhours,                                       \
               " Counts:", self.conflicts
         # main.outputs.output.writeMetrics(input, self.conflicts)
