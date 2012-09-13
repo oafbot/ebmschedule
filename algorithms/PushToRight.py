@@ -1,5 +1,6 @@
 from datetime import timedelta
 import main
+
 class PushToRight:
     
     def __init__(self, input):
@@ -22,7 +23,10 @@ class PushToRight:
                 ((1-weight) * (len(task.conflicts) / (totalTasks *1.0)))
             ),
             reverse=True)
-
+        
+        # for t in input.tasks:
+        #     print t.name
+        
         for asset in input.assets:
             for task in input.tasks:
                 if(task.interval):
@@ -42,7 +46,7 @@ class PushToRight:
             input.schedule.processed = []
         # input.schedule.cal.PushBatchRequest()
         self.analytics(input)
-
+    
     def regularSchedule(self, asset, task, input, start):
         """
         Schedule single tasks.
@@ -56,7 +60,7 @@ class PushToRight:
             end = input.schedule.add(asset, task, start) # Add to schedule
             self.output(asset, task, input, start, end)
             start = task.next(asset, end)
-
+    
     def bundleSchedule(self, bundle, asset, input, task, start):
         """
         Schedule bundled tasks.
@@ -107,18 +111,25 @@ class PushToRight:
                 else: end = start
                 # input.schedule.processed.append(bundle_task.id)
             start = task.next(asset, end)
-
+    
     def output(self, asset, task, input, start, end):
         """Print out the scheduling output to the console."""       
+        # from outputs.Output import Output
+        #         out = Output(input)
         main.outputs.output.printSchedule(self, asset, task, start, end) 
-
+    
     def analytics(self,input):
         """Print out the cost analysis for the algorithm."""
+        # from outputs.Output import Output
+        #         out = Output(input)
         print "\n",                                                                            \
               self.name+":", input.schedule.dataSource,                                        \
               "Manhours:", input.schedule.totalManhours,                                       \
               " Counts:", self.conflicts
-        # main.outputs.output.writeMetrics(input, self.conflicts)
+        
+        """Write out metrics to a file."""
+        if(input.conf.metrics):
+            Main.outputs.output.writeMetrics(input, self.conflicts)
 
 
 

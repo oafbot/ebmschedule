@@ -33,5 +33,3 @@ PushToRight: Simple-Model, Manhours: 917 Counts: 43
 
 -- 1 YEAR --
 PushToRight: Simple-Model, Manhours: 5654 Counts: 364
-
-

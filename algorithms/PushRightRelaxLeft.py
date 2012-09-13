@@ -1,5 +1,6 @@
 from datetime import timedelta
 import main
+
 class PushRightRelaxLeft:
     
     def __init__(self, input):
@@ -17,9 +18,9 @@ class PushRightRelaxLeft:
         Divide manhours cost with total available manhours.
         Schedule the complex ( i.e. conflict heavy ) task first.
         """
-        input.tasks.sort(key=lambda task: 
-            (     
-                (weight * ((task.manhours / (task.totalAvailableHours *1.0)) 
+        input.tasks.sort(key=lambda task:
+            (
+                (weight * ((task.manhours / (task.totalAvailableHours *1.0))
                 if task.totalAvailableHours else 0)) + 
                 ((1-weight) * (len(task.conflicts) / (totalTasks *1.0)))
             ),
@@ -131,8 +132,8 @@ class PushRightRelaxLeft:
         return start
     
     def output(self, asset, task, input, start, end):
-        """Print out the scheduling output to the console."""       
-        main.outputs.output.printSchedule(self, asset, task, start, end) 
+        """Print out the scheduling output to the console."""
+        main.outputs.output.printSchedule(self, asset, task, start, end)
 
     def analytics(self,input):
         """Print out the cost analysis for the algorithm."""
@@ -140,4 +141,7 @@ class PushRightRelaxLeft:
               self.name+":", input.schedule.dataSource,                                        \
               "Manhours:", input.schedule.totalManhours,                                       \
               " Counts:", self.conflicts
-        # main.outputs.output.writeMetrics(input, self.conflicts)
+        
+        """Write out metrics to a file."""
+        if(input.conf.metrics):
+            main.outputs.output.writeMetrics(input, self.conflicts)

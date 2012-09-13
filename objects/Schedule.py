@@ -118,19 +118,22 @@ class Schedule:
         """Tally manhours."""
         self.totalManhours += task.manhours
         """Call Google Calendar scheduler."""
-        # self.scheduleCalendar(task,asset)
+        from inputs.Config import Config
+        if(Config().pushcal):
+            self.scheduleCalendar(task,asset)
     
     def scheduleCalendar(self,task,asset):
-        """Schedule to Google Calendar."""
+        """Schedule to Google Calendar."""        
         from outputs.Calendar import Calendar
         from datetime import timedelta
+        
         if not self.cal: self.cal = Calendar()
         #if not self.previous_asset: self.previous_asset = asset.name
         calendar = self.cal.Select(asset.name)        
         start = task.dateRange.start.strftime('%Y-%m-%dT%H:%M:%S.000Z')
         end = task.dateRange.end + timedelta(minutes=1) #shift time for Google calendar display
         end = end.strftime('%Y-%m-%dT%H:%M:%S.000Z')
-        
+    
         if start == end:
             self.cal.InsertSingleEvent(calendar, task.name, task.name, None, start)
             # if asset.name == self.previous_asset:

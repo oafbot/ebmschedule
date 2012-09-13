@@ -124,8 +124,8 @@ class Output:
             if algorithm.prev != asset.name: print ""
             print str.ljust(asset.name, 16),                                                   \
                   str.ljust(task.name, 32),                                                    \
-                  str.ljust(str.replace(str(start), "00:00:00", ""), 10), "--",                \
-                  str.ljust(str.replace(str(end), "00:00:00", ""), 10)
+                  str.ljust(str(start)[:-9], 10), "--",                                        \
+                  str.ljust(str(end)[:-9], 10)
             algorithm.prev = asset.name
     
     def writeMetrics(self, input, conflicts):

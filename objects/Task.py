@@ -195,9 +195,9 @@ class Task:
         interval = timedelta(days=self.interval)
         end = self.end(start)
         date = schedule.last(asset, self)
-        if self.concurrent and schedule.processed.count(self.id) > 1: return True        
+        if self.concurrent and schedule.processed.count(self.id) > 1: return True
         if not date: return False
         if (start > date) and (start - interval > date - self.relax): return False
-        elif (start < date) and (end   + interval < date + self.relax): return False
+        elif (start < date) and (end + interval < date + self.relax): return False
         return True
         

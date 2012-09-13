@@ -1,34 +1,25 @@
+from Config import Config
+from objects import Asset, Skill, Manpower
+from objects.Schedule import Schedule
+from objects.Task import Task
+from objects.DateRange import DateRange
+
+import random
+from random import randrange
+from datetime import timedelta, datetime
+
 class Model:
     
-    def __init__(self):        
-        from datetime import datetime
-        import time
-        from objects import Asset, Skill, Manpower
-        from objects.Schedule import Schedule
-        from objects.Task import Task
-        from objects.DateRange import DateRange
-                
-        self.name = "Simple-Model"
-        
-        self.trace   = False
-        self.bigdata = False
-        
-        self.now   = time.gmtime()
-        self.year  = self.now.tm_year
-        self.month = self.now.tm_mon
-        self.day   = self.now.tm_mday
-                
-        self.endy  = self.year  + 0
-        self.endm  = self.month + 1
-        self.endd  = self.day   + 0
-        
-        self.start = datetime(self.year, self.month, 1)
-        self.end   = datetime(self.endy, self.endm, 10)
-        
-        #---------------------------------------------------------------------------
-        
-        
-        schedule = Schedule(self.name, DateRange(self.start, self.end), 2)
+    def __init__(self):                        
+        self.conf    = Config()
+        self.name    = "Simple-Model"        
+        self.trace   = self.conf.trace
+        self.bigdata = self.conf.bigdata
+        self.start   = self.conf.start
+        self.end     = self.conf.end
+        self.hours   = self.conf.hours
+                        
+        schedule = Schedule(self.name, DateRange(self.start, self.end), self.conf.max)
         
         assets = {
             1: Asset(1, 'E-6B 01', self.start),
@@ -37,10 +28,10 @@ class Model:
         }
 
         skills = {
-            1: Skill(1, 'Electrician', 5, 8),
-            2: Skill(2, 'Mechanic', 10, 8),
-            3: Skill(3, 'Painter', 1, 8),
-            4: Skill(4, 'Misc. Ground Crew', 15, 8)
+            1: Skill(1, 'Electrician', 5, self.hours),
+            2: Skill(2, 'Mechanic', 10, self.hours),
+            3: Skill(3, 'Painter', 1, self.hours),
+            4: Skill(4, 'Misc. Ground Crew', 15, self.hours)
         }
         
         tasks = {
@@ -186,36 +177,41 @@ class Model:
               concur = []
             ),
         }
-        
-        
+                            
         # import random
+        # from datetime import datetime
         # for i, asset in enumerate(assets):
         #     for task in tasks:
         #         date = datetime(2012, 7, random.randrange(1, 30))
         #         schedule.force(assets[asset], tasks[task], DateRange(date, date))
-        # 
+        
         # ---------------------------------------------------------------------------
-        
-        # schedule.force(assets[1], tasks[7], 
-        #             DateRange(datetime(2012, 8, 15), datetime(2012, 8, 15)))
-        
-        # schedule.force(assets[1], tasks[2], 
-        #     DateRange(datetime(2012, 1, 1), datetime(2012, 1, 1)))
-        # 
-        # schedule.force(assets[2], tasks[1], 
-        #     DateRange(datetime(2012, 1, 1), datetime(2012, 1, 1)))
-        # 
-        # schedule.force(assets[2], tasks[2], 
-        #     DateRange(datetime(2012, 1, 1), datetime(2012, 1, 1)))
-        # 
-        # schedule.force(assets[3], tasks[1], 
-        #     DateRange(datetime(2012, 1, 1), datetime(2012, 1, 1)))
-        # 
-        # schedule.force(assets[3], tasks[2], 
-        #     DateRange(datetime(2012, 1, 1), datetime(2012, 1, 1)))
-
 
         self.assets = assets.values()
         self.tasks = tasks.values()
         self.skills = skills.values()
-        self.schedule = schedule
+        # self.schedule = schedule
+        self.schedule = self.initial_conditions(assets, tasks, schedule)
+        
+    def initial_conditions(self, assets, tasks, schedule):
+        """Set initial conditions for when the tasks were last performed."""
+        for i, asset in enumerate(assets):
+            for tid in tasks:
+                task = tasks[tid]
+                if(task.interval > task.threshold):
+                    diff = task.interval
+                else:
+                    diff = task.threshold
+                if(diff != 0):
+                    start = self.start - timedelta(days = diff)
+                    end   = self.start                   
+                    date = self.random_date(start, end)
+                    schedule.force(assets[asset], tasks[tid], DateRange(date, date))
+        return schedule
+        
+    def random_date(self, start, end):
+        """This function will return a random datetime between two datetime objects."""
+        delta = end - start
+        int_delta = (delta.days * 24 * 60 * 60) + delta.seconds
+        random_second = randrange(int_delta)
+        return (start + timedelta(seconds=random_second))        
