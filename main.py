@@ -15,3 +15,14 @@ outputs
 
 # Display Metrics
 # metrics
+
+
+
+# class Main:
+#     def __init__(self):
+# self.inputs = inputs
+# self.algorithms = algorithms
+# self.outputs = outputs
+
+# if __name__ == "__main__":
+#     main = Main()

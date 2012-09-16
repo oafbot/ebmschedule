@@ -14,6 +14,13 @@ import time
 sys.path.append( '../' )
 from inputs.Config import Config
 
+from oauth2client.client import flow_from_clientsecrets
+from oauth2client.client import OAuth2WebServerFlow
+from oauth2client.tools import run
+from oauth2client.file import Storage
+import httplib2
+from apiclient.discovery import build
+
 class Calendar:
     """
     Class for scheduling to Google Calendars.
@@ -26,112 +33,125 @@ class Calendar:
     
     def __init__(self):                
         """Instantiate a Calendar Object. Log into Google Calendar"""
-        self.calendar_service = gdata.calendar.service.CalendarService()
-        self.config = Config()
-        self.calendar_service.email = self.config.gmail
-        self.calendar_service.password = self.config.password
-        self.calendar_service.source = 'EBM-Scheduler'
-        self.calendar_service.ProgrammaticLogin()
-        self.feed = gdata.calendar.CalendarEventFeed()
         self.batch = 0
+        self.config = Config()
+        self.username = self.config.gmail
+        self.flow = OAuth2WebServerFlow(client_id=self.config.CLIENT_ID,
+                                        client_secret=self.config.CLIENT_SECRET,
+                                        scope='https://www.googleapis.com/auth/calendar',
+                                        redirect_uri=self.config.REDIRECT)
+
+        auth_uri = self.flow.step1_get_authorize_url()
+        self.storage = Storage('inputs/credentials.json')
+        self.credentials = self.storage.get()
+
+        if self.credentials is None or self.credentials.invalid == True:
+            self.credentials = run(self.flow, self.storage)
+
+        http = self.credentials.authorize(httplib2.Http())
+        self.service = build('calendar', 'v3', http=http)        
         
+        # self.Select('E-6B 01')
         # self.PrintOwnCalendars()
-        # self.DeleteAll()
-        # print "..."
-        # self.NewCalendar('E-6B 01', 'E-6B 01', 'VQ-3', '#1B887A')
-        # self.NewCalendar('E-6B 02', 'E-6B 01', 'VQ-3', '#BE6D00')
-        # self.NewCalendar('E-6B 03', 'E-6B 01', 'VQ-3', '#528800')
-        # print "Done."
-        
+        # self.DeleteCalendar('E-6B 02')
+        # self.InsertSingleEvent(self.Select('E-6B 01'), 'Test', 'test')
         
         
     def Select(self, name):
         """Select a calendar by name and assign to """
-        feed = self.calendar_service.GetAllCalendarsFeed()
-        for cal in feed.entry:
-            if cal.title.text == name:
-                self.calendar = cal
-                return cal
+        feed = self.service.calendarList().list().execute()
+        for f in feed:
+            item = feed[f]
+            for i in item:
+                if type(i) is dict and i['summary'] == name:
+                    self.calendar = self.service.calendars().get(calendarId=i['id']).execute()
+                    return self.calendar
     
-    def SelectEvent(self, cal, find):
-        feed = self.calendar_service.GetCalendarEventFeed(cal.content.src)
-        #print cal.content.src
-        print 'Events on Primary Calendar: %s' % (feed.title.text,)
-        for i, an_event in enumerate(feed.entry):
-            print '\t%s. %s' % (i, an_event.title.text,)
-            for p, a_participant in enumerate(an_event.who):
-                            print '\t\t%s. %s' % (p, a_participant.email,)
-                            print '\t\t\t%s' % (a_participant.name,)
-                            print '\t\t\t%s' % (a_participant.attendee_status.value,)
+    # def SelectEvent(self, cal, find):
+    #     feed = self.calendar_service.GetCalendarEventFeed(cal.content.src)
+    #     #print cal.content.src
+    #     print 'Events on Primary Calendar: %s' % (feed.title.text,)
+    #     for i, an_event in enumerate(feed.entry):
+    #         print '\t%s. %s' % (i, an_event.title.text,)
+    #         for p, a_participant in enumerate(an_event.who):
+    #                         print '\t\t%s. %s' % (p, a_participant.email,)
+    #                         print '\t\t\t%s' % (a_participant.name,)
+    #                         print '\t\t\t%s' % (a_participant.attendee_status.value,)
         
     def PrintUserCalendars(self):
         """Print all calendars"""
-        feed = self.calendar_service.GetAllCalendarsFeed()
-        print feed.title.text
-        for i, a_calendar in enumerate(feed.entry):
-            print '\t%s. %s' % (i, a_calendar.title.text,)        
+        feed = self.service.calendarList().list().execute()
+        for f in feed:
+            item = feed[f]
+            for i, cal in enumerate(item):
+                if type(cal) is dict:
+                    calendar = self.service.calendars().get(calendarId=cal['id']).execute()
+                    print '\t%s. %s' % (i, calendar['summary'])      
         
     def PrintOwnCalendars(self):
         """Print all calendars"""
-        feed = self.calendar_service.GetOwnCalendarsFeed()
-        print feed.title.text
-        for i, a_calendar in enumerate(feed.entry):
-            print '\t%s. %s' % (i, a_calendar.title.text,)
+        feed = self.service.calendarList().list().execute()
+        for f in feed:
+            item = feed[f]
+            for i, cal in enumerate(item):
+                if type(cal) is dict:
+                    calendar = self.service.calendars().get(calendarId=cal['id']).execute()
+                    print '\t%s. %s' % (i, calendar['summary'])
             
-    def NewCalendar(self, title, summary, location, color='#2952A3', tz='America/New_York'):
+    def NewCalendar(self, summary, description, location, color='#2952A3', tz='America/New_York'):
         """Create a new Calendar."""
-        calendar = gdata.calendar.CalendarListEntry()
-        calendar.title = atom.Title(text=title)
-        calendar.summary = atom.Summary(text=summary)
-        calendar.where = gdata.calendar.Where(value_string=location)
-        calendar.color = gdata.calendar.Color(value=color)
-        calendar.timezone = gdata.calendar.Timezone(value=tz)
-        calendar.hidden = gdata.calendar.Hidden(value='false')
-        print "Creating calendar: " + title
-        new_calendar = self.calendar_service.InsertCalendar(new_calendar=calendar)
+        calendar = {
+            'summary': summary,
+            'description': description,
+            'location': location,
+            'color': color,
+            'timeZone': tz
+        }
+        self.service.calendars().insert(body=calendar).execute()
+        print "Creating calendar: " + summary
     
     def UpdateCalendar(self, calendar, name, color='#B1365F'):
         """Update a calendar."""
-        calendar.title = atom.Title(text=name)
-        calendar.color = gdata.calendar.Color(value=color)
-        updated_calendar = self.calendar_service.UpdateCalendar(calendar=calendar)
+        cal = self.Select(calendar)
+        cal['summary'] = name
+        cal['color']  = color
+        self.service.calendars().update(calendarId=calendar['id'], body=calendar).execute()
 
     def DeleteCalendar(self, calendar):
         """Delete a specific calendar."""
-        self.calendar_service.Delete(calendar.GetEditLink().href)
-    
+        id = self.Select(calendar)['id']
+        print "Deleting calendar: " + calendar
+        self.service.calendars().delete(calendarId=id).execute()
+                    
     def DeleteAll(self):
         """Delete all events and calendars."""
-        feed = self.calendar_service.GetOwnCalendarsFeed()
-        for entry in feed.entry:
-            if entry.title.text != "Default":
-                print 'Deleting calendar: %s' % entry.title.text
-                self.calendar_service.Delete(entry.GetEditLink().href)
+        feed = self.service.calendarList().list().execute()
+        for f in feed:
+            item = feed[f]
+            for cal in item:
+                if type(cal) is dict:
+                    if cal['accessRole'] == 'owner' and cal['id'] != self.username:
+                        self.DeleteCalendar(cal['summary'])
         
-    def InsertSingleEvent(self, calendar, title, content, 
+    def InsertSingleEvent(self, calendar, summary, content, 
                           where=None, start_time=None, end_time=None):
         """Insert a single event."""
-        event = gdata.calendar.CalendarEventEntry()
-        event.title = atom.Title(text=title)
-        event.content = atom.Content(text=content)
-        event.where.append(gdata.calendar.Where(value_string=where))
-
         if start_time is None:
             # Use current time for the start_time and have the event last 1 hour
             start_time = time.strftime('%Y-%m-%dT%H:%M:%S.000Z', time.gmtime())
             end_time = time.strftime('%Y-%m-%dT%H:%M:%S.000Z', time.gmtime(time.time() + 3600))
-        event.when.append(gdata.calendar.When(start_time=start_time, end_time=end_time))
         
-        new_event = self.calendar_service.InsertEvent(event, calendar.content.src)        
-        # print 'Event inserted: %s' % (new_event.id.text,)
-        # print '\tEvent edit URL: %s' % (new_event.GetEditLink().href,)
-        # print '\tEvent HTML URL: %s' % (new_event.GetHtmlLink().href,)
-        
-        return new_event
+        event = { 'summary': summary,
+                  'description': content,
+                  'location': where,
+                  'start': {'dateTime': start_time},
+                  'end': {'dateTime': end_time}
+                }        
+        return self.service.events().insert(calendarId=calendar['id'], body=event).execute()        
 
-    def DeleteEvent(self, event):
+    def DeleteEvent(self, calendar, event):
         """Delete a specific event."""
-        self.calendar_service.DeleteEvent(event.GetEditLink().href)
+        self.service.events().delete(calendarId=calendar['id'], eventId=event['id']).execute()
 
     def InsertEvents(self, calendar, title, content, where=None, start_time=None, end_time=None):
         """
@@ -154,7 +174,7 @@ class Calendar:
         response_feed = self.calendar_service.ExecuteBatch(self.feed, calendar.content.src + u'/batch')
         self.batch = 0
 
-#Calendar()
+# Calendar()
 
 
 
