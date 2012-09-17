@@ -135,36 +135,17 @@ class Schedule:
         start = task.dateRange.start.strftime('%Y-%m-%dT%H:%M:%S.000Z')
         end = task.dateRange.end + timedelta(minutes=1) #shift time for Google calendar display
         end = end.strftime('%Y-%m-%dT%H:%M:%S.000Z')
-        
-        trying = True
-        attempts = 0
-        sleep_secs = 1
-        gsessionid = ''
-        
-        while trying:
-            trying = False
-            attempts += 1
-            try:
-                if start == end:            
-                    response_feed = self.cal.InsertSingleEvent(calendar, task.name, task.name, None, start)
-                    # if asset.name == self.previous_asset:
-                    #     self.cal.InsertEvents(calendar, task.name, task.name, None, start)
-                    # else:
-                    #     self.cal.PushBatchRequest(calendar)
-                else:
-                    response_feed = self.cal.InsertSingleEvent(calendar, task.name, task.name, None, start, end)
-                #     if asset.name == self.previous_asset:    
-                #         self.cal.InsertEvents(calendar, task.name, task.name, None, start, end)
-                #     else:
-                #         self.cal.PushBatchRequest(calendar)
-                # self.previous_asset = asset.name
-            except gdata.service.RequestError as inst:
-                thing = inst[0]
-                if thing['status'] == 302 and attempts < 8:
-                    trying = True
-                    gsessionid=thing['body'][ thing['body'].find('?') : thing['body'].find('">here</A>')]
-                    print 'Received redirect - retrying in', sleep_secs, 'seconds with', gsessionid
-                    time.sleep(sleep_secs)
-                    sleep_secs *= 2
-                else:
-                    print 'too many RequestErrors, giving up'
+
+        if start == end:            
+            response_feed = self.cal.InsertSingleEvent(calendar, task.name, task.name, None, start)
+            # if asset.name == self.previous_asset:
+            #     self.cal.InsertEvents(calendar, task.name, task.name, None, start)
+            # else:
+            #     self.cal.PushBatchRequest(calendar)
+        else:
+            response_feed = self.cal.InsertSingleEvent(calendar, task.name, task.name, None, start, end)
+        #     if asset.name == self.previous_asset:    
+        #         self.cal.InsertEvents(calendar, task.name, task.name, None, start, end)
+        #     else:
+        #         self.cal.PushBatchRequest(calendar)
+        # self.previous_asset = asset.name

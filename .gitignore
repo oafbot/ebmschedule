@@ -8,3 +8,4 @@ inputs/*
 .ropeproject
 .ropeproject/*
 .tm_properties
+*.json

@@ -20,6 +20,7 @@ from oauth2client.tools import run
 from oauth2client.file import Storage
 import httplib2
 from apiclient.discovery import build
+# import apiclient.errors
 
 class Calendar:
     """
@@ -39,10 +40,10 @@ class Calendar:
         self.flow = OAuth2WebServerFlow(client_id=self.config.CLIENT_ID,
                                         client_secret=self.config.CLIENT_SECRET,
                                         scope='https://www.googleapis.com/auth/calendar',
-                                        redirect_uri=self.config.REDIRECT)
+                                        redirect_uri=self.config.redirect)
 
         auth_uri = self.flow.step1_get_authorize_url()
-        self.storage = Storage('inputs/credentials.json')
+        self.storage = Storage('credentials.json')
         self.credentials = self.storage.get()
 
         if self.credentials is None or self.credentials.invalid == True:
@@ -53,6 +54,7 @@ class Calendar:
         
         # self.Select('E-6B 01')
         # self.PrintOwnCalendars()
+        # self.NewCalendar('E-6B 01', 'E-6B 01', 'VQ-3', '#1B887A')
         # self.DeleteCalendar('E-6B 02')
         # self.InsertSingleEvent(self.Select('E-6B 01'), 'Test', 'test')
         
@@ -152,27 +154,6 @@ class Calendar:
     def DeleteEvent(self, calendar, event):
         """Delete a specific event."""
         self.service.events().delete(calendarId=calendar['id'], eventId=event['id']).execute()
-
-    def InsertEvents(self, calendar, title, content, where=None, start_time=None, end_time=None):
-        """
-        Insert multiple events in a batch operation.
-        -----------------------------------------------------------------------------------
-        Google's Documentation on batch requests: 
-        https://developers.google.com/google-apps/calendar/v1/developers_guide_python#batch
-        """
-        insert = gdata.calendar.CalendarEventEntry()
-        insert.title = atom.Title(text=title)
-        insert.content = atom.Content(text=content)
-        insert.when.append(gdata.calendar.When(start_time=start_time, end_time=end_time))
-        insert.batch_id = gdata.BatchId(text='insert-request')
-        self.feed.AddInsert(entry=insert)
-        self.batch += 1
-        if self.batch > 49: self.PushBatchRequest(calendar)
-        
-    def PushBatchRequest(self, calendar):
-        # submit the batch request to the server
-        response_feed = self.calendar_service.ExecuteBatch(self.feed, calendar.content.src + u'/batch')
-        self.batch = 0
 
 # Calendar()
 

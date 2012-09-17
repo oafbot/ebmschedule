@@ -1,5 +1,6 @@
 from datetime import timedelta
 import main
+import apiclient.errors
 
 class PushRightRelaxLeft:
     
@@ -153,42 +154,24 @@ class PushRightRelaxLeft:
         from outputs.Calendar import Calendar
         import gdata.service
         import time
+                
+        if not input.schedule.cal: 
+            input.schedule.cal = Calendar()
         
-        count = 0
-        colors = ['#A32929', '#B1365F',	'#7A367A', '#5229A3', '#29527A', '#2952A3', '#1B887A', '#28754E', 
-                  '#0D7813', '#528800', '#88880E', '#AB8B00', '#BE6D00', '#B1440E', '#865A5A', '#705770', 
-                  '#4E5D6C', '#5A6986', '#4A716C', '#6E6E41', '#8D6F47', '#853104', '#691426', '#5C1158', 
-                  '#23164E', '#182C57', '#060D5E', '#125A12', '#2F6213', '#2F6309', '#5F6B02', '#8C500B', 
-                  '#8C500B', '#754916', '#6B3304', '#5B123B', '#42104A', '#113F47', '#333333', '#0F4B38', 
-                  '#856508', '#711616']
-        trying = True
-        attempts = 0
-        sleep_secs = 1
-        gsessionid = ''
-
-        if not input.schedule.cal: input.schedule.cal = Calendar()
-        
+        count = 0       
+        colors = input.schedule.cal.config.colors
+                    
         print "Purging calendar."          
         input.schedule.cal.DeleteAll()
         print "..."
-        
+
         for asset in input.assets:
-            while trying:
-                trying = False
-                attempts += 1
-                try:
-                    input.schedule.cal.NewCalendar(asset.name, asset.name, 'E-6B', colors[count])
-                except gdata.service.RequestError as inst:
-                    thing = inst[0]
-                    if thing['status'] == 302 and attempts < 8:
-                        trying = True
-                        gsessionid=thing['body'][ thing['body'].find('?') : thing['body'].find('">here</A>')]
-                        print 'Received redirect - retrying in', sleep_secs, 'seconds with', gsessionid
-                        time.sleep(sleep_secs)
-                        sleep_secs *= 2
-                    else:
-                        print 'too many RequestErrors, giving up'
-            if(count < len(colors)):
-                count += 1
-            else:
+            try: 
+                input.schedule.cal.NewCalendar(asset.name, asset.name, 'VQ-3', colors[count])
+            except apiclient.errors.HttpError as e:
+                print e.__str__()
+                raise
+            if(count > len(colors)): 
                 count = 0
+            else:
+                count += 1
