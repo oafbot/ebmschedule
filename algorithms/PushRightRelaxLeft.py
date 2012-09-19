@@ -143,8 +143,8 @@ class PushRightRelaxLeft:
         """Print out the cost analysis for the algorithm."""
         print "\n",                                                                            \
               self.name+":", input.schedule.dataSource,                                        \
-              "Manhours:", input.schedule.totalManhours,                                       \
-              " Counts:", self.conflicts
+              "    Manhours:", input.schedule.totalManhours,                                   \
+              "    Adjustment:", self.conflicts
         
         """Write out metrics to a file."""
         if(input.conf.metrics):

@@ -1,12 +1,9 @@
 from Config import Config
+from InitialConditions import InitialConditions
 from objects import Asset, Skill, Manpower
 from objects.Schedule import Schedule
 from objects.Task import Task
 from objects.DateRange import DateRange
-
-import random
-from random import randrange
-from datetime import timedelta, datetime
 
 class Model:
     
@@ -177,41 +174,10 @@ class Model:
               concur = []
             ),
         }
-                            
-        # import random
-        # from datetime import datetime
-        # for i, asset in enumerate(assets):
-        #     for task in tasks:
-        #         date = datetime(2012, 7, random.randrange(1, 30))
-        #         schedule.force(assets[asset], tasks[task], DateRange(date, date))
-        
-        # ---------------------------------------------------------------------------
 
         self.assets = assets.values()
         self.tasks = tasks.values()
         self.skills = skills.values()
-        # self.schedule = schedule
-        self.schedule = self.initial_conditions(assets, tasks, schedule)
+        conditions = InitialConditions(self.name)
+        self.schedule = conditions.set(assets, tasks, schedule)
         
-    def initial_conditions(self, assets, tasks, schedule):
-        """Set initial conditions for when the tasks were last performed."""
-        for i, asset in enumerate(assets):
-            for tid in tasks:
-                task = tasks[tid]
-                if(task.interval > task.threshold):
-                    diff = task.interval
-                else:
-                    diff = task.threshold
-                if(diff != 0):
-                    start = self.start - timedelta(days = diff)
-                    end   = self.start                   
-                    date = self.random_date(start, end)
-                    schedule.force(assets[asset], tasks[tid], DateRange(date, date))
-        return schedule
-        
-    def random_date(self, start, end):
-        """This function will return a random datetime between two datetime objects."""
-        delta = end - start
-        int_delta = (delta.days * 24 * 60 * 60) + delta.seconds
-        random_second = randrange(int_delta)
-        return (start + timedelta(seconds=random_second))        

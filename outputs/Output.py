@@ -136,7 +136,7 @@ class Output:
             path = "metrics/"
         fo = open(path + input.schedule.dataSource + ".txt", "ab+")
         out = "PushToRight: " + input.schedule.dataSource + ", Manhours: " +                   \
-              str(input.schedule.totalManhours) + " Counts: " + str(conflicts) + "\n"
+              str(input.schedule.totalManhours) + " Adjustments: " + str(conflicts) + "\n"
 
         fo.write( out )
         fo.close()

@@ -4,6 +4,8 @@
 .pydevproject
 inputs/*
 !inputs/Model.py
+!inputs/InitialConditions.py
+!inputs/Config.default.py
 *.sql
 .ropeproject
 .ropeproject/*

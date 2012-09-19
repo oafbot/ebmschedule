@@ -125,8 +125,8 @@ class PushToRight:
         #         out = Output(input)
         print "\n",                                                                            \
               self.name+":", input.schedule.dataSource,                                        \
-              "Manhours:", input.schedule.totalManhours,                                       \
-              " Counts:", self.conflicts
+              "    Manhours:", input.schedule.totalManhours,                                   \
+              "    Adjustments:", self.conflicts
         
         """Write out metrics to a file."""
         if(input.conf.metrics):
