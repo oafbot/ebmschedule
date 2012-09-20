@@ -62,11 +62,12 @@ class Schedule:
                             meta.remove('')
                         for meta_id in meta:
                             if int(meta_id) in self._conflictTasks[asset.id][date]: return True
-            
+
             """If not a metatask check if task falls within the interval."""
             if task.id != 0 and task.withinInterval(self, asset, date):
+                # print "true"
                 return True
-        
+            
         return False
     
     def last(self, asset, task):

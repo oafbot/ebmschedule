@@ -25,7 +25,8 @@ class Task:
         self.required            = False
         self.concurrent          = False
         self.first_run           = False
-        self.relax               = timedelta(days=2)
+        # self.relax               = timedelta(days=int(self.interval/4))
+        self.relax               = timedelta(days=0)
         
         if len(manpowers): self.precal() #TODO: Should come from sequencing
     
@@ -40,11 +41,17 @@ class Task:
         #TODO: Add usage units
         #TODO: Add task start/end
         #TODO: Add schedule start/end/active
-        if date == None: return self.addDays(asset.start, self.threshold)
+        if date == None: 
+            return self.addDays(asset.start, self.threshold)
         elif self.required and self.first_run: 
             self.first_run = False
             return asset.start
-        elif self.required or self.concurrent: return self.addDays(date, self.interval)
+        # elif self.concurrent and self.first_run:
+        #     self.first_run = False
+        #     return self.addDays(date, self.interval)
+        elif self.required or self.concurrent: 
+            return self.addDays(date, self.interval)
+        
         return max(self.addDays(date, self.interval), self.addDays(asset.start, self.threshold))
         # without rebasing it would be: return self.addDays(date, self.interval) 
     
@@ -187,17 +194,50 @@ class Task:
         return Task(0, name, 1, threshold, interval, mp, cf)
     
     def withinInterval(self, schedule, asset, start):
-        """
-        If last is not set or
-        if last is earlier than start minus interval
-        if last is later than end plus interval
-        """
+        """Check if a date falls with the interval period"""        
+        from objects.DateRange import DateRange
         interval = timedelta(days=self.interval)
         end = self.end(start)
-        date = schedule.last(asset, self)
-        if self.concurrent and schedule.processed.count(self.id) > 1: return True
-        if not date: return False
-        if (start > date) and (start - interval > date - self.relax): return False
-        elif (start < date) and (end + interval < date + self.relax): return False
-        return True
+        # last = schedule.last(asset, self)
+
+        if self.concurrent and schedule.processed.count(self.id) > 1: 
+            """Check if task has already been processed together with its concurrent task."""
+            return True
+        
+        # print "start -", interval - self.relax
+        # print "end +", interval - self.relax
+        
+        before = DateRange(start - (interval - self.relax), start)
+        after  = DateRange(end, end + (interval - self.relax))
+        # daterange = DateRange(start - (interval - self.relax), end + (interval - self.relax))
+        dates = schedule._scheduledTasks[asset.id].keys()
+        # dates.sort()
+        
+        # for d in  daterange.range():
+        #     print d
+        # # 
+        # print self.name
+        # print start
+                
+        for date in dates:
+            """If the task is scheduled for that date."""
+            if self.id in schedule._scheduledTasks[asset.id][date]:
+                """Is the date found in the interval daterange?"""
+                # if(date in before.range()):                    
+                #     return True
+                # if(date in after.range()):
+                #     return True
+                """Is the difference between the blocked date and date is within a day."""    
+                # for blocked in before.range():
+                #     if(blocked - date > timedelta(days=0) and blocked - date < timedelta(days=1)):
+                #         return True
+                # for blocked in after.range():
+                #     if(blocked - date > timedelta(days=0) and blocked - date < timedelta(days=1)):
+                #         return True
+                if before.within(date):
+                    return True
+                if after.within(date):
+                    return True               
+        return False        
+                
         

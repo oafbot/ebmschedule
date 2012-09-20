@@ -144,7 +144,7 @@ class PushRightRelaxLeft:
         print "\n",                                                                            \
               self.name+":", input.schedule.dataSource,                                        \
               "    Manhours:", input.schedule.totalManhours,                                   \
-              "    Adjustment:", self.conflicts
+              "    Adjustments:", self.conflicts
         
         """Write out metrics to a file."""
         if(input.conf.metrics):

@@ -47,7 +47,12 @@ class PushToRight:
             input.schedule.processed = []
         # input.schedule.cal.PushBatchRequest()
         self.analytics(input)
-    
+
+        # keylist = input.schedule._scheduledTasks[1].keys()
+        # keylist.sort()
+        # for key in keylist:
+        #     print "%s: %s" % (key, input.schedule._scheduledTasks[1][key])
+       
     def regularSchedule(self, asset, task, input, start):
         """
         Schedule single tasks.
@@ -58,6 +63,7 @@ class PushToRight:
             while(input.schedule.blocked(asset, task, start)):
                 start += timedelta(days=1) # Shift to the right one day when blocked
                 self.conflicts += 1
+                # print "push", start
             end = input.schedule.add(asset, task, start) # Add to schedule
             self.output(asset, task, input, start, end)
             start = task.next(asset, end)
@@ -75,7 +81,7 @@ class PushToRight:
             while(input.schedule.blocked(asset, metatask, start)):
                 start += timedelta(days=1)
                 self.conflicts += 1
-                # print "push"
+                # print "push", start
             remainder_hours = 0            # The hours carried over from the preceding task
             maxhours = task.hoursPerDay    # The work hours in a day
             longest = 0                    # The task that takes the longest to perform
@@ -83,6 +89,7 @@ class PushToRight:
             """For each task in the bundle, schedule in order."""
             for bundle_task in bundle:
                 overhours  = False
+                # print start
                 if not bundle_task.withinInterval(input.schedule, asset, start):
                     end = input.schedule.add(asset, bundle_task, start)
                 
