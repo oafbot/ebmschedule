@@ -13,6 +13,7 @@ class DateRange:
     
     def within(self, date):
         from datetime import timedelta
+        """Is the difference between the blocked date and the daterange date within a day?"""
         for blocked in self.range():
             if(blocked - date > timedelta(days=0) and blocked - date < timedelta(days=1)):
                 return True

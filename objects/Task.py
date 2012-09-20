@@ -198,24 +198,18 @@ class Task:
         from objects.DateRange import DateRange
         interval = timedelta(days=self.interval)
         end = self.end(start)
-        # last = schedule.last(asset, self)
 
         if self.concurrent and schedule.processed.count(self.id) > 1: 
             """Check if task has already been processed together with its concurrent task."""
             return True
         
-        # print "start -", interval - self.relax
-        # print "end +", interval - self.relax
-        
         before = DateRange(start - (interval - self.relax), start)
         after  = DateRange(end, end + (interval - self.relax))
-        # daterange = DateRange(start - (interval - self.relax), end + (interval - self.relax))
         dates = schedule._scheduledTasks[asset.id].keys()
         # dates.sort()
         
-        # for d in  daterange.range():
+        # for d in  after.range():
         #     print d
-        # # 
         # print self.name
         # print start
                 
@@ -224,16 +218,11 @@ class Task:
             if self.id in schedule._scheduledTasks[asset.id][date]:
                 """Is the date found in the interval daterange?"""
                 # if(date in before.range()):                    
+                #     print "TRUE"
                 #     return True
                 # if(date in after.range()):
+                #     print "TRUE"
                 #     return True
-                """Is the difference between the blocked date and date is within a day."""    
-                # for blocked in before.range():
-                #     if(blocked - date > timedelta(days=0) and blocked - date < timedelta(days=1)):
-                #         return True
-                # for blocked in after.range():
-                #     if(blocked - date > timedelta(days=0) and blocked - date < timedelta(days=1)):
-                #         return True
                 if before.within(date):
                     return True
                 if after.within(date):
