@@ -13,6 +13,8 @@ class PushRightRelaxLeft:
         self.RELAX = -3
         self.schedule = input.schedule
         
+        if(input.conf.pushcal): self.calendar(input)
+        
         """
         Prioritize the tasks that require higher percentage of resources.
         How many of the skills for the task are available.
@@ -27,9 +29,6 @@ class PushRightRelaxLeft:
             ),
             reverse=True)
         
-        if(input.conf.pushcal):
-            self.initcal(input)
-                
         for asset in input.assets:
             for task in input.tasks:
                 if(task.interval):
@@ -150,28 +149,11 @@ class PushRightRelaxLeft:
         if(input.conf.metrics):
             main.outputs.output.writeMetrics(input, self.conflicts)
     
-    def initcal(self, input):
+    def calendar(self,input):
+        """Initiate the Google Calendar."""
         from outputs.Calendar import Calendar
-        import gdata.service
-        import time
-                
+
         if not input.schedule.cal: 
             input.schedule.cal = Calendar()
-        
-        count = 0       
-        colors = input.schedule.cal.config.colors
-                    
-        print "Purging calendar."          
-        input.schedule.cal.DeleteAll()
-        print "..."
 
-        for asset in input.assets:
-            try: 
-                input.schedule.cal.NewCalendar(asset.name, asset.name, 'VQ-3', colors[count])
-            except apiclient.errors.HttpError as e:
-                print e.__str__()
-                raise
-            if(count > len(colors)): 
-                count = 0
-            else:
-                count += 1
+        input.schedule.cal.Connect(input)

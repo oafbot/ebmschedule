@@ -157,8 +157,8 @@ class Task:
             if tasks_set and self in bundle:
                 return bundle
             """If no prior scheduling or scheduled prior to interval."""
-            # if not concurrent.withinInterval(input.schedule, asset, start):                
-            bundle = self.bundle(bundle, self.concur, asset, input)
+            if not concurrent.withinInterval(input.schedule, asset, start):                
+                bundle = self.bundle(bundle, self.concur, asset, input)
         return bundle
     
     def bundle(self, bundle, tasks, asset, input):
@@ -196,37 +196,25 @@ class Task:
     def withinInterval(self, schedule, asset, start):
         """Check if a date falls with the interval period"""        
         from objects.DateRange import DateRange
+        
         interval = timedelta(days=self.interval)
         end = self.end(start)
+        before = DateRange(start - (interval - self.relax), start)
+        after  = DateRange(end, end + (interval - self.relax))
+        dates = schedule._scheduledTasks[asset.id].keys()
+        # dates.sort()
 
         if self.concurrent and schedule.processed.count(self.id) > 1: 
             """Check if task has already been processed together with its concurrent task."""
             return True
         
-        before = DateRange(start - (interval - self.relax), start)
-        after  = DateRange(end, end + (interval - self.relax))
-        dates = schedule._scheduledTasks[asset.id].keys()
-        # dates.sort()
-        
-        # for d in  after.range():
-        #     print d
-        # print self.name
-        # print start
-                
         for date in dates:
             """If the task is scheduled for that date."""
             if self.id in schedule._scheduledTasks[asset.id][date]:
                 """Is the date found in the interval daterange?"""
-                # if(date in before.range()):                    
-                #     print "TRUE"
-                #     return True
-                # if(date in after.range()):
-                #     print "TRUE"
-                #     return True
                 if before.within(date):
                     return True
                 if after.within(date):
                     return True               
         return False        
-                
-        
+       

@@ -13,11 +13,13 @@ from objects.Task import Task
 from objects.DateRange import DateRange
 
 class InitialConditions:
-    def __init__(self, name):
+    def __init__(self, name, num, count=0, config=Config()):
         self.name = name
-        self.config = Config()
+        self.config = config
         self.reset = self.config.reset
-        self.xml = etree.Element("data")
+        self.max = num
+        self.count = count
+        self.xml = etree.Element("Dataset")
         
         if 'tools' in os.getcwd():
             self.path = "../inputs/"
@@ -27,9 +29,10 @@ class InitialConditions:
         self.xml_file_path = self.path + self.name + ".xml"
         
         if(self.reset):
-            self.xmlfile = open(self.xml_file_path, 'wb')            
-            self.xmlfile.write('<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n')
-            self.xmlfile.close()
+            if(self.count < 1):                
+                self.xmlfile = open(self.xml_file_path, 'wb')            
+                self.xmlfile.write('<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n')
+                self.xmlfile.close()
             self.xmlfile = open(self.xml_file_path, 'ab+')
                 
     def set(self, assets, tasks, schedule):
@@ -48,14 +51,16 @@ class InitialConditions:
                         start = self.config.start - timedelta(days = diff)
                         end   = self.config.start                   
                         date  = self.random_date(start, end)
-                        self.write(asset, task, date)
+                        for count in range(0, self.max):
+                            self.write(asset, task, date, count)
+                            self.count = count
                 else:
                     if(task.interval != 0 and task.threshold != 0):
                         date = self.read(asset, task)                
                 if(date is not None):
                     schedule.force(assets[asset], task, DateRange(date, date))
-        if(self.reset):
-            self.xmlfile.write( etree.tostring(self.xml, pretty_print=True) )
+        if(self.reset):            
+            self.xmlfile.write(etree.tostring(self.xml, pretty_print=True))
             self.xmlfile.close()                    
         return schedule
             
@@ -69,19 +74,25 @@ class InitialConditions:
     def read(self, asset, task):
         parser = etree.XMLParser()       
         xml = etree.parse(self.xml_file_path, parser)
-        date = xml.xpath('//Asset[@id="'+str(asset)+'"]/Task[@id="'+str(task.id)+'"]')[0].text
+        date = xml.xpath('//Data[@id="'+str(self.count)+'"]/Asset[@id="'+str(asset)+'"]/Task[@id="'+str(task.id)+'"]')[0].text
         return datetime_parser.parse(date)
                 
-    def write(self, asset, task, date):        
+    def write(self, asset, task, date, count):        
         asset = str(asset)
         date = str(date)      
         parser = etree.XMLParser()       
         xml = self.xml
-        root = xml.xpath('/data')[0]        
-        xpath = '//Asset[@id="'+asset+'"]'           
-                
+        root = xml.xpath("/Dataset")[0]       
+        
+        xpath = '//Data[@id="'+str(count)+'"]'           
         if(not xml.xpath(xpath)):
-            _asset = etree.SubElement(root,'Asset')
+            _data = etree.SubElement(root, 'Data')
+            _data.set('id', str(count))
+        else:
+            _data = xml.xpath(xpath)[0]
+        xpath = '//Data[@id="'+str(count)+'"]/Asset[@id="'+asset+'"]'       
+        if(not xml.xpath(xpath)):
+            _asset = etree.SubElement(_data, 'Asset')
             _asset.set('id', asset)
         else:
             _asset = xml.xpath(xpath)[0]  

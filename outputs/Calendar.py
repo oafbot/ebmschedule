@@ -20,7 +20,7 @@ from oauth2client.tools import run
 from oauth2client.file import Storage
 import httplib2
 from apiclient.discovery import build
-# import apiclient.errors
+import apiclient.errors
 
 class Calendar:
     """
@@ -154,6 +154,24 @@ class Calendar:
     def DeleteEvent(self, calendar, event):
         """Delete a specific event."""
         self.service.events().delete(calendarId=calendar['id'], eventId=event['id']).execute()
+
+    def Connect(input):
+        count = 0
+        colors = input.schedule.cal.config.colors
+
+        print "Purging calendar."          
+        input.schedule.cal.DeleteAll()
+        print "..."
+
+        for asset in input.assets:
+            try: 
+                input.schedule.cal.NewCalendar(asset.name, asset.name, 'VQ-3', colors[count])
+            except apiclient.errors.HttpError as e:
+                print e.__str__()
+            if(count > len(colors)): 
+                count = 0
+            else:
+                count += 1
 
 # Calendar()
 

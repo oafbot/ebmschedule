@@ -1,6 +1,5 @@
 from datetime import timedelta
 import main
-import apiclient.errors
 
 class PushToRight:
     
@@ -10,6 +9,8 @@ class PushToRight:
         self.conflicts = 0
         self.prev = 0
         self.name = "PushRight"
+        
+        if(input.conf.pushcal): self.calendar(input)
         
         """
         Prioritize the tasks that require higher percentage of resources.
@@ -25,9 +26,6 @@ class PushToRight:
             ),
             reverse=True)
         
-        if(input.conf.pushcal):
-            self.initcal(input)
-
         for asset in input.assets:
             for task in input.tasks:
                 if(task.interval):
@@ -45,13 +43,7 @@ class PushToRight:
                     else:
                         self.regularSchedule(asset, task, input, start)
             input.schedule.processed = []
-        # input.schedule.cal.PushBatchRequest()
         self.analytics(input)
-
-        # keylist = input.schedule._scheduledTasks[1].keys()
-        # keylist.sort()
-        # for key in keylist:
-        #     print "%s: %s" % (key, input.schedule._scheduledTasks[1][key])
        
     def regularSchedule(self, asset, task, input, start):
         """
@@ -63,7 +55,6 @@ class PushToRight:
             while(input.schedule.blocked(asset, task, start)):
                 start += timedelta(days=1) # Shift to the right one day when blocked
                 self.conflicts += 1
-                # print "push", start
             end = input.schedule.add(asset, task, start) # Add to schedule
             self.output(asset, task, input, start, end)
             start = task.next(asset, end)
@@ -81,7 +72,6 @@ class PushToRight:
             while(input.schedule.blocked(asset, metatask, start)):
                 start += timedelta(days=1)
                 self.conflicts += 1
-                # print "push", start
             remainder_hours = 0            # The hours carried over from the preceding task
             maxhours = task.hoursPerDay    # The work hours in a day
             longest = 0                    # The task that takes the longest to perform
@@ -89,7 +79,6 @@ class PushToRight:
             """For each task in the bundle, schedule in order."""
             for bundle_task in bundle:
                 overhours  = False
-                # print start
                 if not bundle_task.withinInterval(input.schedule, asset, start):
                     end = input.schedule.add(asset, bundle_task, start)
                 
@@ -121,15 +110,11 @@ class PushToRight:
             start = task.next(asset, end)
     
     def output(self, asset, task, input, start, end):
-        """Print out the scheduling output to the console."""       
-        # from outputs.Output import Output
-        #         out = Output(input)
-        main.outputs.output.printSchedule(self, asset, task, start, end) 
+        """Print out the scheduling output to the console."""
+        main.outputs.printSchedule(self, asset, task, start, end) 
     
     def analytics(self,input):
         """Print out the cost analysis for the algorithm."""
-        # from outputs.Output import Output
-        #         out = Output(input)
         print "\n",                                                                            \
               self.name+":", input.schedule.dataSource,                                        \
               "    Manhours:", input.schedule.totalManhours,                                   \
@@ -137,29 +122,13 @@ class PushToRight:
         
         """Write out metrics to a file."""
         if(input.conf.metrics):
-            Main.outputs.output.writeMetrics(input, self.conflicts)
-
-    def initcal(self, input):
+            main.outputs.output.writeMetrics(input, self.conflicts)
+    
+    def calendar(self,input):
+        """Initiate the Google Calendar."""
         from outputs.Calendar import Calendar
-        import gdata.service
-        import time
         
         if not input.schedule.cal: 
             input.schedule.cal = Calendar()
         
-        count = 0
-        colors = input.schedule.cal.config.colors
-        
-        print "Purging calendar."          
-        input.schedule.cal.DeleteAll()
-        print "..."
-
-        for asset in input.assets:
-            try: 
-                input.schedule.cal.NewCalendar(asset.name, asset.name, 'VQ-3', colors[count])
-            except apiclient.errors.HttpError as e:
-                print e.__str__()
-            if(count > len(colors)): 
-                count = 0
-            else:
-                count += 1                
+        input.schedule.cal.Connect(input)
