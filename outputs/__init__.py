@@ -1,12 +1,9 @@
-def define(model):
-    from Output import Output
+class Outputs:
+    def __init__(self, model):
+        from Output import Output
 
-    for input in model:
-        return Output(input)
+        for input in model:
+            self.output = Output(input)
 
-    # from Calendar import Calendar
-    # Calendar = Calendar()
-
-# if __name__ == "__main__":
-#     # output()
-#     pass
+        # from Calendar import Calendar
+        # Calendar = Calendar()

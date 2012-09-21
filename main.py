@@ -1,30 +1,21 @@
 #!/usr/bin/python
-def main():
-    import inputs, algorithms, outputs
-    import sys
-    
-    if(len(sys.argv)>1):
-        count = sys.argv[1]
-    else:
-        count = 0
-    
-    model = inputs.define(count)
-    algorithms = algorithms.define(model)
-    outputs = outputs.define(model)
+class Main:
+    def __init__(self):
+        import inputs, algorithms, outputs
+        import sys
 
-    return [model, algorithms, outputs]
+        if(len(sys.argv)>1):
+            self.counter = sys.argv[1]
+        else:
+            self.counter = 0
+        
+        self.Model = inputs.Inputs(self.counter).model
+        self.Outputs = outputs.Outputs(self.Model).output
+        self.Algorithm = algorithms.Algorithms(self.Model).algorithm
     
-    # inputs.input(count)
-    # algorithms.algorithm()
-    # outputs.outputs()
-    
-    print count
-    
-if __name__ == "__main__":
-    ret = main() 
-    model = ret[0]
-    algorithms = ret[1]
-    outputs = ret[2] 
+# if __name__ == "__main__":
+Main()
+
 
 # inputs
 # # inputs = Inputs()

@@ -111,7 +111,7 @@ class PushToRight:
     
     def output(self, asset, task, input, start, end):
         """Print out the scheduling output to the console."""
-        main.outputs.printSchedule(self, asset, task, start, end) 
+        main.Output.printSchedule(self, asset, task, start, end) 
     
     def analytics(self,input):
         """Print out the cost analysis for the algorithm."""
