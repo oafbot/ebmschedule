@@ -15,7 +15,6 @@ class Model:
         self.start   = self.conf.start
         self.end     = self.conf.end
         self.hours   = self.conf.hours
-        self.cap     = self.conf.cap
         self.count   = count
                                
         schedule = Schedule(self.name, DateRange(self.start, self.end), self.conf.max)
@@ -181,6 +180,6 @@ class Model:
         self.tasks = tasks.values()
         self.skills = skills.values()
       
-        conditions = InitialConditions(self.name, self.cap, self.count, self.conf)
+        conditions = InitialConditions(self.name, self.count, self.conf)
         self.schedule = conditions.set(assets, tasks, schedule)
         

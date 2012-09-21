@@ -12,9 +12,9 @@ if __name__ == "__main__":
     algorithm = algorithms.Algorithms(model).algorithm
     # output = outputs.Outputs(model).output
 
-# # Test Scheduling Output
-# # tests
-# 
-# # Display Metrics
-# # metrics
+    # Test Scheduling Output
+    # tests
+
+    # Display Metrics
+    # metrics
 

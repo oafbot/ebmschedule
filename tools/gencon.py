@@ -2,6 +2,7 @@ import sys
 sys.path.append( '../' )
 from inputs.Config import Config 
 config = Config()
+
 config.bigdata = 0
 config.reset = True
 config.fixed = True

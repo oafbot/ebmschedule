@@ -13,11 +13,11 @@ from objects.Task import Task
 from objects.DateRange import DateRange
 
 class InitialConditions:
-    def __init__(self, name, num, count=0, config=Config()):
+    def __init__(self, name, count=0, config=Config()):
         self.name = name
         self.config = config
         self.reset = self.config.reset
-        self.cap = num
+        self.cap = self.config.cap
         self.count = count
         self.xml = etree.Element("Dataset")
 
@@ -30,12 +30,9 @@ class InitialConditions:
             self.xml_file_path = self.path + self.name + "-fix.xml"
         else:
             self.xml_file_path = self.path + self.name + ".xml"
-        
-        # if(self.cap != 1):
-        #             self.cap = count + 1 
-        
+            
         if(self.reset):
-            if(self.count < 1):                
+            if(self.count < 1 or not self.config.fixed):                
                 self.xmlfile = open(self.xml_file_path, 'wb')            
                 self.xmlfile.write('<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n')
                 self.xmlfile.close()
@@ -57,7 +54,8 @@ class InitialConditions:
                         if(diff != 0):
                             start = self.config.start - timedelta(days = diff)
                             end   = self.config.start                   
-                            date  = self.random_date(start, end)                        
+                            date  = self.random_date(start, end)
+                            # if(self.config.fixed):
                             self.write(asset, task, date, count)
                             self.count = count
                 else:

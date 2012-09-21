@@ -26,16 +26,22 @@ class Config:
         # =============================
         self.bigdata  = True
         self.trace    = True
-
-        self.fixed    = True
-        self.duration = "C"   # Y, M, C
-                        
-        self.algo     = 0     # 0, 1, 2
-        self.hours    = 8
         
-        self.pushcal  = False   # Push schedule to Googe Calendar
-        self.metrics  = False   # Write metrics to output file
-        self.reset    = False   # rest the initial conditions
+        self.fixed    = True  # start on a fixed day
+        self.algo     = 0     # 0 : PushRight, 1 : PushRight-RelaxLeft, 2
+        
+        self.hours    = 8
+        self.duration = "Y"   # Y : Year, M : Month, C : Custom        
+        
+        self.pushcal  = False # Push schedule to Googe Calendar
+        self.metrics  = False # Write metrics to output file
+        
+        """XML rewriting and limit."""
+        self.reset    = False # reset the initial conditions
+        self.cap      = 1     # cap for the xml gerneration, alter externally
+                        
+        if(not self.fixed):
+            self.reset = True
                 
         """Set maximum number of assets grounded."""
         if(self.bigdata):
@@ -47,8 +53,9 @@ class Config:
         self.now   = time.gmtime()
         
         if(self.fixed):
-            self.year  = 2013 #self.now.tm_year
-            self.month = 1    #self.now.tm_mon
+            """Scheduling start date if fixed."""
+            self.year  = 2013
+            self.month = 1
             self.day   = 1
         else:
             self.year  = self.now.tm_year
