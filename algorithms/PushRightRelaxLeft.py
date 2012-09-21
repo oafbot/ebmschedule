@@ -1,6 +1,6 @@
 from datetime import timedelta
-import main
 import apiclient.errors
+from outputs.Output import Output
 
 class PushRightRelaxLeft:
     
@@ -12,9 +12,13 @@ class PushRightRelaxLeft:
         self.name = "PushRight-RelaxLeft"
         self.RELAX = -3
         self.schedule = input.schedule
-        
-        if(input.conf.pushcal): self.calendar(input)
-        
+        self.output = Output(input)
+
+        if(input.trace): 
+            self.output.console()
+        if(input.conf.pushcal): 
+            self.calendar(input)
+                
         """
         Prioritize the tasks that require higher percentage of resources.
         How many of the skills for the task are available.
@@ -62,7 +66,7 @@ class PushRightRelaxLeft:
             start = self.shift(asset, task, start, oInterval, oStart, n)
             task.interval = oInterval
             end = input.schedule.add(asset, task, start)
-            self.output(asset, task, input, start, end)
+            self.console(asset, task, input, start, end)
             start = task.next(asset, end)
 
     def bundleSchedule(self, bundle, asset, input, task, start):
@@ -90,7 +94,7 @@ class PushRightRelaxLeft:
                 if not bundle_task.withinInterval(input.schedule, asset, start):
                     end = input.schedule.add(asset, bundle_task, start)
                 
-                    self.output(asset, bundle_task, input, start, end)
+                    self.console(asset, bundle_task, input, start, end)
                 
                     """Find the the most costly task."""
                     for manpower in bundle_task.manpowers:
@@ -134,20 +138,20 @@ class PushRightRelaxLeft:
                 self.conflicts += 1
         return start
     
-    def output(self, asset, task, input, start, end):
+    def console(self, asset, task, input, start, end):
         """Print out the scheduling output to the console."""
-        main.outputs.output.printSchedule(self, asset, task, start, end)
+        self.output.printSchedule(self, asset, task, start, end)
 
     def analytics(self,input):
         """Print out the cost analysis for the algorithm."""
         print "\n",                                                                            \
-              self.name+":", input.schedule.dataSource,                                        \
+              self.name+":", input.schedule.dataSource, input.count,                            \
               "    Manhours:", input.schedule.totalManhours,                                   \
               "    Adjustments:", self.conflicts
         
         """Write out metrics to a file."""
         if(input.conf.metrics):
-            main.outputs.output.writeMetrics(input, self.conflicts)
+            self.output.writeMetrics(input, self.conflicts)
     
     def calendar(self,input):
         """Initiate the Google Calendar."""

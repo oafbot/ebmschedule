@@ -7,7 +7,7 @@ from objects.DateRange import DateRange
 
 class Model:
     
-    def __init__(self, count, config=Config()):                        
+    def __init__(self, count, config=Config()):                   
         self.conf    = config
         self.name    = "Simple-Model"        
         self.trace   = self.conf.trace
@@ -15,7 +15,9 @@ class Model:
         self.start   = self.conf.start
         self.end     = self.conf.end
         self.hours   = self.conf.hours
-                                         
+        self.cap     = self.conf.cap
+        self.count   = count
+                               
         schedule = Schedule(self.name, DateRange(self.start, self.end), self.conf.max)
         
         assets = {
@@ -179,6 +181,6 @@ class Model:
         self.tasks = tasks.values()
         self.skills = skills.values()
       
-        conditions = InitialConditions(self.name, 10, count)
+        conditions = InitialConditions(self.name, self.cap, self.count, self.conf)
         self.schedule = conditions.set(assets, tasks, schedule)
         

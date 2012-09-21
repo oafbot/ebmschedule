@@ -6,105 +6,105 @@ class Output:
             self.columnSize = 10
         else: 
             self.columnSize = 3
-        if input.trace:
-            self.console()
-    
+        self.trace = input.trace
+        
     def console(self):
         """Print output to console."""        
-        print ""
-        print "Schedule"
-        print "Data source: ", self.input.schedule.dataSource
-        print "Date range:  ", self.input.schedule.dateRange.start, ' -- ',                    \
-                               self.input.schedule.dateRange.end
-        print "Max assets in work: ", self.input.schedule.maxAssetsInWork
-        print "------------------------------------------------------------\n"        
+        if self.trace:
+            print ""
+            print "Schedule:     No. " + str(self.input.count)
+            print "Data source: ", self.input.schedule.dataSource
+            print "Date range:  ", self.input.schedule.dateRange.start, ' -- ',                \
+                                   self.input.schedule.dateRange.end
+            print "Max assets in work: ", self.input.schedule.maxAssetsInWork
+            print "------------------------------------------------------------\n"        
         
-        for asset in self.input.assets:        
-            print "Asset: ", asset.name 
-            print "Start: ", asset.start
-            print "------------------------------------------------------------\n"
+            for asset in self.input.assets:        
+                print "Asset: ", asset.name 
+                print "Start: ", asset.start
+                print "------------------------------------------------------------\n"
         
-        for skill in self.input.skills:
-            print "Skill:           ", skill.name
-            print "Availability:    ", skill.available
-            print "Hours per day:   ", skill.hoursPerDay
-            print "Available hours: ", skill.availableHours
-            print "------------------------------------------------------------\n"
+            for skill in self.input.skills:
+                print "Skill:           ", skill.name
+                print "Availability:    ", skill.available
+                print "Hours per day:   ", skill.hoursPerDay
+                print "Available hours: ", skill.availableHours
+                print "------------------------------------------------------------\n"
         
-        for task in self.input.tasks:
-            if task.id is not 0:
-                print "Task:            ", task.name
-                print "ID:              ", task.id
-                print "Unit:            ", task.unit
-                print "Threshold:       ", task.threshold
-                print "Interval:        ", task.interval
-                print "Days:            ", task.days
-                for m in task.manpowers:
-                    print "Manpower:        ",m.hours, "x", m.skill.name 
-                if not self.input.bigdata:
-                    if task.conflicts:
-                        print "Conflicts:       ",
-                        for n in sorted(task.conflicts):
-                            print str.ljust(str(n), self.columnSize),
-                    if task.prep:
-                        print "\nPrep:            ",
-                        for n in sorted(task.prep):
-                            print str.ljust(str(n), self.columnSize),
-                    if task.prereq:
-                        print "\nPrerequisite:    ",
-                        for n in sorted(task.prereq):
-                            print str.ljust(str(n), self.columnSize),
-                    if task.subseq:
-                        print "\nSubsequent:      ",
-                        for p in sorted(task.subseq):
-                            print str.ljust(str(p), self.columnSize),
-                    if task.concur:
-                        print "\nConcur:          ",
-                        for n in sorted(task.concur):
-                            print str.ljust(str(n), self.columnSize),        
-                    print "\n------------------------------------------------------------\n"
-                else:
-                    if task.conflicts:
-                        print "Conflicts:       ",
-                        i = 0
-                        for n in sorted(task.conflicts):
-                            if i % 8 == 0:
-                                print ""
-                            print str.ljust(str(n), self.columnSize),
-                            i += 1
-                    if task.prep:
-                        print "\nPrep:            ",
-                        i = 0
-                        for n in sorted(task.prep):
-                            if i % 8 == 0:
-                                print ""
-                            print str.ljust(str(n), self.columnSize),
-                            i += 1
-                    if task.prereq:
-                        print "\nPrerequisite:    ",
-                        i = 0
-                        for n in sorted(task.prereq):
-                            if i % 8 == 0:
-                                print ""
-                            print str.ljust(str(n), self.columnSize),
-                            i += 1
-                    if task.subseq:
-                        print "\nSubsequent:      ",
-                        i = 0
-                        for p in sorted(task.subseq):
-                            if i % 8 == 0:
-                                print ""
-                            print str.ljust(str(p), self.columnSize),
-                            i += 1
-                    if task.concur:
-                        print "\nConcur:          ",
-                        i = 0
-                        for n in sorted(task.concur):
-                            if i % 8 == 0:
-                                print ""
-                            print str.ljust(str(n), self.columnSize),
-                            i += 1        
-                    print "\n------------------------------------------------------------\n"
+            for task in self.input.tasks:
+                if task.id is not 0:
+                    print "Task:            ", task.name
+                    print "ID:              ", task.id
+                    print "Unit:            ", task.unit
+                    print "Threshold:       ", task.threshold
+                    print "Interval:        ", task.interval
+                    print "Days:            ", task.days
+                    for m in task.manpowers:
+                        print "Manpower:        ",m.hours, "x", m.skill.name 
+                    if not self.input.bigdata:
+                        if task.conflicts:
+                            print "Conflicts:       ",
+                            for n in sorted(task.conflicts):
+                                print str.ljust(str(n), self.columnSize),
+                        if task.prep:
+                            print "\nPrep:            ",
+                            for n in sorted(task.prep):
+                                print str.ljust(str(n), self.columnSize),
+                        if task.prereq:
+                            print "\nPrerequisite:    ",
+                            for n in sorted(task.prereq):
+                                print str.ljust(str(n), self.columnSize),
+                        if task.subseq:
+                            print "\nSubsequent:      ",
+                            for p in sorted(task.subseq):
+                                print str.ljust(str(p), self.columnSize),
+                        if task.concur:
+                            print "\nConcur:          ",
+                            for n in sorted(task.concur):
+                                print str.ljust(str(n), self.columnSize),        
+                        print "\n------------------------------------------------------------\n"
+                    else:
+                        if task.conflicts:
+                            print "Conflicts:       ",
+                            i = 0
+                            for n in sorted(task.conflicts):
+                                if i % 8 == 0:
+                                    print ""
+                                print str.ljust(str(n), self.columnSize),
+                                i += 1
+                        if task.prep:
+                            print "\nPrep:            ",
+                            i = 0
+                            for n in sorted(task.prep):
+                                if i % 8 == 0:
+                                    print ""
+                                print str.ljust(str(n), self.columnSize),
+                                i += 1
+                        if task.prereq:
+                            print "\nPrerequisite:    ",
+                            i = 0
+                            for n in sorted(task.prereq):
+                                if i % 8 == 0:
+                                    print ""
+                                print str.ljust(str(n), self.columnSize),
+                                i += 1
+                        if task.subseq:
+                            print "\nSubsequent:      ",
+                            i = 0
+                            for p in sorted(task.subseq):
+                                if i % 8 == 0:
+                                    print ""
+                                print str.ljust(str(p), self.columnSize),
+                                i += 1
+                        if task.concur:
+                            print "\nConcur:          ",
+                            i = 0
+                            for n in sorted(task.concur):
+                                if i % 8 == 0:
+                                    print ""
+                                print str.ljust(str(n), self.columnSize),
+                                i += 1        
+                        print "\n------------------------------------------------------------\n"
         
         for forced in self.input.schedule.forced:
             print "Force Schedule"
@@ -135,8 +135,9 @@ class Output:
         else: 
             path = "metrics/"
         fo = open(path + input.schedule.dataSource + ".txt", "ab+")
-        out = "PushToRight: " + input.schedule.dataSource + ", Manhours: " +                   \
-              str(input.schedule.totalManhours) + " Adjustments: " + str(conflicts) + "\n"
+        out = "PushToRight: " + input.schedule.dataSource + " " + str(input.count) + \
+              ", Manhours: " + str(input.schedule.totalManhours) + \
+              " Adjustments: " + str(conflicts) + "\n"
 
         fo.write( out )
         fo.close()

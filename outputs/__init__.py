@@ -4,6 +4,3 @@ class Outputs:
 
         for input in model:
             self.output = Output(input)
-
-        # from Calendar import Calendar
-        # Calendar = Calendar()

@@ -17,16 +17,22 @@ class InitialConditions:
         self.name = name
         self.config = config
         self.reset = self.config.reset
-        self.max = num
+        self.cap = num
         self.count = count
         self.xml = etree.Element("Dataset")
-        
+
         if 'tools' in os.getcwd():
             self.path = "../inputs/"
         else: 
             self.path = "inputs/"
+
+        if(self.config.fixed):
+            self.xml_file_path = self.path + self.name + "-fix.xml"
+        else:
+            self.xml_file_path = self.path + self.name + ".xml"
         
-        self.xml_file_path = self.path + self.name + ".xml"
+        # if(self.cap != 1):
+        #             self.cap = count + 1 
         
         if(self.reset):
             if(self.count < 1):                
@@ -43,15 +49,15 @@ class InitialConditions:
                 task = tasks[t]                
                 
                 if(self.reset):                
-                    if(task.interval < task.threshold):
-                        diff = task.interval
-                    else:
-                        diff = task.threshold
-                    if(diff != 0):
-                        start = self.config.start - timedelta(days = diff)
-                        end   = self.config.start                   
-                        date  = self.random_date(start, end)
-                        for count in range(0, self.max):
+                    for count in range(0, self.cap):
+                        if(task.interval < task.threshold):
+                            diff = task.interval
+                        else:
+                            diff = task.threshold
+                        if(diff != 0):
+                            start = self.config.start - timedelta(days = diff)
+                            end   = self.config.start                   
+                            date  = self.random_date(start, end)                        
                             self.write(asset, task, date, count)
                             self.count = count
                 else:
@@ -74,7 +80,8 @@ class InitialConditions:
     def read(self, asset, task):
         parser = etree.XMLParser()       
         xml = etree.parse(self.xml_file_path, parser)
-        date = xml.xpath('//Data[@id="'+str(self.count)+'"]/Asset[@id="'+str(asset)+'"]/Task[@id="'+str(task.id)+'"]')[0].text
+        date = xml.xpath('//Data[@id="'+str(self.count)+'"]/Asset[@id="'+str(asset)+'"] \
+                          /Task[@id="'+str(task.id)+'"]')[0].text
         return datetime_parser.parse(date)
                 
     def write(self, asset, task, date, count):        

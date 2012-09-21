@@ -1,5 +1,5 @@
 from datetime import timedelta
-import main
+from outputs.Output import Output
 
 class PushToRight:
     
@@ -8,9 +8,13 @@ class PushToRight:
         totalTasks = len(input.tasks)
         self.conflicts = 0
         self.prev = 0
-        self.name = "PushRight"
-        
-        if(input.conf.pushcal): self.calendar(input)
+        self.name = "PushRight"        
+        self.output = Output(input)
+
+        if(input.trace): 
+            self.output.console()
+        if(input.conf.pushcal): 
+            self.calendar(input)
         
         """
         Prioritize the tasks that require higher percentage of resources.
@@ -56,7 +60,7 @@ class PushToRight:
                 start += timedelta(days=1) # Shift to the right one day when blocked
                 self.conflicts += 1
             end = input.schedule.add(asset, task, start) # Add to schedule
-            self.output(asset, task, input, start, end)
+            self.console(asset, task, input, start, end)
             start = task.next(asset, end)
     
     def bundleSchedule(self, bundle, asset, input, task, start):
@@ -82,7 +86,7 @@ class PushToRight:
                 if not bundle_task.withinInterval(input.schedule, asset, start):
                     end = input.schedule.add(asset, bundle_task, start)
                 
-                    self.output(asset, bundle_task, input, start, end)
+                    self.console(asset, bundle_task, input, start, end)
                 
                     """Find the the most costly task."""
                     for manpower in bundle_task.manpowers:
@@ -109,20 +113,20 @@ class PushToRight:
                 # input.schedule.processed.append(bundle_task.id)
             start = task.next(asset, end)
     
-    def output(self, asset, task, input, start, end):
+    def console(self, asset, task, input, start, end):
         """Print out the scheduling output to the console."""
-        main.Output.printSchedule(self, asset, task, start, end) 
+        self.output.printSchedule(self, asset, task, start, end) 
     
     def analytics(self,input):
         """Print out the cost analysis for the algorithm."""
         print "\n",                                                                            \
-              self.name+":", input.schedule.dataSource,                                        \
+              self.name + ":", input.schedule.dataSource, input.count,                         \
               "    Manhours:", input.schedule.totalManhours,                                   \
               "    Adjustments:", self.conflicts
         
         """Write out metrics to a file."""
         if(input.conf.metrics):
-            main.outputs.output.writeMetrics(input, self.conflicts)
+            self.output.writeMetrics(input, self.conflicts)
     
     def calendar(self,input):
         """Initiate the Google Calendar."""
