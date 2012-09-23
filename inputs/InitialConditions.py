@@ -61,7 +61,7 @@ class InitialConditions:
                 else:
                     if(task.interval != 0 and task.threshold != 0):
                         date = self.read(asset, task)                
-                if(date is not None):
+                if(date is not None and task.interval > 0):
                     schedule.force(assets[asset], task, DateRange(date, date))
         if(self.reset):            
             self.xmlfile.write(etree.tostring(self.xml, pretty_print=True))

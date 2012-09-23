@@ -157,8 +157,8 @@ class Task:
             if tasks_set and self in bundle:
                 return bundle
             """If no prior scheduling or scheduled prior to interval."""
-            if not concurrent.withinInterval(input.schedule, asset, start):                
-                bundle = self.bundle(bundle, self.concur, asset, input)
+            # if not concurrent.withinInterval(input.schedule, asset, start):                
+            bundle = self.bundle(bundle, self.concur, asset, input)
         return bundle
     
     def bundle(self, bundle, tasks, asset, input):
@@ -213,8 +213,13 @@ class Task:
             if self.id in schedule._scheduledTasks[asset.id][date]:
                 """Is the date found in the interval daterange?"""
                 if before.within(date):
-                    return True
+                    # for a in before.range():
+                    #     print a
+                    return True                    
                 if after.within(date):
-                    return True               
+                    # for a in after.range():
+                    #     print a
+                    return True
+                                   
         return False        
        

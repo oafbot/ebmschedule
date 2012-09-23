@@ -1,8 +1,10 @@
 #!/usr/bin/python
 import inputs, algorithms, outputs
 import sys
+from tests.Tests import Tests
 
 if __name__ == "__main__":
+
     if(len(sys.argv)>1):
         counter = sys.argv[1]
     else:
@@ -13,7 +15,8 @@ if __name__ == "__main__":
     # output = outputs.Outputs(model).output
 
     # Test Scheduling Output
-    # tests
+    if(algorithm.results.conf.testing):
+        test = Tests(algorithm.results)
 
     # Display Metrics
     # metrics

@@ -27,7 +27,7 @@ class Schedule:
         return _task.dateRange.end
     
     def blocked(self, asset, task, date):
-        """Return true if task can be scheduled on that day."""
+        """Return False if task can be scheduled on that day."""
         _task = task.schedule(date) #Create scheduled task (prevent threading issues)
         
         for date in _task.dateRange.range():
@@ -65,7 +65,6 @@ class Schedule:
 
             """If not a metatask check if task falls within the interval."""
             if task.id != 0 and task.withinInterval(self, asset, date):
-                # print "true"
                 return True
             
         return False

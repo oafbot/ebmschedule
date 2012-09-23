@@ -48,6 +48,8 @@ class PushToRight:
                         self.regularSchedule(asset, task, input, start)
             input.schedule.processed = []
         self.analytics(input)
+        self.results = input
+        
        
     def regularSchedule(self, asset, task, input, start):
         """
@@ -59,9 +61,11 @@ class PushToRight:
             while(input.schedule.blocked(asset, task, start)):
                 start += timedelta(days=1) # Shift to the right one day when blocked
                 self.conflicts += 1
+                # print "push"
             end = input.schedule.add(asset, task, start) # Add to schedule
             self.console(asset, task, input, start, end)
             start = task.next(asset, end)
+        return start
     
     def bundleSchedule(self, bundle, asset, input, task, start):
         """
@@ -76,18 +80,19 @@ class PushToRight:
             while(input.schedule.blocked(asset, metatask, start)):
                 start += timedelta(days=1)
                 self.conflicts += 1
+                # print "push"
             remainder_hours = 0            # The hours carried over from the preceding task
             maxhours = task.hoursPerDay    # The work hours in a day
             longest = 0                    # The task that takes the longest to perform
             
             """For each task in the bundle, schedule in order."""
             for bundle_task in bundle:
-                overhours  = False
-                if not bundle_task.withinInterval(input.schedule, asset, start):
+                overhours  = False                
+
+                if not bundle_task.withinInterval(input.schedule, asset, start):                    
                     end = input.schedule.add(asset, bundle_task, start)
-                
                     self.console(asset, bundle_task, input, start, end)
-                
+                    
                     """Find the the most costly task."""
                     for manpower in bundle_task.manpowers:
                         if manpower.hours > longest: longest = manpower.hours
@@ -107,9 +112,12 @@ class PushToRight:
                         remainder_hours += hours
                 
                     """Set the start date. Push to next day if overtime."""
-                    if overhours: start = end + timedelta(days=1)
-                    else: start = end
-                else: end = start
+                    if overhours: 
+                        start = end + timedelta(days=1)
+                    else: 
+                        start = end
+                else: 
+                    end = start
                 # input.schedule.processed.append(bundle_task.id)
             start = task.next(asset, end)
     
