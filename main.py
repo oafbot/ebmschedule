@@ -4,17 +4,22 @@ import sys
 from tests.Tests import Tests
 
 if __name__ == "__main__":
-
+    """Handle command line args."""
     if(len(sys.argv)>1):
         counter = sys.argv[1]
     else:
         counter = 0
-
-    model = inputs.Inputs(counter).model    
+    
+    """Construct the model."""
+    model = inputs.Inputs(counter).model
+    
+    """Feed the model to the algorithm."""    
     algorithm = algorithms.Algorithms(model).algorithm
+    
+    """Configure outputs."""
     # output = outputs.Outputs(model).output
-
-    # Test Scheduling Output
+    
+    """Test Scheduling Output."""
     if(algorithm.results.conf.testing):
         test = Tests(algorithm.results)
 

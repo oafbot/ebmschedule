@@ -20,8 +20,7 @@ class Task:
         self.skills              = []
         self.days                = 0
         self.manhours            = 0
-        self.totalAvailableHours = 0
-        
+        self.totalAvailableHours = 0        
         self.required            = False
         self.concurrent          = False
         self.first_run           = False
@@ -45,14 +44,15 @@ class Task:
             return self.addDays(asset.start, self.threshold)
         elif self.required and self.first_run: 
             self.first_run = False
-            return asset.start
+            # return asset.start
+            return self.addDays(asset.start, self.interval)
         # elif self.concurrent and self.first_run:
         #     self.first_run = False
         #     return self.addDays(date, self.interval)
-        elif self.required or self.concurrent: 
-            return self.addDays(date, self.interval)
-        
-        return max(self.addDays(date, self.interval), self.addDays(asset.start, self.threshold))
+        # elif self.required or self.concurrent: 
+        #             return self.addDays(date, self.interval)
+        return self.addDays(date, self.interval)
+        # return max(self.addDays(date, self.interval), self.addDays(asset.start, self.threshold))
         # without rebasing it would be: return self.addDays(date, self.interval) 
     
     def end(self, start):
@@ -62,13 +62,15 @@ class Task:
     def dateRange(self, date):
         """Set the date range"""
         from objects.DateRange import DateRange
+        self._start = date
+        self._end = self.end(date)
         self.dateRange = DateRange(date, self.end(date))
     
     def addDays(self, date, days):
         """Return the sum of the date and the time difference between today and 'days'-1."""
         from datetime import timedelta
         from math import floor
-        days -= 1 #commented out because of scheduling paradox for end date.
+        days -= 1
         return date + timedelta(days=floor(days)) #todo: decrement precision if decimal
     
     def precal(self):
@@ -202,7 +204,6 @@ class Task:
         before = DateRange(start - (interval - self.relax), start)
         after  = DateRange(end, end + (interval - self.relax))
         dates = schedule._scheduledTasks[asset.id].keys()
-        # dates.sort()
 
         if self.concurrent and schedule.processed.count(self.id) > 1: 
             """Check if task has already been processed together with its concurrent task."""

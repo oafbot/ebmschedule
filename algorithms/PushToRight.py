@@ -30,23 +30,26 @@ class PushToRight:
             ),
             reverse=True)
         
-        for asset in input.assets:
-            for task in input.tasks:
+        
+        for task in input.tasks:
+            for asset in input.assets:
                 if(task.interval):
                     """
                     If the task is to be performed at a set interval,
                     Set the new start date to the later of either:
                       A. The last time a task was performed on a given asset
                       B. The start date of the given date range.
-                    """                    
+                    """ 
+                    # print input.schedule.last(asset, task)                  
                     start = task.next(asset, input.schedule.last(asset, task))
+                    # print start
                     start = max(start, input.schedule.dateRange.start)
                     bundle = task.checkConstraints(list(), asset, input)
                     if len(bundle) > 1:
                         self.bundleSchedule(bundle, asset, input, task, start)
                     else:
                         self.regularSchedule(asset, task, input, start)
-            input.schedule.processed = []
+                input.schedule.processed = []
         self.analytics(input)
         self.results = input
         

@@ -6,7 +6,7 @@ config = Config()
 config.bigdata = 0
 config.reset = True
 config.fixed = True
-config.cap = 1000
+config.cap = 100
 
 if(config.bigdata): 
     from inputs.BigModel import BigModel   

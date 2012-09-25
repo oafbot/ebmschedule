@@ -47,13 +47,13 @@ class InitialConditions:
                 
                 if(self.reset):                
                     for count in range(0, self.cap):
-                        if(task.interval < task.threshold):
+                        if(task.interval < task.threshold or task.threshold == 0):
                             diff = task.interval
                         else:
                             diff = task.threshold
                         if(diff != 0):
                             start = self.config.start - timedelta(days = diff)
-                            end   = self.config.start                   
+                            end   = self.config.start - timedelta(days = 1)                  
                             date  = self.random_date(start, end)
                             # if(self.config.fixed):
                             self.write(asset, task, date, count)

@@ -64,7 +64,7 @@ class Schedule:
                             if int(meta_id) in self._conflictTasks[asset.id][date]: return True
 
             """If not a metatask check if task falls within the interval."""
-            if task.id != 0 and task.withinInterval(self, asset, date):
+            if task.id != 0 and task.withinInterval(self, asset, date) and task.first_run:
                 return True
             
         return False
@@ -91,14 +91,14 @@ class Schedule:
             
             for skill in task.skills:
                 """Assign skills to the date."""
-                if date not in self._skillsInWork.keys(): 
+                if date not in self._skillsInWork.keys():
                     self._skillsInWork[date] = { skill.id:skill.hoursPerDay }
                 elif skill.id not in self._skillsInWork[date].keys():
                     self._skillsInWork[date][skill.id] = skill.hoursPerDay
                 else:
                     self._skillsInWork[date][skill.id] += skill.hoursPerDay
             
-            if asset.id not in self._scheduledTasks.keys(): 
+            if asset.id not in self._scheduledTasks.keys():
                 """Assign asset, date, and task to list of scheduled tasks."""
                 self._scheduledTasks[asset.id] = { date: [task.id] }
             elif date not in self._scheduledTasks[asset.id]: 
