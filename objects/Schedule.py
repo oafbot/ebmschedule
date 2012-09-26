@@ -12,7 +12,7 @@ class Schedule:
         self.totalManhours   = 0
         self.forced          = []        
         self.cal             = None
-        self.processed       = []
+        self.processed       = set()
         
     def force(self, asset, task, dateRange):
         """Force an asset to be scheduled for specified task to be performed."""

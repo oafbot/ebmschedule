@@ -32,9 +32,8 @@ class PushRightRelaxLeft:
                 ((1-weight) * (len(task.conflicts) / (totalTasks *1.0)))
             ),
             reverse=True)
-        
-        for asset in input.assets:
-            for task in input.tasks:
+        for task in input.tasks:
+            for asset in input.assets:            
                 if(task.interval):
                     """
                     If the task is to be performed at a set interval,
@@ -49,9 +48,10 @@ class PushRightRelaxLeft:
                         self.bundleSchedule(bundle, asset, input, task, start)
                     else:
                         self.regularSchedule(asset, task, input, start)
-            self.schedule.processed = []
+                self.schedule.processed = []
         # input.schedule.cal.PushBatchRequest()
         self.analytics(input)
+        self.results = input
 
     def regularSchedule(self, asset, task, input, start):
         """

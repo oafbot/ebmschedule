@@ -1,3 +1,4 @@
+from datetime import datetime
 from datetime import timedelta
 from outputs.Output import Output
 
@@ -10,7 +11,8 @@ class PushToRight:
         self.prev = 0
         self.name = "PushRight"        
         self.output = Output(input)
-
+        self.stopwatch = datetime.now()
+        
         if(input.trace): 
             self.output.console()
         if(input.conf.pushcal): 
@@ -40,16 +42,14 @@ class PushToRight:
                       A. The last time a task was performed on a given asset
                       B. The start date of the given date range.
                     """ 
-                    # print input.schedule.last(asset, task)                  
                     start = task.next(asset, input.schedule.last(asset, task))
-                    # print start
                     start = max(start, input.schedule.dateRange.start)
                     bundle = task.checkConstraints(list(), asset, input)
                     if len(bundle) > 1:
                         self.bundleSchedule(bundle, asset, input, task, start)
                     else:
                         self.regularSchedule(asset, task, input, start)
-                input.schedule.processed = []
+                input.schedule.processed.clear()
         self.analytics(input)
         self.results = input
         
@@ -79,6 +79,7 @@ class PushToRight:
         Schedule individual tasks in consecutive order once an empty slot is found.
         """
         metatask = task.bundleAsTask(bundle, asset)
+        proc = set()
         while(start <= input.schedule.dateRange.end):
             while(input.schedule.blocked(asset, metatask, start)):
                 start += timedelta(days=1)
@@ -87,12 +88,11 @@ class PushToRight:
             remainder_hours = 0            # The hours carried over from the preceding task
             maxhours = task.hoursPerDay    # The work hours in a day
             longest = 0                    # The task that takes the longest to perform
-            
+                        
             """For each task in the bundle, schedule in order."""
             for bundle_task in bundle:
-                overhours  = False                
-
-                if not bundle_task.withinInterval(input.schedule, asset, start):                    
+                overhours  = False
+                if not bundle_task.withinInterval(input.schedule, asset, start):        
                     end = input.schedule.add(asset, bundle_task, start)
                     self.console(asset, bundle_task, input, start, end)
                     
@@ -119,9 +119,11 @@ class PushToRight:
                         start = end + timedelta(days=1)
                     else: 
                         start = end
-                else: 
+                    if(bundle_task.concurrent and bundle_task.id in task.concur):
+                        proc.add(bundle_task.id)
+                else:
                     end = start
-                # input.schedule.processed.append(bundle_task.id)
+            input.schedule.processed.update(proc)
             start = task.next(asset, end)
     
     def console(self, asset, task, input, start, end):
@@ -130,10 +132,11 @@ class PushToRight:
     
     def analytics(self,input):
         """Print out the cost analysis for the algorithm."""
-        print "\n",                                                                            \
-              self.name + ":", input.schedule.dataSource, input.count,                         \
-              "    Manhours:", input.schedule.totalManhours,                                   \
+        print "\n", \
+              self.name + ":", input.schedule.dataSource, input.count, \
+              "    Manhours:", input.schedule.totalManhours, \
               "    Adjustments:", self.conflicts
+        print "\nExecution:", str(datetime.now()-self.stopwatch)[:-4]
         
         """Write out metrics to a file."""
         if(input.conf.metrics):
