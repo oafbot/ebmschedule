@@ -47,3 +47,16 @@ PushToRight: Simple-Model 21, Manhours: 5905 Adjustments: 256
 PushToRight: Simple-Model 22, Manhours: 5550 Adjustments: 218
 PushToRight: Simple-Model 23, Manhours: 5063 Adjustments: 186
 PushToRight: Simple-Model 23, Manhours: 5063 Adjustments: 186
+PushToRight: Simple-Model 23, Manhours: 5063 Adjustments: 186
+PushToRight: Simple-Model 23, Manhours: 5063 Adjustments: 186
+PushToRight: Simple-Model 23, Manhours: 5063 Adjustments: 186
+PushToRight: Simple-Model 22, Manhours: 5550 Adjustments: 215
+PushToRight: Simple-Model 23, Manhours: 5209 Adjustments: 164
+PushToRight: Simple-Model 23, Manhours: 5209 Adjustments: 164
+PushToRight: Simple-Model 23, Manhours: 5209 Adjustments: 164
+PushToRight: Simple-Model 23, Manhours: 5209 Adjustments: 164
+PushToRight: Simple-Model 23, Manhours: 5209 Adjustments: 164
+PushToRight: Simple-Model 23, Manhours: 5209 Adjustments: 164
+PushToRight: Simple-Model 23, Manhours: 5209 Adjustments: 164
+PushToRight: Simple-Model 23, Manhours: 5063 Adjustments: 186
+PushToRight: Simple-Model 23, Manhours: 5209 Adjustments: 164
