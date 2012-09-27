@@ -1,4 +1,4 @@
-class Algorithms:
+class Algos:
     def __init__(self, model):
         import main
         from PushToRight import PushToRight

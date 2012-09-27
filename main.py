@@ -8,13 +8,13 @@ if __name__ == "__main__":
     if(len(sys.argv)>1):
         counter = sys.argv[1]
     else:
-        counter = 0
+        counter = 23
     
     """Construct the model."""
     model = inputs.Inputs(counter).model
     
     """Feed the model to the algorithm."""    
-    algorithm = algorithms.Algorithms(model).algorithm
+    algorithm = algorithms.Algos(model).algorithm
     
     """Configure outputs."""
     # output = outputs.Outputs(model).output

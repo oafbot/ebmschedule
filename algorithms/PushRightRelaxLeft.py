@@ -1,74 +1,30 @@
 from datetime import timedelta
-import apiclient.errors
-from outputs.Output import Output
+from Algorithm import Algorithm
 
-class PushRightRelaxLeft:
+class PushRightRelaxLeft(Algorithm):
+
+    def __init__(self, input, weight=1.0, name="PushRight-RelaxLeft"):
+        Algorithm.__init__(self, input, weight, name, -3)
     
-    def __init__(self, input):
-        weight = 1.0 # 0 <= weight <= 1
-        totalTasks = len(input.tasks)
-        self.conflicts = 0
-        self.prev = 0
-        self.name = "PushRight-RelaxLeft"
-        self.RELAX = -3
-        self.schedule = input.schedule
-        self.output = Output(input)
-
-        if(input.trace): 
-            self.output.console()
-        if(input.conf.pushcal): 
-            self.calendar(input)
-                
-        """
-        Prioritize the tasks that require higher percentage of resources.
-        How many of the skills for the task are available.
-        Divide manhours cost with total available manhours.
-        Schedule the complex ( i.e. conflict heavy ) task first.
-        """
-        input.tasks.sort(key=lambda task:
-            (
-                (weight * ((task.manhours / (task.totalAvailableHours *1.0))
-                if task.totalAvailableHours else 0)) + 
-                ((1-weight) * (len(task.conflicts) / (totalTasks *1.0)))
-            ),
-            reverse=True)
-        for task in input.tasks:
-            for asset in input.assets:            
-                if(task.interval):
-                    """
-                    If the task is to be performed at a set interval,
-                    Set the new start date to the later of either:
-                      A. The last time a task was performed on a given asset
-                      B. The start date of the given date range.
-                    """                    
-                    start = task.next(asset, self.schedule.last(asset, task))
-                    start = max(start, self.schedule.dateRange.start)
-                    bundle = task.checkConstraints(list(), asset, input)
-                    if len(bundle) > 1:
-                        self.bundleSchedule(bundle, asset, input, task, start)
-                    else:
-                        self.regularSchedule(asset, task, input, start)
-                self.schedule.processed = []
-        # input.schedule.cal.PushBatchRequest()
-        self.analytics(input)
-        self.results = input
-
     def regularSchedule(self, asset, task, input, start):
         """
         Schedule single tasks.
         While the start date is within the date range,
         Keep Shifting one day forward as long as a schedule conflict exists.
         """
-        oInterval = task.interval
-        oStart = start
         while(start <= input.schedule.dateRange.end):
-            n = 0 
-            start = self.shift(asset, task, start, oInterval, oStart, n)
+            n = 0
+            oInterval = task.interval
+            oStart = start 
+            start = self.shift(asset, task, start, oInterval, oStart, n, input.schedule)
             task.interval = oInterval
-            end = input.schedule.add(asset, task, start)
-            self.console(asset, task, input, start, end)
+            if not task.withinInterval(input.schedule, asset, start):  
+                end = input.schedule.add(asset, task, start)
+                self.console(asset, task, input, start, end)
+            else : 
+                end = start
             start = task.next(asset, end)
-
+            
     def bundleSchedule(self, bundle, asset, input, task, start):
         """
         Schedule bundled tasks.
@@ -82,7 +38,7 @@ class PushRightRelaxLeft:
         oStart = start
         while(start <= input.schedule.dateRange.end):
             n = 0
-            start = self.shift(asset, metatask, start, oInterval, oStart, n)
+            start = self.shift(asset, metatask, start, oInterval, oStart, n, input.schedule)
             metatask.interval = oInterval
             remainder_hours = 0            # The hours carried over from the preceding task
             maxhours = task.hoursPerDay    # The work hours in a day
@@ -121,43 +77,20 @@ class PushRightRelaxLeft:
                 # input.schedule.processed.append(bundle_task.id)
             start = task.next(asset, end)
     
-    def shift(self, asset, task, start, interval, ostart, n):
-        while(self.schedule.blocked(asset, task, start)):
-            if n > self.RELAX:
-                task.interval = interval + self.RELAX
+    def shift(self, asset, task, start, interval, orig, n, schedule):
+        while(schedule.blocked(asset, task, start)):
+            if n > self.relax:
+                task.interval = interval + self.relax
                 if start - timedelta(days=1) >= asset.start:
                     start -= timedelta(days=1)
                     n -= 1
-                    self.conflicts += 1
-                else: break
+                    # self.conflicts += 1
+                    print "shove"
             else:
-                if start < ostart:
-                    start = ostart
+                if start < orig:
+                    start = orig
                 task.interval = interval
                 start += timedelta(days=1)
+                # print "push"
                 self.conflicts += 1
         return start
-    
-    def console(self, asset, task, input, start, end):
-        """Print out the scheduling output to the console."""
-        self.output.printSchedule(self, asset, task, start, end)
-
-    def analytics(self,input):
-        """Print out the cost analysis for the algorithm."""
-        print "\n",                                                                            \
-              self.name+":", input.schedule.dataSource, input.count,                            \
-              "    Manhours:", input.schedule.totalManhours,                                   \
-              "    Adjustments:", self.conflicts
-        
-        """Write out metrics to a file."""
-        if(input.conf.metrics):
-            self.output.writeMetrics(input, self.conflicts)
-    
-    def calendar(self,input):
-        """Initiate the Google Calendar."""
-        from outputs.Calendar import Calendar
-
-        if not input.schedule.cal: 
-            input.schedule.cal = Calendar()
-
-        input.schedule.cal.Connect(input)

@@ -1,59 +1,11 @@
-from datetime import datetime
 from datetime import timedelta
-from outputs.Output import Output
+from Algorithm import Algorithm
 
-class PushToRight:
+class PushToRight(Algorithm):
     
-    def __init__(self, input):
-        weight = 1.0 # 0 <= weight <= 1
-        totalTasks = len(input.tasks)
-        self.conflicts = 0
-        self.prev = 0
-        self.name = "PushRight"        
-        self.output = Output(input)
-        self.stopwatch = datetime.now()
-        
-        if(input.trace): 
-            self.output.console()
-        if(input.conf.pushcal): 
-            self.calendar(input)
-        
-        """
-        Prioritize the tasks that require higher percentage of resources.
-        How many of the skills for the task are available.
-        Divide manhours cost with total available manhours.
-        Schedule the complex ( i.e. conflict heavy ) task first.
-        """
-        input.tasks.sort(key=lambda task: 
-            (     
-                (weight * ((task.manhours / (task.totalAvailableHours *1.0)) 
-                if task.totalAvailableHours else 0)) + 
-                ((1-weight) * (len(task.conflicts) / (totalTasks *1.0)))
-            ),
-            reverse=True)
-        
-        
-        for task in input.tasks:
-            for asset in input.assets:
-                if(task.interval):
-                    """
-                    If the task is to be performed at a set interval,
-                    Set the new start date to the later of either:
-                      A. The last time a task was performed on a given asset
-                      B. The start date of the given date range.
-                    """ 
-                    start = task.next(asset, input.schedule.last(asset, task))
-                    start = max(start, input.schedule.dateRange.start)
-                    bundle = task.checkConstraints(list(), asset, input)
-                    if len(bundle) > 1:
-                        self.bundleSchedule(bundle, asset, input, task, start)
-                    else:
-                        self.regularSchedule(asset, task, input, start)
-                input.schedule.processed.clear()
-        self.analytics(input)
-        self.results = input
-        
-       
+    def __init__(self, input, weight=1.0, name="PushRight"):        
+        Algorithm.__init__(self, input, weight, name)        
+                       
     def regularSchedule(self, asset, task, input, start):
         """
         Schedule single tasks.
@@ -64,11 +16,12 @@ class PushToRight:
             while(input.schedule.blocked(asset, task, start)):
                 start += timedelta(days=1) # Shift to the right one day when blocked
                 self.conflicts += 1
-                # print "push"
-            end = input.schedule.add(asset, task, start) # Add to schedule
-            self.console(asset, task, input, start, end)
+            if not task.withinInterval(input.schedule, asset, start):  
+                end = input.schedule.add(asset, task, start) # Add to schedule
+                self.console(asset, task, input, start, end)
+            else : 
+                end = start
             start = task.next(asset, end)
-        return start
     
     def bundleSchedule(self, bundle, asset, input, task, start):
         """
@@ -80,11 +33,19 @@ class PushToRight:
         """
         metatask = task.bundleAsTask(bundle, asset)
         proc = set()
+        skip = []
+        
+        for i in self.processed:
+            for concur in task.concur:
+                if concur in self.processed[i]:
+                    skip.append(concur) # pass
+                    # return
+        
         while(start <= input.schedule.dateRange.end):
             while(input.schedule.blocked(asset, metatask, start)):
                 start += timedelta(days=1)
                 self.conflicts += 1
-                # print "push"
+            
             remainder_hours = 0            # The hours carried over from the preceding task
             maxhours = task.hoursPerDay    # The work hours in a day
             longest = 0                    # The task that takes the longest to perform
@@ -92,6 +53,8 @@ class PushToRight:
             """For each task in the bundle, schedule in order."""
             for bundle_task in bundle:
                 overhours  = False
+                if(bundle_task.id in skip):
+                    return
                 if not bundle_task.withinInterval(input.schedule, asset, start):        
                     end = input.schedule.add(asset, bundle_task, start)
                     self.console(asset, bundle_task, input, start, end)
@@ -120,33 +83,10 @@ class PushToRight:
                     else: 
                         start = end
                     if(bundle_task.concurrent and bundle_task.id in task.concur):
-                        proc.add(bundle_task.id)
+                        proc.add(task.id)
                 else:
                     end = start
-            input.schedule.processed.update(proc)
+            if(proc):
+                self.processed[asset.id].update(proc)                
             start = task.next(asset, end)
-    
-    def console(self, asset, task, input, start, end):
-        """Print out the scheduling output to the console."""
-        self.output.printSchedule(self, asset, task, start, end) 
-    
-    def analytics(self,input):
-        """Print out the cost analysis for the algorithm."""
-        print "\n", \
-              self.name + ":", input.schedule.dataSource, input.count, \
-              "    Manhours:", input.schedule.totalManhours, \
-              "    Adjustments:", self.conflicts
-        print "\nExecution:", str(datetime.now()-self.stopwatch)[:-4]
-        
-        """Write out metrics to a file."""
-        if(input.conf.metrics):
-            self.output.writeMetrics(input, self.conflicts)
-    
-    def calendar(self,input):
-        """Initiate the Google Calendar."""
-        from outputs.Calendar import Calendar
-        
-        if not input.schedule.cal: 
-            input.schedule.cal = Calendar()
-        
-        input.schedule.cal.Connect(input)
+            

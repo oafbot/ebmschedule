@@ -44,7 +44,7 @@ class Model:
                     Manpower(2, skills[2], 4),
                     Manpower(3, skills[2], 2)
                 ], 
-                conflicts=[2,4],
+                conflicts=[2,4,7],
                 prep   = [],
                 prereq = [],
                 subseq = [],
@@ -59,7 +59,7 @@ class Model:
                 manpowers=[
                     Manpower(4, skills[3], 20)
                 ], 
-                conflicts=[1,3,4,5,6,7,8,9],
+                conflicts=[1,3,4,5,6,8,9],
                 prep   = [],
                 prereq = [7],
                 subseq = [],
@@ -138,7 +138,7 @@ class Model:
                   Manpower(11, skills[4], 5),
                   Manpower(12, skills[4], 5)
               ], 
-              conflicts=[1,2,3,4,5,6,8,9],
+              conflicts=[1,3,4,5,6,8,9],
               prep   = [],
               prereq = [],
               subseq = [],

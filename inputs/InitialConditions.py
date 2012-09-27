@@ -71,12 +71,15 @@ class InitialConditions:
     def random_date(self, start, end):
         """This function will return a random datetime between two datetime objects."""
         delta = end - start        
+        
         # delta_secs = (delta.days * 24 * 60 * 60) + delta.seconds
         # random_second = randrange(delta_secs)
-        # return (start + timedelta(seconds=random_second))        
+        # print (start + timedelta(seconds=random_second))
+        # return (start + timedelta(seconds=random_second))       
         delta_days = (delta.days)
         random_day = randrange(delta_days)
-        return (start + timedelta(days=random_day))
+        print (start + timedelta(days=random_day, hours=8))
+        return (start + timedelta(days=random_day, hours=8))
             
     def read(self, asset, task):
         parser = etree.XMLParser()       

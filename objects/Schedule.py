@@ -66,7 +66,7 @@ class Schedule:
             """If not a metatask check if task falls within the interval."""
             if task.id != 0 and task.withinInterval(self, asset, date) and task.first_run:
                 return True
-            
+                            
         return False
     
     def last(self, asset, task):
@@ -114,7 +114,7 @@ class Schedule:
             else:
                 self._conflictTasks[asset.id][date] = \
                 self._conflictTasks[asset.id][date].union(task.conflicts)
-        
+
         """Tally manhours."""
         self.totalManhours += task.manhours
         """Call Google Calendar scheduler."""
@@ -122,7 +122,7 @@ class Schedule:
         if(Config().pushcal and not forced):
             self.scheduleCalendar(task,asset)
     
-    def scheduleCalendar(self,task,asset):
+    def scheduleCalendar(self, task, asset):
         """Schedule to Google Calendar."""        
         from outputs.Calendar import Calendar
         from datetime import timedelta

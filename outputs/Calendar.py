@@ -155,7 +155,7 @@ class Calendar:
         """Delete a specific event."""
         self.service.events().delete(calendarId=calendar['id'], eventId=event['id']).execute()
 
-    def Connect(input):
+    def Connect(self, input):
         count = 0
         colors = input.schedule.cal.config.colors
 

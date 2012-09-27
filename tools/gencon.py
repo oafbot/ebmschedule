@@ -2,11 +2,14 @@ import sys
 sys.path.append( '../' )
 from inputs.Config import Config 
 config = Config()
-
-config.bigdata = 0
 config.reset = True
 config.fixed = True
-config.cap = 100
+# ===========================================
+# = ALL YOUR CONFIGURATIONS ARE BELOW TO US =
+# ===========================================
+config.bigdata = 1
+config.cap = 1000
+
 
 if(config.bigdata): 
     from inputs.BigModel import BigModel   

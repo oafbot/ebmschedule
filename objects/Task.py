@@ -26,8 +26,8 @@ class Task:
         # self.parent              = False
         self.first_run           = False
         # self.relax               = timedelta(days=int(self.interval/4))
-        self.relax               = timedelta(days=0)
-        self.requisite_interval  = int(round(self.interval / 1))
+        self.relax               = timedelta(days=1)
+        self.requisite_interval  = int(round(self.interval / 2))
         
         if len(manpowers): self.precal() #TODO: Should come from sequencing
     
@@ -39,20 +39,16 @@ class Task:
          A. date plus the delta of interval
          B. start date plus the delta of threshold
         """
-        #TODO: Add usage units
-        #TODO: Add task start/end
-        #TODO: Add schedule start/end/active
         if date == None: 
             return self.addDays(asset.start, self.threshold)
         elif self.required and self.first_run: 
             self.first_run = False
             # return asset.start
             return self.addDays(date, self.interval)
-        # elif self.concurrent and self.first_run:
-        #     self.first_run = False
-        #     return self.addDays(date, self.interval)
-        # elif self.required or self.concurrent: 
-        #       return self.addDays(date, self.interval)
+        elif self.concurrent and self.first_run:
+            self.first_run = False
+            return self.addDays(date, self.interval)
+
         return self.addDays(date, self.interval)
     
     def end(self, start):
@@ -112,10 +108,8 @@ class Task:
         """Check the constrains and bundle tasks together when appropriate."""
         if self.prereq: self.satisfyRequisite(bundle, asset, input)              # prerequisite
         if self.prep: bundle = self.bundle(bundle, self.prep, asset, input)      # prepatory
-        if not bundle or self not in bundle:                                     # primary task
-            self.parent = True
-            bundle.append(self)
-        if self.concur: bundle = self.concurrence(bundle, asset, input)          # concurrent
+        if not bundle or self not in bundle: bundle.append(self)                 # primary task            
+        # if self.concur: bundle = self.concurrence(bundle, asset, input)          # concurrent
         if self.subseq: bundle = self.bundle(bundle, self.subseq, asset, input)  # subsequent
         return bundle
     
@@ -144,10 +138,6 @@ class Task:
         last = input.schedule.last(asset, task)
         start = self.next(asset, input.schedule.last(asset, self))
         start = max(start, date)
-        # print "last", last
-        # print "start", start
-        # print start - timedelta(days=self.requisite_interval)
-        # print self.requisite_interval
         if(last is None):
             return False
         elif(last < start - timedelta(days=self.requisite_interval)):
@@ -165,7 +155,6 @@ class Task:
                     t.concurrent = True
                     t.first_run = True
                     concurlist.append(t)
-                    # input.schedule.processed.append(t.id)
         """Check if tasks are already in the Bundle."""
         for concurrent in concurlist:
             if concurrent in bundle: tasks_set = True
@@ -176,7 +165,7 @@ class Task:
                 return bundle
             """If no prior scheduling or scheduled prior to interval."""
             last = input.schedule.last(asset, concurrent)
-            if not concurrent.withinInterval(input.schedule, asset, last):
+            if last is None or not concurrent.withinInterval(input.schedule, asset, last):
                 # print last
                 # print concurrent.name
                 # print concurrent.interval
@@ -224,20 +213,18 @@ class Task:
         before = DateRange(start - (interval - self.relax), start)
         after  = DateRange(end, end + (interval - self.relax))
         dates = schedule._scheduledTasks[asset.id].keys()
-
-        if self.concurrent and self.id in schedule.processed: 
-            """Check if task has already been processed together with its concurrent task."""
-            return True
-        
+            
         for date in dates:
             """If the task is scheduled for that date."""
             if self.id in schedule._scheduledTasks[asset.id][date]:
                 """Is the date found in the interval daterange?"""
                 if before.within(date):
                     # for a in before.range(): print a
+                    # print "true"
                     return True                    
                 if after.within(date):
                     # for a in after.range(): print a
+                    # print "true"
                     return True                                   
         return False        
        
