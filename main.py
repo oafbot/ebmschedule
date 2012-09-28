@@ -8,7 +8,7 @@ if __name__ == "__main__":
     if(len(sys.argv)>1):
         counter = sys.argv[1]
     else:
-        counter = 23
+        counter = 0
     
     """Construct the model."""
     model = inputs.Inputs(counter).model
@@ -21,7 +21,7 @@ if __name__ == "__main__":
     
     """Test Scheduling Output."""
     if(algorithm.results.conf.testing):
-        test = Tests(algorithm.results)
+        test = Tests(algorithm)
 
     # Display Metrics
     # metrics

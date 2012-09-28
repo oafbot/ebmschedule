@@ -157,7 +157,7 @@ class Model:
               prep   = [],
               prereq = [],
               subseq = [],
-              concur = [1]
+              concur = []
             ),
             9: Task(
               id=9, 

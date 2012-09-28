@@ -128,16 +128,20 @@ class Output:
                   str.ljust(str(end)[:-9], 10)
             algorithm.prev = asset.name
     
-    def writeMetrics(self, input, conflicts):
+    def writeMetrics(self, input, conflicts, name, exectime, now):
         import os
         if 'tools' in os.getcwd():
             path = "../metrics/"
         else: 
             path = "metrics/"
+        line = "\n----------------------------------------"+ \
+               "-----------------------------------------\n"
         fo = open(path + input.schedule.dataSource + ".txt", "ab+")
-        out = "PushToRight: " + input.schedule.dataSource + " " + str(input.count) + \
-              ", Manhours: " + str(input.schedule.totalManhours) + \
-              " Adjustments: " + str(conflicts) + "\n"
+        out = line+ name + ": " + input.schedule.dataSource + " " + str(input.count) + \
+              "\t[" + str(now)[:-7] + "]" + "\tExecution: " + exectime + line + \
+              str.ljust("Manhours: " + str(input.schedule.totalManhours), 25) + \
+              str.ljust("Adjustments: " + str(conflicts), 25) + "\n"
+              
 
         fo.write( out )
         fo.close()

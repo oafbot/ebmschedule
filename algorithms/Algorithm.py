@@ -52,7 +52,7 @@ class Algorithm:
                     Set the new start date to the later of either:
                       A. The last time a task was performed on a given asset
                       B. The start date of the given date range.
-                    """ 
+                    """
                     start = task.next(asset, input.schedule.last(asset, task))
                     start = max(start, input.schedule.dateRange.start)
                     bundle = task.checkConstraints(list(), asset, input)
@@ -70,15 +70,17 @@ class Algorithm:
     
     def analytics(self, input):
         """Print out the cost analysis for the algorithm."""
+        now = datetime.now()
+        exectime = str(now - self.stopwatch)[:-4]
         print "\n", \
               self.name + ":", input.schedule.dataSource, input.count, \
               "    Manhours:", input.schedule.totalManhours, \
               "    Adjustments:", self.conflicts
-        print "\nExecution:", str(datetime.now()-self.stopwatch)[:-4]
+        print "\nExecution:", exectime
         
         """Write out metrics to a file."""
         if(input.conf.metrics):
-            self.output.writeMetrics(input, self.conflicts)
+            self.output.writeMetrics(input, self.conflicts, self.name, exectime, now)
     
     def calendar(self, input):
         """Initiate the Google Calendar."""

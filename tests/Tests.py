@@ -4,10 +4,13 @@ from collections import namedtuple
 from objects.DateRange import DateRange
 
 class Tests:
-    def __init__(self, model):
-        self.schedule = model.schedule
-        self.tasks = model.tasks
-        self.assets = model.assets        
+    def __init__(self, algorithm):
+        self.algorithm = algorithm
+        self.model = self.algorithm.results
+        self.schedule = self.model.schedule
+        self.tasks = self.model.tasks
+        self.assets = self.model.assets        
+        self.total = 0
         self.IntervalCheck()
         self.ConflictCheck()
     
@@ -36,6 +39,7 @@ class Tests:
                         for t in self.schedule._schedule[asset.id]:
                             if(t.dateRange.start == date):
                                 SortedByTask[Index(Asset=asset.id, Task=task.id)].append(date)
+                                self.total += 1
         return SortedByTask
     
     def IntervalViolations(self, SortedByTask):
@@ -44,7 +48,10 @@ class Tests:
         prev = None
         prev_asset = None
         prev_task = None
-        counter = 0
+        violation = 0
+        ground = 0
+        ineff  = 0
+        groundedlist = []
         
         print "\n-------------------------------------------\
                \n------------- INTERVAL CHECKS -------------\
@@ -85,12 +92,44 @@ class Tests:
                         print "Last:", str(task.end(prev))[:-9], \
                               "\tDifference:\t", difference, "days"
                         print "-------------------------------------------"
-                        counter += 1
+                        violation += 1
+                        if(difference - task.interval > 0):
+                            ground += 1
+                            groundedlist.append(difference - task.interval)
+                        else:
+                            ineff += 1
                     prev = task.end(date)
                 else:
                     prev = None
-        print "\nTotal Interval Violations:", counter
-
+        
+        average_grounded = sum(groundedlist) / len(groundedlist)
+        
+        print "\nTotal violations:", violation, \
+              "\tGroundings:", ground, "\tInefficiencies:", ineff, "\tScheduled:", self.total, \
+              "\tOptimal:", self.total - violation, \
+              "\tAverage grounded:", str(average_grounded), " days"  
+        
+        self.writeMetrics(violation, ground, ineff, average_grounded)
+        
+    def writeMetrics(self, violations, groundings, inefficiencies, average_grounded):
+        """Write out metrics to a file."""
+        import os
+        if 'tools' in os.getcwd(): 
+            path = "../metrics/"
+        else: 
+            path = "metrics/"
+        optimal = self.total - violations
+        percent = int((float(optimal) / float(self.total)) * 100)
+        fo = open(path + self.schedule.dataSource + ".txt", "ab+")
+        out =  str.ljust("Groundings: " + str(groundings), 25) + \
+               str.ljust("Inefficiencies: " + str(inefficiencies), 25) + "\n" + \
+               str.ljust("Scheduled: " + str(self.total), 25) + \
+               str.ljust("Violations: " + str(violations), 25) + \
+               str.ljust("Optimal: " + str(optimal) + "  " + str(percent) + "%", 25) + "\n" + \
+               str.ljust("Average groundings: " + str(average_grounded) + " days", 25) + "\n"       
+        fo.write( out )
+        fo.close()
+              
     def strfdelta(self, tdelta, fmt):
         d = {"days": tdelta.days}
         d["hours"], rem = divmod(tdelta.seconds, 3600)
