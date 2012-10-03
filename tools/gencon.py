@@ -8,7 +8,7 @@ config.fixed = True
 # = ALL YOUR CONFIGURATIONS ARE BELOW TO US =
 # ===========================================
 config.bigdata = True
-config.cap = 10
+config.cap = 1
 
 
 if(config.bigdata): 

@@ -16,5 +16,6 @@ class DateRange:
         """Check if the date is found in the daterange."""
         for blocked in self.range():
             if(blocked - date > timedelta(days=0) and blocked - date < timedelta(days=1)):
+        # if( date >= self.start and date <= self.end ): 
                 return True
         return False

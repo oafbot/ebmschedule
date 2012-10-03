@@ -147,3 +147,753 @@ Manhours: 5875           Adjustments: 4
 Groundings: 13           Inefficiencies: 25       
 Scheduled: 1022          Violations: 38           Optimal: 984  96%        
 Average groundings: 1 days
+
+---------------------------------------------------------------------------------
+PushLeft: Simple-Model 0	[2012-09-28 17:47:08]	Execution: 0:00:02.20
+---------------------------------------------------------------------------------
+Manhours: 5959           Adjustments: 4           
+Groundings: 14           Inefficiencies: 87       
+Scheduled: 1323          Violations: 101          Optimal: 1222  92%       
+Average groundings: 1 days
+
+---------------------------------------------------------------------------------
+PushRight-RelaxLeft: Simple-Model 0	[2012-09-28 18:20:52]	Execution: 0:00:03.48
+---------------------------------------------------------------------------------
+Manhours: 6010           Adjustments: 296         
+Groundings: 19           Inefficiencies: 113      
+Scheduled: 1167          Violations: 132          Optimal: 1035  88%       
+Average groundings: 2 days
+
+---------------------------------------------------------------------------------
+PushRight-RelaxLeft: Simple-Model 0	[2012-09-28 18:26:27]	Execution: 0:00:03.46
+---------------------------------------------------------------------------------
+Manhours: 6010           Adjustments: 296         
+Groundings: 19           Inefficiencies: 113      
+Scheduled: 1167          Violations: 132          Optimal: 1035  88%       
+Average groundings: 2 days
+
+---------------------------------------------------------------------------------
+PushLeft: Simple-Model 0	[2012-09-28 18:31:21]	Execution: 0:00:02.27
+---------------------------------------------------------------------------------
+Manhours: 5959           Adjustments: 4           
+Groundings: 14           Inefficiencies: 87       
+Scheduled: 1323          Violations: 101          Optimal: 1222  92%       
+Average groundings: 1 days
+
+---------------------------------------------------------------------------------
+PushLeft: Simple-Model 0	[2012-09-28 18:32:51]	Execution: 0:00:02.19
+---------------------------------------------------------------------------------
+Manhours: 5959           Adjustments: 4           
+Groundings: 14           Inefficiencies: 87       
+Scheduled: 1323          Violations: 101          Optimal: 1222  92%       
+Average groundings: 1 days
+
+---------------------------------------------------------------------------------
+PushLeft: Simple-Model 0	[2012-09-28 18:38:38]	Execution: 0:00:02.21
+---------------------------------------------------------------------------------
+Manhours: 5959           Adjustments: 4           
+Groundings: 14           Inefficiencies: 87       
+Scheduled: 1323          Violations: 101          Optimal: 1222  92%       
+Average groundings: 1 days
+
+---------------------------------------------------------------------------------
+PushLeft: Simple-Model 0	[2012-09-28 18:43:06]	Execution: 0:00:02.20
+---------------------------------------------------------------------------------
+Manhours: 5959           Adjustments: 4           
+Groundings: 14           Inefficiencies: 87       
+Scheduled: 1323          Violations: 101          Optimal: 1222  92%       
+Average groundings: 1 days
+
+---------------------------------------------------------------------------------
+PushRight-RelaxLeft: Simple-Model 0	[2012-09-28 18:43:26]	Execution: 0:00:03.48
+---------------------------------------------------------------------------------
+Manhours: 6010           Adjustments: 296         
+Groundings: 19           Inefficiencies: 113      
+Scheduled: 1167          Violations: 132          Optimal: 1035  88%       
+Average groundings: 2 days
+
+---------------------------------------------------------------------------------
+PushRight: Simple-Model 0	[2012-09-28 18:46:12]	Execution: 0:00:03.14
+---------------------------------------------------------------------------------
+Manhours: 5731           Adjustments: 235         
+Groundings: 39           Inefficiencies: 65       
+Scheduled: 1101          Violations: 104          Optimal: 997  90%        
+Average groundings: 1 days
+
+---------------------------------------------------------------------------------
+PushRight: Simple-Model 0	[2012-09-28 18:46:44]	Execution: 0:00:02.66
+---------------------------------------------------------------------------------
+Manhours: 5655           Adjustments: 235         
+Groundings: 63           Inefficiencies: 14       
+Scheduled: 873           Violations: 77           Optimal: 796  91%        
+Average groundings: 2 days
+
+---------------------------------------------------------------------------------
+PushLeft: Simple-Model 0	[2012-09-28 18:49:25]	Execution: 0:00:01.66
+---------------------------------------------------------------------------------
+Manhours: 5875           Adjustments: 4           
+Groundings: 13           Inefficiencies: 25       
+Scheduled: 1022          Violations: 38           Optimal: 984  96%        
+Average groundings: 1 days
+
+---------------------------------------------------------------------------------
+PushRight-RelaxLeft: Simple-Model 0	[2012-09-28 18:52:04]	Execution: 0:00:02.94
+---------------------------------------------------------------------------------
+Manhours: 5929           Adjustments: 296         
+Groundings: 26           Inefficiencies: 90       
+Scheduled: 912           Violations: 116          Optimal: 796  87%        
+Average groundings: 2 days
+
+---------------------------------------------------------------------------------
+PushLeft: Simple-Model 0	[2012-09-28 18:52:19]	Execution: 0:00:01.66
+---------------------------------------------------------------------------------
+Manhours: 5875           Adjustments: 4           
+Groundings: 13           Inefficiencies: 25       
+Scheduled: 1022          Violations: 38           Optimal: 984  96%        
+Average groundings: 1 days
+
+---------------------------------------------------------------------------------
+PushLeft: Simple-Model 0	[2012-09-28 19:00:34]	Execution: 0:00:01.67
+---------------------------------------------------------------------------------
+Manhours: 5875           Adjustments: 4           
+Groundings: 13           Inefficiencies: 25       
+Scheduled: 1022          Violations: 38           Optimal: 984  96%        
+Average groundings: 1 days
+
+---------------------------------------------------------------------------------
+PushRight-RelaxLeft: Simple-Model 0	[2012-09-28 19:01:00]	Execution: 0:00:10.70
+---------------------------------------------------------------------------------
+Manhours: 18255          Adjustments: 5378        
+Groundings: 24           Inefficiencies: 148      
+Scheduled: 1908          Violations: 172          Optimal: 1736  90%       
+Average groundings: 2 days
+
+---------------------------------------------------------------------------------
+PushRight-RelaxLeft: Simple-Model 0	[2012-09-28 20:08:07]	Execution: 0:00:02.94
+---------------------------------------------------------------------------------
+Manhours: 5929           Adjustments: 296         
+Groundings: 26           Inefficiencies: 90       
+Scheduled: 912           Violations: 116          Optimal: 796  87%        
+Average groundings: 2 days
+
+---------------------------------------------------------------------------------
+PushRight-RelaxLeft: Simple-Model 0	[2012-09-28 20:11:25]	Execution: 0:00:02.95
+---------------------------------------------------------------------------------
+Manhours: 5929           Adjustments: 296         
+
+---------------------------------------------------------------------------------
+PushRight-RelaxLeft: Simple-Model 0	[2012-09-28 20:11:41]	Execution: 0:00:02.93
+---------------------------------------------------------------------------------
+Manhours: 5929           Adjustments: 296         
+
+---------------------------------------------------------------------------------
+PushRight-RelaxLeft: Simple-Model 0	[2012-09-28 20:12:31]	Execution: 0:00:02.93
+---------------------------------------------------------------------------------
+Manhours: 5929           Adjustments: 296         
+Groundings: 26           Inefficiencies: 90       
+Scheduled: 912           Violations: 116          Optimal: 796  87%        
+Average groundings: 2 days
+
+---------------------------------------------------------------------------------
+PushRight-RelaxLeft: Simple-Model 0	[2012-09-28 20:13:56]	Execution: 0:00:02.99
+---------------------------------------------------------------------------------
+Manhours: 5929           Adjustments: 296         
+Groundings: 26           Inefficiencies: 90       
+Scheduled: 912           Violations: 116          Optimal: 796  87%        
+Average groundings: 2 days
+
+---------------------------------------------------------------------------------
+PushRight-RelaxLeft: Simple-Model 0	[2012-09-28 20:14:57]	Execution: 0:00:02.94
+---------------------------------------------------------------------------------
+Manhours: 5929           Adjustments: 296         
+Groundings: 26           Inefficiencies: 90       
+Scheduled: 912           Violations: 116          Optimal: 796  87%        
+Average groundings: 2 days
+
+---------------------------------------------------------------------------------
+PushRight-RelaxLeft: Simple-Model 0	[2012-09-28 20:15:23]	Execution: 0:00:02.94
+---------------------------------------------------------------------------------
+Manhours: 5929           Adjustments: 296         
+Groundings: 26           Inefficiencies: 90       
+Scheduled: 912           Violations: 116          Optimal: 796  87%        
+Average groundings: 2 days
+
+---------------------------------------------------------------------------------
+PushRight-RelaxLeft: Simple-Model 0	[2012-09-28 20:18:08]	Execution: 0:00:03.03
+---------------------------------------------------------------------------------
+Manhours: 5929           Adjustments: 296         
+Groundings: 26           Inefficiencies: 90       
+Scheduled: 912           Violations: 116          Optimal: 796  87%        
+Average groundings: 2 days
+
+---------------------------------------------------------------------------------
+PushRight-RelaxLeft: Simple-Model 0	[2012-09-28 20:21:14]	Execution: 0:00:02.97
+---------------------------------------------------------------------------------
+Manhours: 5929           Adjustments: 296         
+
+---------------------------------------------------------------------------------
+PushRight-RelaxLeft: Simple-Model 0	[2012-09-28 20:21:57]	Execution: 0:00:02.93
+---------------------------------------------------------------------------------
+Manhours: 5929           Adjustments: 296         
+
+---------------------------------------------------------------------------------
+PushRight-RelaxLeft: Simple-Model 0	[2012-09-28 20:22:44]	Execution: 0:00:02.92
+---------------------------------------------------------------------------------
+Manhours: 5929           Adjustments: 296         
+
+---------------------------------------------------------------------------------
+PushRight-RelaxLeft: Simple-Model 0	[2012-09-28 20:23:00]	Execution: 0:00:02.87
+---------------------------------------------------------------------------------
+Manhours: 5929           Adjustments: 296         
+
+---------------------------------------------------------------------------------
+PushRight-RelaxLeft: Simple-Model 0	[2012-09-28 20:23:23]	Execution: 0:00:02.93
+---------------------------------------------------------------------------------
+Manhours: 5929           Adjustments: 296         
+Groundings: 26           Inefficiencies: 90       
+Scheduled: 912           Violations: 116          Optimal: 796  87%        
+Average groundings: 2 days
+
+---------------------------------------------------------------------------------
+PushRight-RelaxLeft: Simple-Model 0	[2012-09-28 20:23:49]	Execution: 0:00:02.93
+---------------------------------------------------------------------------------
+Manhours: 5929           Adjustments: 296         
+Groundings: 26           Inefficiencies: 90       
+Scheduled: 912           Violations: 116          Optimal: 796  87%        
+Average groundings: 2 days
+
+---------------------------------------------------------------------------------
+PushRight-RelaxLeft: Simple-Model 0	[2012-09-28 20:24:19]	Execution: 0:00:02.95
+---------------------------------------------------------------------------------
+Manhours: 5929           Adjustments: 296         
+Groundings: 26           Inefficiencies: 90       
+Scheduled: 912           Violations: 116          Optimal: 796  87%        
+Average groundings: 2 days
+
+---------------------------------------------------------------------------------
+PushRight-RelaxLeft: Simple-Model 0	[2012-09-28 20:25:29]	Execution: 0:00:02.94
+---------------------------------------------------------------------------------
+Manhours: 5929           Adjustments: 296         
+Groundings: 26           Inefficiencies: 90       
+Scheduled: 912           Violations: 116          Optimal: 796  87%        
+Average groundings: 2 days
+
+---------------------------------------------------------------------------------
+PushRight-RelaxLeft: Simple-Model 0	[2012-09-28 20:27:06]	Execution: 0:00:02.95
+---------------------------------------------------------------------------------
+Manhours: 5929           Adjustments: 296         
+Groundings: 26           Inefficiencies: 90       
+Scheduled: 912           Violations: 116          Optimal: 796  87%        
+Average groundings: 2 days
+
+---------------------------------------------------------------------------------
+PushRight-RelaxLeft: Simple-Model 0	[2012-09-28 20:29:48]	Execution: 0:00:02.96
+---------------------------------------------------------------------------------
+Manhours: 5929           Adjustments: 296         
+Groundings: 26           Inefficiencies: 90       
+Scheduled: 912           Violations: 116          Optimal: 796  87%        
+Average groundings: 2 days
+
+---------------------------------------------------------------------------------
+PushRight-RelaxLeft: Simple-Model 0	[2012-09-28 20:51:25]	Execution: 0:00:02.92
+---------------------------------------------------------------------------------
+Manhours: 5929           Adjustments: 296         
+Groundings: 26           Inefficiencies: 90       
+Scheduled: 912           Violations: 116          Optimal: 796  87%        
+Average groundings: 2 days
+
+---------------------------------------------------------------------------------
+PushRight-RelaxLeft: Simple-Model 0	[2012-09-28 21:18:05]	Execution: 0:00:03.79
+---------------------------------------------------------------------------------
+Manhours: 6010           Adjustments: 296         
+Groundings: 19           Inefficiencies: 113      
+Scheduled: 1167          Violations: 132          Optimal: 1035  88%       
+Average groundings: 2 days
+
+---------------------------------------------------------------------------------
+PushRight-RelaxLeft: Simple-Model 0	[2012-09-28 21:19:05]	Execution: 0:00:04.13
+---------------------------------------------------------------------------------
+Manhours: 6010           Adjustments: 296         
+Groundings: 19           Inefficiencies: 113      
+Scheduled: 1167          Violations: 132          Optimal: 1035  88%       
+Average groundings: 2 days
+
+---------------------------------------------------------------------------------
+PushRight-RelaxLeft: Simple-Model 0	[2012-09-28 22:04:49]	Execution: 0:00:00.87
+---------------------------------------------------------------------------------
+Manhours: 4966           Adjustments: 199         
+Groundings: 68           Inefficiencies: 0        
+Scheduled: 833           Violations: 68           Optimal: 765  91%        
+Average groundings: 6 days
+
+---------------------------------------------------------------------------------
+PushRight-RelaxLeft: Simple-Model 0	[2012-09-28 22:07:01]	Execution: 0:00:00.62
+---------------------------------------------------------------------------------
+Manhours: 3373           Adjustments: 125         
+Groundings: 175          Inefficiencies: 0        
+Scheduled: 613           Violations: 175          Optimal: 438  71%        
+Average groundings: 10 days
+
+---------------------------------------------------------------------------------
+PushRight-RelaxLeft: Simple-Model 0	[2012-09-28 22:10:20]	Execution: 0:00:00.89
+---------------------------------------------------------------------------------
+Manhours: 3373           Adjustments: 125         
+Groundings: 175          Inefficiencies: 0        
+Scheduled: 613           Violations: 175          Optimal: 438  71%        
+Average groundings: 10 days
+
+---------------------------------------------------------------------------------
+PushRight-RelaxLeft: Simple-Model 0	[2012-09-28 22:11:40]	Execution: 0:00:00.93
+---------------------------------------------------------------------------------
+Manhours: 3388           Adjustments: 125         
+Groundings: 154          Inefficiencies: 0        
+Scheduled: 642           Violations: 154          Optimal: 488  76%        
+Average groundings: 8 days
+
+---------------------------------------------------------------------------------
+PushRight-RelaxLeft: Simple-Model 0	[2012-09-28 22:13:31]	Execution: 0:00:01.10
+---------------------------------------------------------------------------------
+Manhours: 3437           Adjustments: 142         
+Groundings: 159          Inefficiencies: 0        
+Scheduled: 747           Violations: 159          Optimal: 588  78%        
+Average groundings: 7 days
+
+---------------------------------------------------------------------------------
+PushRight-RelaxLeft: Simple-Model 0	[2012-09-28 22:18:06]	Execution: 0:00:01.13
+---------------------------------------------------------------------------------
+Manhours: 3437           Adjustments: 142         
+Groundings: 159          Inefficiencies: 0        
+Scheduled: 747           Violations: 159          Optimal: 588  78%        
+Average groundings: 7 days
+
+---------------------------------------------------------------------------------
+PushRight-RelaxLeft: Simple-Model 0	[2012-09-28 22:18:30]	Execution: 0:00:00.93
+---------------------------------------------------------------------------------
+Manhours: 3388           Adjustments: 125         
+Groundings: 154          Inefficiencies: 0        
+Scheduled: 642           Violations: 154          Optimal: 488  76%        
+Average groundings: 8 days
+
+---------------------------------------------------------------------------------
+PushRight-RelaxLeft: Simple-Model 0	[2012-09-28 22:19:22]	Execution: 0:00:00.92
+---------------------------------------------------------------------------------
+Manhours: 3373           Adjustments: 125         
+Groundings: 175          Inefficiencies: 0        
+Scheduled: 613           Violations: 175          Optimal: 438  71%        
+Average groundings: 10 days
+
+---------------------------------------------------------------------------------
+PushRight-RelaxLeft: Simple-Model 0	[2012-09-28 22:20:51]	Execution: 0:00:02.96
+---------------------------------------------------------------------------------
+Manhours: 5929           Adjustments: 296         
+Groundings: 26           Inefficiencies: 90       
+Scheduled: 912           Violations: 116          Optimal: 796  87%        
+Average groundings: 2 days
+
+---------------------------------------------------------------------------------
+PushRight-RelaxLeft: Simple-Model 0	[2012-09-28 23:27:59]	Execution: 0:00:02.99
+---------------------------------------------------------------------------------
+Manhours: 5929           Adjustments: 296         
+Groundings: 26           Inefficiencies: 90       
+Scheduled: 912           Violations: 116          Optimal: 796  87%        
+Average groundings: 2 days
+
+---------------------------------------------------------------------------------
+PushRight-RelaxLeft: Simple-Model 0	[2012-09-28 23:28:30]	Execution: 0:00:02.95
+---------------------------------------------------------------------------------
+Manhours: 5929           Adjustments: 296         
+Groundings: 26           Inefficiencies: 90       
+Scheduled: 912           Violations: 116          Optimal: 796  87%        
+Average groundings: 2 days
+
+---------------------------------------------------------------------------------
+PushRight-RelaxLeft: Simple-Model 0	[2012-09-28 23:29:02]	Execution: 0:00:03.55
+---------------------------------------------------------------------------------
+Manhours: 6010           Adjustments: 296         
+Groundings: 19           Inefficiencies: 113      
+Scheduled: 1167          Violations: 132          Optimal: 1035  88%       
+Average groundings: 2 days
+
+---------------------------------------------------------------------------------
+PushRight-RelaxLeft: Simple-Model 0	[2012-09-28 23:29:37]	Execution: 0:00:04.03
+---------------------------------------------------------------------------------
+Manhours: 6087           Adjustments: 339         
+Groundings: 26           Inefficiencies: 117      
+Scheduled: 1294          Violations: 143          Optimal: 1151  88%       
+Average groundings: 2 days
+
+---------------------------------------------------------------------------------
+PushRight-RelaxLeft: Simple-Model 0	[2012-09-28 23:30:51]	Execution: 0:00:03.52
+---------------------------------------------------------------------------------
+Manhours: 6010           Adjustments: 296         
+Groundings: 19           Inefficiencies: 113      
+Scheduled: 1167          Violations: 132          Optimal: 1035  88%       
+Average groundings: 2 days
+
+---------------------------------------------------------------------------------
+PushRight-RelaxLeft: Simple-Model 0	[2012-09-28 23:32:04]	Execution: 0:00:02.94
+---------------------------------------------------------------------------------
+Manhours: 5929           Adjustments: 296         
+Groundings: 26           Inefficiencies: 90       
+Scheduled: 912           Violations: 116          Optimal: 796  87%        
+Average groundings: 2 days
+
+---------------------------------------------------------------------------------
+PushRight-RelaxLeft: Simple-Model 0	[2012-09-30 14:54:46]	Execution: 0:00:00.90
+---------------------------------------------------------------------------------
+Manhours: 3373           Adjustments: 125         
+Groundings: 175          Inefficiencies: 0        
+Scheduled: 613           Violations: 175          Optimal: 438  71%        
+Average groundings: 10 days
+
+---------------------------------------------------------------------------------
+PushRight-RelaxLeft: Simple-Model 0	[2012-09-30 14:55:24]	Execution: 0:00:00.88
+---------------------------------------------------------------------------------
+Manhours: 3388           Adjustments: 125         
+Groundings: 154          Inefficiencies: 0        
+Scheduled: 642           Violations: 154          Optimal: 488  76%        
+Average groundings: 8 days
+
+---------------------------------------------------------------------------------
+PushRight-RelaxLeft: Simple-Model 0	[2012-09-30 14:56:07]	Execution: 0:00:02.58
+---------------------------------------------------------------------------------
+Manhours: 6010           Adjustments: 296         
+Groundings: 19           Inefficiencies: 113      
+Scheduled: 1167          Violations: 132          Optimal: 1035  88%       
+Average groundings: 2 days
+
+---------------------------------------------------------------------------------
+PushRight-RelaxLeft: Simple-Model 0	[2012-09-30 14:56:33]	Execution: 0:00:00.88
+---------------------------------------------------------------------------------
+Manhours: 3388           Adjustments: 125         
+Groundings: 154          Inefficiencies: 0        
+Scheduled: 642           Violations: 154          Optimal: 488  76%        
+Average groundings: 8 days
+
+---------------------------------------------------------------------------------
+PushRight-RelaxLeft: Simple-Model 0	[2012-09-30 14:57:23]	Execution: 0:00:00.13
+---------------------------------------------------------------------------------
+Manhours: 978            Adjustments: 41          
+Groundings: 39           Inefficiencies: 0        
+Scheduled: 188           Violations: 39           Optimal: 149  79%        
+Average groundings: 11 days
+
+---------------------------------------------------------------------------------
+PushRight-RelaxLeft: Simple-Model 0	[2012-09-30 14:57:39]	Execution: 0:00:00.30
+---------------------------------------------------------------------------------
+Manhours: 1685           Adjustments: 74          
+Groundings: 6            Inefficiencies: 27       
+Scheduled: 328           Violations: 33           Optimal: 295  89%        
+Average groundings: 2 days
+
+---------------------------------------------------------------------------------
+PushRight-RelaxLeft: Simple-Model 0	[2012-09-30 14:58:03]	Execution: 0:00:00.26
+---------------------------------------------------------------------------------
+Manhours: 1666           Adjustments: 74          
+Groundings: 10           Inefficiencies: 20       
+Scheduled: 267           Violations: 30           Optimal: 237  88%        
+Average groundings: 2 days
+
+---------------------------------------------------------------------------------
+PushRight-RelaxLeft: Simple-Model 0	[2012-09-30 14:58:37]	Execution: 0:00:00.37
+---------------------------------------------------------------------------------
+Manhours: 1685           Adjustments: 74          
+Groundings: 6            Inefficiencies: 27       
+Scheduled: 328           Violations: 33           Optimal: 295  89%        
+Average groundings: 2 days
+
+---------------------------------------------------------------------------------
+PushRight-RelaxLeft: Simple-Model 0	[2012-09-30 14:59:15]	Execution: 0:00:00.32
+---------------------------------------------------------------------------------
+Manhours: 1666           Adjustments: 74          
+Groundings: 10           Inefficiencies: 20       
+Scheduled: 267           Violations: 30           Optimal: 237  88%        
+Average groundings: 2 days
+
+---------------------------------------------------------------------------------
+PushRight-RelaxLeft: Simple-Model 0	[2012-09-30 15:00:07]	Execution: 0:00:00.36
+---------------------------------------------------------------------------------
+Manhours: 1685           Adjustments: 74          
+Groundings: 6            Inefficiencies: 27       
+Scheduled: 328           Violations: 33           Optimal: 295  89%        
+Average groundings: 2 days
+
+---------------------------------------------------------------------------------
+PushRight: Simple-Model 0	[2012-09-30 15:00:21]	Execution: 0:00:00.33
+---------------------------------------------------------------------------------
+Manhours: 1626           Adjustments: 66          
+Groundings: 11           Inefficiencies: 16       
+Scheduled: 310           Violations: 27           Optimal: 283  91%        
+Average groundings: 2 days
+
+---------------------------------------------------------------------------------
+PushRight-RelaxLeft: Simple-Model 0	[2012-09-30 15:02:04]	Execution: 0:00:00.36
+---------------------------------------------------------------------------------
+Manhours: 1685           Adjustments: 74          
+Groundings: 6            Inefficiencies: 27       
+Scheduled: 328           Violations: 33           Optimal: 295  89%        
+Average groundings: 2 days
+
+---------------------------------------------------------------------------------
+PushRight-RelaxLeft: Simple-Model 0	[2012-09-30 15:02:51]	Execution: 0:00:00.36
+---------------------------------------------------------------------------------
+Manhours: 1685           Adjustments: 74          
+Groundings: 6            Inefficiencies: 27       
+Scheduled: 328           Violations: 33           Optimal: 295  89%        
+Average groundings: 2 days
+
+---------------------------------------------------------------------------------
+PushRight-RelaxLeft: Simple-Model 0	[2012-09-30 15:03:15]	Execution: 0:00:00.13
+---------------------------------------------------------------------------------
+Manhours: 975            Adjustments: 41          
+Groundings: 47           Inefficiencies: 0        
+Scheduled: 182           Violations: 47           Optimal: 135  74%        
+Average groundings: 12 days
+
+---------------------------------------------------------------------------------
+PushRight-RelaxLeft: Simple-Model 0	[2012-09-30 15:05:40]	Execution: 0:00:00.42
+---------------------------------------------------------------------------------
+Manhours: 1655           Adjustments: 74          
+Groundings: 1            Inefficiencies: 25       
+Scheduled: 311           Violations: 26           Optimal: 285  91%        
+Average groundings: 1 days
+
+---------------------------------------------------------------------------------
+PushRight-RelaxLeft: Simple-Model 0	[2012-09-30 15:06:53]	Execution: 0:00:00.38
+---------------------------------------------------------------------------------
+Manhours: 1655           Adjustments: 74          
+Groundings: 1            Inefficiencies: 25       
+Scheduled: 311           Violations: 26           Optimal: 285  91%        
+Average groundings: 1 days
+
+---------------------------------------------------------------------------------
+PushRight-RelaxLeft: Simple-Model 0	[2012-09-30 15:07:14]	Execution: 0:00:00.33
+---------------------------------------------------------------------------------
+Manhours: 1636           Adjustments: 74          
+Groundings: 5            Inefficiencies: 18       
+Scheduled: 250           Violations: 23           Optimal: 227  90%        
+Average groundings: 2 days
+
+---------------------------------------------------------------------------------
+PushRight: Simple-Model 0	[2012-09-30 15:07:54]	Execution: 0:00:00.31
+---------------------------------------------------------------------------------
+Manhours: 1578           Adjustments: 66          
+Groundings: 14           Inefficiencies: 0        
+Scheduled: 239           Violations: 14           Optimal: 225  94%        
+Average groundings: 2 days
+
+---------------------------------------------------------------------------------
+PushRight: Simple-Model 23	[2012-09-30 15:08:16]	Execution: 0:00:00.33
+---------------------------------------------------------------------------------
+Manhours: 1617           Adjustments: 52          
+Groundings: 12           Inefficiencies: 0        
+Scheduled: 242           Violations: 12           Optimal: 230  95%        
+Average groundings: 2 days
+
+---------------------------------------------------------------------------------
+PushRight: Simple-Model 0	[2012-09-30 15:08:41]	Execution: 0:00:00.11
+---------------------------------------------------------------------------------
+Manhours: 901            Adjustments: 33          
+Groundings: 45           Inefficiencies: 0        
+Scheduled: 169           Violations: 45           Optimal: 124  73%        
+Average groundings: 13 days
+
+---------------------------------------------------------------------------------
+PushRight: Simple-Model 0	[2012-09-30 15:11:33]	Execution: 0:00:00.33
+---------------------------------------------------------------------------------
+Manhours: 1578           Adjustments: 66          
+Groundings: 14           Inefficiencies: 0        
+Scheduled: 239           Violations: 14           Optimal: 225  94%        
+Average groundings: 2 days
+
+---------------------------------------------------------------------------------
+PushRight: Simple-Model 0	[2012-10-01 22:25:55]	Execution: 0:00:03.03
+---------------------------------------------------------------------------------
+Manhours: 5505           Adjustments: 235         
+Groundings: 53           Inefficiencies: 0        
+Scheduled: 802           Violations: 53           Optimal: 749  93%        
+Average groundings: 2 days
+
+---------------------------------------------------------------------------------
+PushRight: Simple-Model 0	[2012-10-01 22:28:47]	Execution: 0:00:03.60
+---------------------------------------------------------------------------------
+Manhours: 5581           Adjustments: 235         
+Groundings: 29           Inefficiencies: 51       
+Scheduled: 1030          Violations: 80           Optimal: 950  92%        
+Average groundings: 2 days
+
+---------------------------------------------------------------------------------
+PushRight: Simple-Model 0	[2012-10-01 22:29:06]	Execution: 0:00:03.58
+---------------------------------------------------------------------------------
+Manhours: 5581           Adjustments: 235         
+Groundings: 29           Inefficiencies: 51       
+Scheduled: 1030          Violations: 80           Optimal: 950  92%        
+Average groundings: 2 days
+
+---------------------------------------------------------------------------------
+PushRight: Simple-Model 2	[2012-10-01 22:29:42]	Execution: 0:00:03.74
+---------------------------------------------------------------------------------
+Manhours: 5622           Adjustments: 223         
+Groundings: 25           Inefficiencies: 50       
+Scheduled: 1017          Violations: 75           Optimal: 942  92%        
+Average groundings: 2 days
+
+---------------------------------------------------------------------------------
+PushRight: Simple-Model 0	[2012-10-01 22:29:52]	Execution: 0:00:03.65
+---------------------------------------------------------------------------------
+Manhours: 5581           Adjustments: 235         
+Groundings: 29           Inefficiencies: 51       
+Scheduled: 1030          Violations: 80           Optimal: 950  92%        
+Average groundings: 2 days
+
+---------------------------------------------------------------------------------
+PushRight: Simple-Model 0	[2012-10-01 22:30:30]	Execution: 0:00:03.38
+---------------------------------------------------------------------------------
+Manhours: 5581           Adjustments: 235         
+Groundings: 29           Inefficiencies: 51       
+Scheduled: 1030          Violations: 80           Optimal: 950  92%        
+Average groundings: 2 days
+
+---------------------------------------------------------------------------------
+PushRight: Simple-Model 1	[2012-10-01 22:30:34]	Execution: 0:00:03.58
+---------------------------------------------------------------------------------
+Manhours: 5648           Adjustments: 196         
+Groundings: 21           Inefficiencies: 55       
+Scheduled: 1042          Violations: 76           Optimal: 966  92%        
+Average groundings: 1 days
+
+---------------------------------------------------------------------------------
+PushRight: Simple-Model 2	[2012-10-01 22:30:38]	Execution: 0:00:03.66
+---------------------------------------------------------------------------------
+Manhours: 5622           Adjustments: 223         
+Groundings: 25           Inefficiencies: 50       
+Scheduled: 1017          Violations: 75           Optimal: 942  92%        
+Average groundings: 2 days
+
+---------------------------------------------------------------------------------
+PushRight: Simple-Model 3	[2012-10-01 22:30:43]	Execution: 0:00:03.62
+---------------------------------------------------------------------------------
+Manhours: 5648           Adjustments: 230         
+Groundings: 25           Inefficiencies: 47       
+Scheduled: 1061          Violations: 72           Optimal: 989  93%        
+Average groundings: 2 days
+
+---------------------------------------------------------------------------------
+PushRight: Simple-Model 4	[2012-10-01 22:30:47]	Execution: 0:00:03.75
+---------------------------------------------------------------------------------
+Manhours: 5730           Adjustments: 174         
+Groundings: 15           Inefficiencies: 52       
+Scheduled: 1065          Violations: 67           Optimal: 998  93%        
+Average groundings: 2 days
+
+---------------------------------------------------------------------------------
+PushRight: Simple-Model 5	[2012-10-01 22:30:51]	Execution: 0:00:03.65
+---------------------------------------------------------------------------------
+Manhours: 5623           Adjustments: 199         
+Groundings: 22           Inefficiencies: 48       
+Scheduled: 1024          Violations: 70           Optimal: 954  93%        
+Average groundings: 1 days
+
+---------------------------------------------------------------------------------
+PushRight: Simple-Model 6	[2012-10-01 22:30:55]	Execution: 0:00:03.35
+---------------------------------------------------------------------------------
+Manhours: 5470           Adjustments: 291         
+Groundings: 42           Inefficiencies: 62       
+Scheduled: 1043          Violations: 104          Optimal: 939  90%        
+Average groundings: 2 days
+
+---------------------------------------------------------------------------------
+PushRight: Simple-Model 7	[2012-10-01 22:30:59]	Execution: 0:00:03.47
+---------------------------------------------------------------------------------
+Manhours: 5364           Adjustments: 242         
+Groundings: 35           Inefficiencies: 53       
+Scheduled: 1044          Violations: 88           Optimal: 956  91%        
+Average groundings: 2 days
+
+---------------------------------------------------------------------------------
+PushRight: Simple-Model 8	[2012-10-01 22:31:03]	Execution: 0:00:03.67
+---------------------------------------------------------------------------------
+Manhours: 5684           Adjustments: 266         
+Groundings: 31           Inefficiencies: 67       
+Scheduled: 1100          Violations: 98           Optimal: 1002  91%       
+Average groundings: 2 days
+
+---------------------------------------------------------------------------------
+PushRight: Simple-Model 9	[2012-10-01 22:31:08]	Execution: 0:00:03.78
+---------------------------------------------------------------------------------
+Manhours: 5562           Adjustments: 274         
+Groundings: 34           Inefficiencies: 50       
+Scheduled: 1063          Violations: 84           Optimal: 979  92%        
+Average groundings: 2 days
+
+---------------------------------------------------------------------------------
+PushRight: Simple-Model 7	[2012-10-01 22:32:35]	Execution: 0:00:03.40
+---------------------------------------------------------------------------------
+Manhours: 5364           Adjustments: 242         
+Groundings: 35           Inefficiencies: 53       
+Scheduled: 1044          Violations: 88           Optimal: 956  91%        
+Average groundings: 2 days
+
+---------------------------------------------------------------------------------
+PushRight: Simple-Model 7	[2012-10-01 22:34:29]	Execution: 0:00:03.33
+---------------------------------------------------------------------------------
+Manhours: 5364           Adjustments: 242         
+Groundings: 35           Inefficiencies: 53       
+Scheduled: 1044          Violations: 88           Optimal: 956  91%        
+Average groundings: 2 days
+
+---------------------------------------------------------------------------------
+PushRight: Simple-Model 7	[2012-10-01 22:34:40]	Execution: 0:00:00.35
+---------------------------------------------------------------------------------
+Manhours: 1551           Adjustments: 71          
+Groundings: 10           Inefficiencies: 14       
+Scheduled: 299           Violations: 24           Optimal: 275  91%        
+Average groundings: 2 days
+
+---------------------------------------------------------------------------------
+PushRight: Simple-Model 7	[2012-10-03 16:32:48]	Execution: 0:00:00.34
+---------------------------------------------------------------------------------
+Manhours: 1551           Adjustments: 71          
+Groundings: 10           Inefficiencies: 14       
+Scheduled: 299           Violations: 24           Optimal: 275  91%        
+Average groundings: 2 days
+
+---------------------------------------------------------------------------------
+PushRight: Simple-Model 7	[2012-10-03 16:37:17]	Execution: 0:00:00.36
+---------------------------------------------------------------------------------
+Manhours: 1554           Adjustments: 48          
+Groundings: 7            Inefficiencies: 14       
+Scheduled: 297           Violations: 21           Optimal: 276  92%        
+Average groundings: 4 days
+
+---------------------------------------------------------------------------------
+PushRight: Simple-Model 7	[2012-10-03 16:38:47]	Execution: 0:00:00.36
+---------------------------------------------------------------------------------
+Manhours: 1554           Adjustments: 48          
+Groundings: 7            Inefficiencies: 14       
+Scheduled: 297           Violations: 21           Optimal: 276  92%        
+Average groundings: 4 days
+
+---------------------------------------------------------------------------------
+PushRight: Simple-Model 7	[2012-10-03 16:40:17]	Execution: 0:00:00.38
+---------------------------------------------------------------------------------
+Manhours: 1551           Adjustments: 71          
+Groundings: 10           Inefficiencies: 14       
+Scheduled: 299           Violations: 24           Optimal: 275  91%        
+Average groundings: 2 days
+
+---------------------------------------------------------------------------------
+PushRight: Simple-Model 7	[2012-10-03 16:41:09]	Execution: 0:00:00.35
+---------------------------------------------------------------------------------
+Manhours: 1551           Adjustments: 71          
+Groundings: 10           Inefficiencies: 14       
+Scheduled: 299           Violations: 24           Optimal: 275  91%        
+Average groundings: 2 days
+
+---------------------------------------------------------------------------------
+PushRight: Simple-Model 7	[2012-10-03 16:56:03]	Execution: 0:00:00.37
+---------------------------------------------------------------------------------
+Manhours: 1551           Adjustments: 71          
+Groundings: 10           Inefficiencies: 14       
+Scheduled: 299           Violations: 24           Optimal: 275  91%        
+Average groundings: 2 days

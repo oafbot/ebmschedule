@@ -35,14 +35,23 @@ class Algorithm:
         Divide manhours cost with total available manhours.
         Schedule the complex ( i.e. conflict heavy ) task first.
         """
+        # prioritize tasks with large intervals
+        # prioritize tasks with many associated tasks.
         input.tasks.sort(key=lambda task: 
-            (     
+            (    
                 (self.weight * ((task.manhours / (task.totalAvailableHours *1.0)) 
                 if task.totalAvailableHours else 0)) + 
                 ((1-self.weight) * (len(task.conflicts) / (self.totalTasks *1.0)))
                 ), reverse=True
             )
-    
+            # (
+            #     (((1-self.weight)/2) * task.interval) +                
+            #     (((1-self.weight)/2) * ((task.manhours / (task.totalAvailableHours *1.0)) 
+            #     if task.totalAvailableHours else 0)) + 
+            #     (self.weight * (len(task.conflicts) / (self.totalTasks *1.0)))
+            #     ), reverse=True
+            # )
+            
     def main(self, input):
         for task in input.tasks:
             for asset in input.assets:

@@ -27,7 +27,7 @@ class PushToLeft(Algorithm):
                 end = start
             start = task.next(asset, end)
     
-    def bundleSchedule(self, bundle, asset, input, task, start):
+    def bundleSchedule(self, bundle, asset, input, primary, start):
         """
         Schedule bundled tasks.
         While the start date is within the date range,
@@ -35,38 +35,38 @@ class PushToLeft(Algorithm):
         Check against the length of the entire bundle of tasks.
         Schedule individual tasks in consecutive order once an empty slot is found.
         """
-        metatask = task.bundleAsTask(bundle, asset)
+        metatask = primary.bundleAsTask(bundle, asset)
         proc = set()
         skip = []
         
         for i in self.processed:
-            for concur in task.concur:
+            for concur in primary.concur:
                 if concur in self.processed[i]:
                     skip.append(concur) # pass
                     # return
         loopend = False
         while(start <= input.schedule.dateRange.end):            
-            while(start > input.schedule.last(asset, task) and not loopend): 
+            while(start > input.schedule.last(asset, primary) and not loopend): 
                 if(input.schedule.blocked(asset, metatask, start)):
                     start -= timedelta(days=1)
                     self.conflicts += 1
                 else:
                     loopend = True
             remainder_hours = 0            # The hours carried over from the preceding task
-            maxhours = task.hoursPerDay    # The work hours in a day
+            maxhours = primary.hoursPerDay    # The work hours in a day
             longest = 0                    # The task that takes the longest to perform
                         
             """For each task in the bundle, schedule in order."""
-            for bundle_task in bundle:
+            for task in bundle:
                 overhours  = False
-                if(bundle_task.id in skip):
+                if(task.id in skip):
                     return
-                if not bundle_task.withinInterval(input.schedule, asset, start):        
-                    end = input.schedule.add(asset, bundle_task, start)
-                    self.console(asset, bundle_task, input, start, end)
+                if not task.withinInterval(input.schedule, asset, start):        
+                    end = input.schedule.add(asset, task, start)
+                    self.console(asset, task, input, start, end)
                     
                     """Find the the most costly task."""
-                    for manpower in bundle_task.manpowers:
+                    for manpower in task.manpowers:
                         if manpower.hours > longest: longest = manpower.hours
                 
                     """If the task takes takes longer than the workday, carry over."""
@@ -88,11 +88,11 @@ class PushToLeft(Algorithm):
                         start = end + timedelta(days=1)
                     else: 
                         start = end
-                    if(bundle_task.concurrent and bundle_task.id in task.concur):
-                        proc.add(task.id)
+                    if(task.concurrent and task.id in primary.concur):
+                        proc.add(primary.id)
                 else:
                     end = start
             if(proc):
                 self.processed[asset.id].update(proc)                
-            start = task.next(asset, end)
+            start = primary.next(asset, end)
             

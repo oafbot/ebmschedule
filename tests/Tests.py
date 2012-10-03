@@ -53,9 +53,10 @@ class Tests:
         ineff  = 0
         groundedlist = []
         
-        print "\n-------------------------------------------\
-               \n------------- INTERVAL CHECKS -------------\
-               \n-------------------------------------------"
+        if(self.model.conf.trace):
+            print "\n-------------------------------------------\
+                   \n------------- INTERVAL CHECKS -------------\
+                   \n-------------------------------------------"
         
         for i in SortedIndecies:
             """Iterate through the Tupple Indicies."""
@@ -72,8 +73,9 @@ class Tests:
                     task = t
             if(asset.id != prev_asset):
                 """If it is a new Asset, reset date."""
-                print "\nAsset:", asset.name
-                print "-------------------------------------------"
+                if(self.model.conf.trace):
+                    print "\nAsset:", asset.name
+                    print "-------------------------------------------"
             prev_asset = asset.id
             
             SortedByTask[i].sort(key=lambda d: (d.year, d.month, d.day))
@@ -86,12 +88,13 @@ class Tests:
                     if(difference != timedelta(days=task.interval-1).days and 
                        difference != timedelta(days=task.interval).days):
                         """If the difference is not the same as the interval."""
-                        print "Task: " + str(task.id), task.name
-                        print "Date:", str(date)[:-9], "\tInterval:\t", \
-                               self.strfdelta(timedelta(days=task.interval), "{days} days") 
-                        print "Last:", str(task.end(prev))[:-9], \
-                              "\tDifference:\t", difference, "days"
-                        print "-------------------------------------------"
+                        if(self.model.conf.trace):
+                            print "Task: " + str(task.id), task.name
+                            print "Date:", str(date)[:-9], "\tInterval:\t", \
+                                   self.strfdelta(timedelta(days=task.interval), "{days} days") 
+                            print "Last:", str(task.end(prev))[:-9], \
+                                  "\tDifference:\t", difference, "days"
+                            print "-------------------------------------------"
                         violation += 1
                         if(difference - task.interval > 0):
                             ground += 1
@@ -104,10 +107,13 @@ class Tests:
         
         average_grounded = sum(groundedlist) / len(groundedlist)
         
-        print "\nTotal violations:", violation, \
-              "\tGroundings:", ground, "\tInefficiencies:", ineff, "\tScheduled:", self.total, \
-              "\tOptimal:", self.total - violation, \
-              "\tAverage grounded:", str(average_grounded), " days"  
+        print "\n" + \
+              str.ljust("Violations: " + str(violation), 25) + \
+              str.ljust("Groundings: " + str(ground), 25) + \
+              str.ljust("Inefficiencies:   " + str(ineff), 25 ) + "\n" + \
+              str.ljust("Scheduled:  " + str(self.total), 25) + \
+              str.ljust("Optimal:    " + str(self.total - violation), 25) + \
+              str.ljust("Average grounded: " + str(average_grounded) + " days", 25 )  
         
         self.writeMetrics(violation, ground, ineff, average_grounded)
         

@@ -27,7 +27,7 @@ class Task:
         self.first_run           = False
         # self.relax               = timedelta(days=int(self.interval/2))
         self.relax               = timedelta(days=1)
-        self.requisite_interval  = int(round(self.interval / 2))
+        self.requisite_interval  = int(round(self.interval / 1))
         
         if len(manpowers): self.precal() #TODO: Should come from sequencing
     
@@ -109,7 +109,7 @@ class Task:
         if self.prereq: self.satisfyRequisite(bundle, asset, input)              # prerequisite
         if self.prep: bundle = self.bundle(bundle, self.prep, asset, input)      # prepatory
         if not bundle or self not in bundle: bundle.append(self)                 # primary task            
-        # if self.concur: bundle = self.concurrence(bundle, asset, input)          # concurrent
+        if self.concur: bundle = self.concurrence(bundle, asset, input)          # concurrent
         if self.subseq: bundle = self.bundle(bundle, self.subseq, asset, input)  # subsequent
         return bundle
     
@@ -219,12 +219,8 @@ class Task:
             if self.id in schedule._scheduledTasks[asset.id][date]:
                 """Is the date found in the interval daterange?"""
                 if before.within(date):
-                    # for a in before.range(): print a
-                    # print "true"
                     return True                    
                 if after.within(date):
-                    # for a in after.range(): print a
-                    # print "true"
                     return True                                   
         return False        
        

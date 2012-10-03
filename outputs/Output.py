@@ -116,10 +116,14 @@ class Output:
     def printSchedule(self, algorithm, asset, task, start, end):
         if self.input.bigdata:
             if algorithm.prev != asset.name: print ""
-            print str.ljust(asset.name, 8), str.ljust(task.name, 112),                         \
-                  str.ljust(str(start)[:-9], 10), "--",                                        \
-                  str.ljust(str(end)[:-9], 10)
-            algorithm.prev = asset.name      
+            print str.ljust(asset.name, 8), str.ljust(task.name, 96), \
+            str.ljust(str(task.id), 8),           \
+            str.ljust(str(task.interval), 8),     \
+            str.ljust(str(task.manhours), 8),     \
+            str.ljust(str(start)[:-9], 10), "--", \
+            str.ljust(str(end)[:-9], 10)
+            algorithm.prev = asset.name
+   
         else:
             if algorithm.prev != asset.name: print ""
             print str.ljust(asset.name, 16),                                                   \

@@ -8,7 +8,7 @@ if __name__ == "__main__":
     if(len(sys.argv)>1):
         counter = sys.argv[1]
     else:
-        counter = 0
+        counter = 7
     
     """Construct the model."""
     model = inputs.Inputs(counter).model
