@@ -51,7 +51,7 @@ class Schedule:
                         skill.hoursPerDay > skill.availableHours:
                     return True
             
-            if  asset.id in self._conflictTasks.keys() and \
+            if asset.id in self._conflictTasks.keys() and \
                 date in self._conflictTasks[asset.id].keys():
                     if task.id in self._conflictTasks[asset.id][date]:
                         return True
@@ -64,7 +64,7 @@ class Schedule:
                             if int(meta_id) in self._conflictTasks[asset.id][date]: return True
 
             """If not a metatask check if task falls within the interval."""
-            if task.id != 0 and task.withinInterval(self, asset, date) and task.first_run:
+            if task.id != 0 and task.withinInterval(self, asset, date):
                 return True
                             
         return False

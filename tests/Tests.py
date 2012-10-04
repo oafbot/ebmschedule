@@ -90,9 +90,9 @@ class Tests:
                         """If the difference is not the same as the interval."""
                         if(self.model.conf.trace):
                             print "Task: " + str(task.id), task.name
-                            print "Date:", str(date)[:-9], "\tInterval:\t", \
+                            print "Last:", str(task.end(prev))[:-9], "\tInterval:\t", \
                                    self.strfdelta(timedelta(days=task.interval), "{days} days") 
-                            print "Last:", str(task.end(prev))[:-9], \
+                            print "Date:", str(date)[:-9], \
                                   "\tDifference:\t", difference, "days"
                             print "-------------------------------------------"
                         violation += 1

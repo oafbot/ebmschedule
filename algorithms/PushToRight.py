@@ -32,14 +32,7 @@ class PushToRight(Algorithm):
         Schedule individual tasks in consecutive order once an empty slot is found.
         """
         metatask = primary.bundleAsTask(bundle, asset)
-        proc = set()
-        skip = []
-        
-        for i in self.processed:
-            for concur in primary.concur:
-                if concur in self.processed[i]:
-                    skip.append(concur)
-        
+
         while(start <= input.schedule.dateRange.end):
             while(input.schedule.blocked(asset, metatask, start)):
                 start += timedelta(days=1)
@@ -52,8 +45,7 @@ class PushToRight(Algorithm):
             """For each task in the bundle, schedule in order."""
             for task in bundle:
                 overhours  = False
-                if(task.id in skip):
-                    return
+                
                 if not task.withinInterval(input.schedule, asset, start):        
                     end = input.schedule.add(asset, task, start)
                     self.console(asset, task, input, start, end)
@@ -81,11 +73,7 @@ class PushToRight(Algorithm):
                         start = end + timedelta(days=1)
                     else: 
                         start = end
-                    if(task.concurrent and task.id in primary.concur):
-                        proc.add(primary.id)
                 else:
-                    end = start
-            if(proc):
-                self.processed[asset.id].update(proc)                
+                    end = start             
             start = primary.next(asset, end)
             

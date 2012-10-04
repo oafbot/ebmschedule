@@ -24,7 +24,6 @@ class Task:
         self.required            = False
         self.concurrent          = False
         # self.parent              = False
-        self.first_run           = False
         # self.relax               = timedelta(days=int(self.interval/2))
         self.relax               = timedelta(days=1)
         self.requisite_interval  = int(round(self.interval / 1))
@@ -41,14 +40,6 @@ class Task:
         """
         if date == None: 
             return self.addDays(asset.start, self.threshold)
-        elif self.required and self.first_run: 
-            self.first_run = False
-            # return asset.start
-            return self.addDays(date, self.interval)
-        elif self.concurrent and self.first_run:
-            self.first_run = False
-            return self.addDays(date, self.interval)
-
         return self.addDays(date, self.interval)
     
     def end(self, start):
@@ -122,7 +113,6 @@ class Task:
             for r in self.prereq:
                 if t.id == r:
                     t.required = True
-                    t.first_run = True
                     requirelist.append(t)
         """For the requirement, find out if it has been performed within the interval."""
         for require in requirelist:
@@ -153,7 +143,6 @@ class Task:
             for c in self.concur:
                 if t.id == c:
                     t.concurrent = True
-                    t.first_run = True
                     concurlist.append(t)
         """Check if tasks are already in the Bundle."""
         for concurrent in concurlist:
@@ -163,13 +152,7 @@ class Task:
             """If all tasks are in the bundle return the bundle."""
             if tasks_set and self in bundle:
                 return bundle
-            """If no prior scheduling or scheduled prior to interval."""
-            last = input.schedule.last(asset, concurrent)
-            if last is None or not concurrent.withinInterval(input.schedule, asset, last):
-                # print last
-                # print concurrent.name
-                # print concurrent.interval
-                bundle = self.bundle(bundle, self.concur, asset, input)
+            bundle = self.bundle(bundle, self.concur, asset, input)
         return bundle
     
     def bundle(self, bundle, tasks, asset, input):
