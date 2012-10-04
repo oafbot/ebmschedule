@@ -14,10 +14,12 @@ class PushToRight(Algorithm):
         """
         while(start <= input.schedule.dateRange.end):
             while(input.schedule.blocked(asset, task, start)):
-                start += timedelta(days=1) # Shift to the right one day when blocked
+                """Shift to the right one day when blocked."""
+                start += timedelta(days=1)
                 self.conflicts += 1
             if not task.withinInterval(input.schedule, asset, start):  
-                end = input.schedule.add(asset, task, start) # Add to schedule
+                """Add to schedule."""
+                end = input.schedule.add(asset, task, start)
                 self.console(asset, task, input, start, end)
             else : 
                 end = start
@@ -35,6 +37,7 @@ class PushToRight(Algorithm):
 
         while(start <= input.schedule.dateRange.end):
             while(input.schedule.blocked(asset, metatask, start)):
+                """Shift to the right one day when blocked."""
                 start += timedelta(days=1)
                 self.conflicts += 1
             
@@ -47,6 +50,7 @@ class PushToRight(Algorithm):
                 overhours  = False
                 
                 if not task.withinInterval(input.schedule, asset, start):        
+                    """Add to schedule."""
                     end = input.schedule.add(asset, task, start)
                     self.console(asset, task, input, start, end)
                     
