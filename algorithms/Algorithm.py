@@ -15,15 +15,12 @@ class Algorithm:
         self.prev       = 0
         self.output     = Output(input)
         self.stopwatch  = datetime.now()
-        self.processed  = {}
         self.relax      = relax
         
         if(input.trace): 
             self.output.console()
         if(input.conf.pushcal): 
             self.calendar(input)        
-        for asset in input.assets:
-            self.processed[asset.id] = set()
         
         self.sort(input)        
         self.main(input)
@@ -69,7 +66,6 @@ class Algorithm:
                         self.bundleSchedule(bundle, asset, input, task, start)
                     else:
                         self.regularSchedule(asset, task, input, start)
-                # input.schedule.processed.clear()
         self.analytics(input)
         self.results = input
         
