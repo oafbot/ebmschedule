@@ -15,14 +15,17 @@ class PushRightRelaxLeft(Algorithm):
         while(start <= input.schedule.dateRange.end):
             oInterval = task.interval
             start = self.shift(asset, task, start, start, oInterval, 0, input.schedule)
-            task.interval = oInterval
+            # task.interval = oInterval
             
             if not task.withinInterval(input.schedule, asset, start):  
                 end = input.schedule.add(asset, task, start)
                 self.console(asset, task, input, start, end)
-            else :
+            else:
+                print "not scheduled"
                 end = start
+            
             start = task.next(asset, end)
+            task.interval = oInterval
             
     def bundleSchedule(self, bundle, asset, input, primary, start):
         """
@@ -38,28 +41,36 @@ class PushRightRelaxLeft(Algorithm):
             oInterval = metatask.interval
             start = self.shift(asset, metatask, start, start, oInterval, 0, input.schedule)            
             metatask.interval = oInterval
-            
+                        
             self.remainder_hours = 0            # The hours carried over from the preceding task
             self.maxhours = primary.hoursPerDay # The work hours in a day
             self.longest = 0                    # The task that takes the longest to perform
                                    
             for task in bundle:
                 """For each task in the bundle, schedule in order."""
-                self.overhours  = False
-                                
-                if not task.withinInterval(input.schedule, asset, start):
+                self.overhours = False                
+                task.interval += self.relax
+                if task.concurrent or not task.withinInterval(input.schedule, asset, start):
+                    """Concurrent task inherits the interval of its parent task."""
+                    if(task.concurrent): task.interval = primary.interval
+                    """Add to schedule."""
                     end = input.schedule.add(asset, task, start)     
                     self.console(asset, task, input, start, end)
+                    """Claculate the start and end dates."""
                     dates = self.calc(task, start, end)
                     start = dates[0]
                     end = dates[1] 
-                else: 
+                else:
+                    print "not scheduled" 
                     end = start
+                task.interval -= self.relax
             start = primary.next(asset, end)
+            
     
     def shift(self, asset, task, start, orig, interval, n, schedule):
         while(schedule.blocked(asset, task, start)):
             if n > self.relax and start - timedelta(days=1) >= asset.start:
+                """Adjust the interval so it doesn't stumble on the interval check."""
                 task.interval = interval + self.relax
                 start -= timedelta(days=1)
                 n -= 1

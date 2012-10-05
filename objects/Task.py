@@ -26,7 +26,7 @@ class Task:
         # self.parent              = False
         # self.relax               = timedelta(days=int(self.interval/2))
         self.relax               = timedelta(days=1)
-        self.requisite_interval  = int(round(self.interval / 1))
+        self.requisite_interval  = int(round(self.interval/1))
         
         if len(manpowers): self.precal() #TODO: Should come from sequencing
     

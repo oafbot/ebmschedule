@@ -48,11 +48,13 @@ class PushToRight(Algorithm):
             for task in bundle:
                 """For each task in the bundle, schedule in order."""
                 self.overhours  = False
-                
-                if not task.withinInterval(input.schedule, asset, start):        
+                if task.concurrent or not task.withinInterval(input.schedule, asset, start):        
+                    """Concurrent task inherits the interval of its parent task."""
+                    if task.concurrent: task.interval = primary.interval                        
                     """Add to schedule."""
                     end = input.schedule.add(asset, task, start)
                     self.console(asset, task, input, start, end)                    
+                    """Claculate the start and end dates."""
                     dates = self.calc(task, start, end)
                     start = dates[0]
                     end = dates[1]                    
