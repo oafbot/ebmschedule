@@ -72,7 +72,35 @@ class Algorithm:
                 # input.schedule.processed.clear()
         self.analytics(input)
         self.results = input
-                
+        
+    def calc(self, task, start, end):
+        """Find the the most costly task."""
+        for manpower in task.manpowers:
+            if manpower.hours > self.longest: self.longest = manpower.hours
+
+        """If the task takes takes longer than the workday, carry over."""
+        if self.longest <= self.maxhours:
+            hours = self.longest
+            if hours + self.remainder_hours >= self.maxhours: 
+                self.overhours = True
+        else: hours = self.longest % self.maxhours
+
+        """Determine the hours remaining on a task that need to be carried over."""
+        if hours + self.remainder_hours == self.maxhours:
+            self.remainder_hours = 0
+        elif hours + self.remainder_hours > self.maxhours:
+            self.remainder_hours = (self.remainder_hours + hours) - self.maxhours
+        else:
+            self.remainder_hours += hours
+
+        """Set the start date. Push to next day if overtime."""
+        if self.overhours:
+            start = end + timedelta(days=1)
+        else: 
+            start = end
+
+        return [start, end]                
+    
     def console(self, asset, task, input, start, end):
         """Print out the scheduling output to the console."""
         self.output.printSchedule(self, asset, task, start, end) 

@@ -41,43 +41,22 @@ class PushToRight(Algorithm):
                 start += timedelta(days=1)
                 self.conflicts += 1
             
-            remainder_hours = 0             # The hours carried over from the preceding task
-            maxhours = primary.hoursPerDay  # The work hours in a day
-            longest = 0                     # The task that takes the longest to perform
-                        
-            """For each task in the bundle, schedule in order."""
+            self.remainder_hours = 0             # The hours carried over from the preceding task
+            self.maxhours = primary.hoursPerDay  # The work hours in a day
+            self.longest = 0                     # The task that takes the longest to perform
+                                    
             for task in bundle:
-                overhours  = False
+                """For each task in the bundle, schedule in order."""
+                self.overhours  = False
                 
                 if not task.withinInterval(input.schedule, asset, start):        
                     """Add to schedule."""
                     end = input.schedule.add(asset, task, start)
-                    self.console(asset, task, input, start, end)
-                    
-                    """Find the the most costly task."""
-                    for manpower in task.manpowers:
-                        if manpower.hours > longest: longest = manpower.hours
-                
-                    """If the task takes takes longer than the workday, carry over."""
-                    if longest <= maxhours:
-                        hours = longest
-                        if hours + remainder_hours >= maxhours: overhours = True
-                    else: hours = longest % maxhours
-                
-                    """Determine the hours remaining on a task that need to be carried over."""
-                    if hours + remainder_hours == maxhours:
-                        remainder_hours = 0
-                    elif hours + remainder_hours > maxhours:
-                        remainder_hours = (remainder_hours + hours) - maxhours
-                    else:
-                        remainder_hours += hours
-                
-                    """Set the start date. Push to next day if overtime."""
-                    if overhours: 
-                        start = end + timedelta(days=1)
-                    else: 
-                        start = end
+                    self.console(asset, task, input, start, end)                    
+                    dates = self.calc(task, start, end)
+                    start = dates[0]
+                    end = dates[1]                    
                 else:
                     end = start             
             start = primary.next(asset, end)
-            
+                
