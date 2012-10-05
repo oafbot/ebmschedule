@@ -114,8 +114,8 @@ class Tests:
               str.ljust("Scheduled:  " + str(self.total), 25) + \
               str.ljust("Optimal:    " + str(self.total - violation), 25) + \
               str.ljust("Average grounded: " + str(average_grounded) + " days", 25 )  
-        
-        self.writeMetrics(violation, ground, ineff, average_grounded)
+        if(self.model.conf.metrics):
+            self.writeMetrics(violation, ground, ineff, average_grounded)
         
     def writeMetrics(self, violations, groundings, inefficiencies, average_grounded):
         """Write out metrics to a file."""

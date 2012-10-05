@@ -1,6 +1,1 @@
-Groundings: 13           Inefficiencies: 0        
-Scheduled: 252           Violations: 13           Optimal: 239  94%        
-Average groundings: 4 days
-Groundings: 13           Inefficiencies: 0        
-Scheduled: 252           Violations: 13           Optimal: 239  94%        
-Average groundings: 4 days
+
