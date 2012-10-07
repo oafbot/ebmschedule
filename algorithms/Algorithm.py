@@ -7,7 +7,7 @@ class Algorithm:
     """Parent class for algorithms"""
     # __metaclass__ = ABCMeta
     
-    def __init__(self, input, weight=1.0, name="Algorithm", relax=0):
+    def __init__(self, input, weight, name="Algorithm", relax=0):
         self.name       = name
         self.weight     = weight # 0 <= weight <= 1
         self.totalTasks = len(input.tasks)
@@ -16,6 +16,7 @@ class Algorithm:
         self.output     = Output(input)
         self.stopwatch  = datetime.now()
         self.relax      = relax
+        self.skip       = set()
         
         if(input.trace): 
             self.output.console()
@@ -35,19 +36,18 @@ class Algorithm:
         # prioritize tasks with large intervals
         # prioritize tasks with many associated tasks.
         input.tasks.sort(key=lambda task: 
-            (    
-                (self.weight * ((task.manhours / (task.totalAvailableHours *1.0)) 
-                if task.totalAvailableHours else 0)) + 
-                ((1-self.weight) * (len(task.conflicts) / (self.totalTasks *1.0)))
-                ), reverse=True
-            )
-            # (
-            #     (((1-self.weight)/2) * task.interval) +                
-            #     (((1-self.weight)/2) * ((task.manhours / (task.totalAvailableHours *1.0)) 
+            # (    
+            #     (self.weight * ((task.manhours / (task.totalAvailableHours *1.0)) 
             #     if task.totalAvailableHours else 0)) + 
-            #     (self.weight * (len(task.conflicts) / (self.totalTasks *1.0)))
+            #     ((1-self.weight) * (len(task.conflicts) / (self.totalTasks *1.0)))
             #     ), reverse=True
             # )
+            (              
+                (self.weight * ((self.totalhours(task, input.tasks)/(task.totalAvailableHours)) 
+                if task.totalAvailableHours else 0)) * (task.interval/365) +
+                ((1-self.weight) * (len(task.conflicts)/(self.totalTasks)))
+                ), reverse=True
+            )
             
     def main(self, input):
         for task in input.tasks:
@@ -64,10 +64,23 @@ class Algorithm:
                     bundle = task.checkConstraints(list(), asset, input)
                     if len(bundle) > 1:
                         self.bundleSchedule(bundle, asset, input, task, start)
-                    else:
+                    elif task.id not in self.skip:
                         self.regularSchedule(asset, task, input, start)
         self.analytics(input)
         self.results = input
+    
+    def totalhours(self, task, tasks):
+        total = task.manhours 
+        for t in tasks:
+            if t.id in task.prep:
+                total += t.manhours
+            if t.id in task.prereq:
+                total += t.manhours
+            if t.id in task.subseq:
+                total += t.manhours
+            if t.id in task.concur:
+                total += t.manhours
+        return total
         
     def calc(self, task, start, end):
         """Find the the most costly task."""
@@ -104,8 +117,8 @@ class Algorithm:
         print "\n", \
               self.name + ":", input.schedule.dataSource, input.count, \
               "    Manhours:", input.schedule.totalManhours, \
-              "    Adjustments:", self.conflicts
-        print "\nExecution:", exectime
+              "    Adjustments:", self.conflicts, \
+              "    Execution:", exectime
         
         """Write out metrics to a file."""
         if(input.conf.metrics):

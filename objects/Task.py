@@ -23,12 +23,12 @@ class Task:
         self.totalAvailableHours = 0        
         self.required            = False
         self.concurrent          = False
-        # self.parent              = False
         # self.relax               = timedelta(days=int(self.interval/2))
         self.relax               = timedelta(days=1)
         self.requisite_interval  = int(round(self.interval/1))
         
         if len(manpowers): self.precal() #TODO: Should come from sequencing
+
     
     def next(self, asset, date):
         """
@@ -68,7 +68,6 @@ class Task:
             self.days = ceil(max(self.days, manpower.hours / (manpower.skill.hoursPerDay *1.0))) 
             self.sumSkills(manpower)
             self.manhours += manpower.hours
-            self.totalAvailableHours += manpower.skill.availableHours
     
     def sumSkills(self, manpower):
         """If the skill is in the list of required skills add manpower hours."""
@@ -170,22 +169,20 @@ class Task:
     
     def bundleAsTask(self, bundle, asset):
         """Convert a bundle into a meta-task for running schedule calculations."""
-        total = 0
         mp = []
-        cf = []
+        cf = set()
         name = ""
         threshold = 0
         interval = 0
         for task in bundle:
             for manpower in task.manpowers:
-                total += manpower.hours
                 mp += task.manpowers
-            cf += task.conflicts
+            cf.union(task.conflicts)
             name += str(task.id) + "-"
             if task.threshold > threshold: threshold = task.threshold
             if task.interval > interval: interval = task.interval
-        days = total / task.hoursPerDay
-        return Task(0, name, 1, threshold, interval, mp, cf)
+        metatask = Task(0, name, 1, threshold, interval, mp, cf)
+        return metatask
     
     def withinInterval(self, schedule, asset, start):
         """Check if a date falls within the interval period."""        
@@ -196,6 +193,8 @@ class Task:
         before = DateRange(start - (interval - self.relax), start)
         after  = DateRange(end, end + (interval - self.relax))
         dates = schedule._scheduledTasks[asset.id].keys()
+        
+        # if(self.interval > 60):
             
         for date in dates:
             """If the task is scheduled for that date."""
@@ -205,5 +204,4 @@ class Task:
                     return True                    
                 if after.within(date):
                     return True                                   
-        return False        
-       
+        return False       

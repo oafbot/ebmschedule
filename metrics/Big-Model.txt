@@ -1,99 +1,47 @@
-PushRight-RelaxLeft: Big-Model 0	Manhours: 17520.6	Adjustments: 1186130
-PushRight-RelaxLeft: Big-Model 0	Groundings: 1939	Inefficiencies: 283
-
-
+----------------------------------------------------------------------------
+PushRight: Big-Model 0	[2012-10-07 15:33:18]	Execution: 0:02:43.31
 ---------------------------------------------------------------------------------
-PushRight-RelaxLeft: Big-Model 0	[2012-09-28 02:09:30]	Execution: 0:16:08.02
----------------------------------------------------------------------------------
-Manhours: 17080.7        Adjustments: 1218897     
-Groundings: 1911         Inefficiencies: 232      
-Scheduled: 95737         Violations: 2143         Optimal: 93594           
-
+Manhours: 39132.7        Adjustments: 84387       
+Groundings: 1737         Inefficiencies: 0        
+Scheduled: 1481454       Violations: 1737         Optimal: 1479717  99%    
+Average groundings: 7 days
 
 ---------------------------------------------------------------------------------
-PushRight-RelaxLeft: Big-Model 0	[2012-09-28 03:32:43]	Execution: 0:16:03.88
+PushRight-RelaxLeft: Big-Model 0	[2012-10-07 15:43:21]	Execution: 0:02:25.03
 ---------------------------------------------------------------------------------
-Manhours: 17080.7        Adjustments: 1218897     
-Groundings: 1911         Inefficiencies: 232      
-Scheduled: 95737         Violations: 2143         Optimal: 93594  97%      
-Average groundings: 341 days
+Manhours: 40522.4        Adjustments: 40148       
+Groundings: 1435         Inefficiencies: 1276     
+Scheduled: 1538363       Violations: 2711         Optimal: 1535652  99%    
+Average groundings: 9 days
 
 ---------------------------------------------------------------------------------
-PushRight-RelaxLeft: Big-Model 0	[2012-09-28 15:49:03]	Execution: 0:18:07.07
+PushRight: Big-Model 0	[2012-10-07 16:37:09]	Execution: 0:02:10.57
 ---------------------------------------------------------------------------------
-Manhours: 17658.5        Adjustments: 1322458     
-Groundings: 1945         Inefficiencies: 249      
-Scheduled: 127041        Violations: 2194         Optimal: 124847  98%     
-Average groundings: 365 days
+Manhours: 39080.2        Adjustments: 30155       
+Groundings: 1737         Inefficiencies: 0        
+Scheduled: 1480963       Violations: 1737         Optimal: 1479226  99%    
+Average groundings: 7 days
 
 ---------------------------------------------------------------------------------
-PushRight-RelaxLeft: Big-Model 0	[2012-09-28 18:11:42]	Execution: 0:19:07.35
+PushRight: Big-Model 0	[2012-10-07 16:48:08]	Execution: 0:02:19.75
 ---------------------------------------------------------------------------------
-Manhours: 17806.1        Adjustments: 1402144     
-Groundings: 1821         Inefficiencies: 235      
-Scheduled: 131837        Violations: 2056         Optimal: 129781  98%     
-Average groundings: 412 days
+Manhours: 39080.2        Adjustments: 30155       
+Groundings: 2334         Inefficiencies: 676      
+Scheduled: 1480963       Violations: 3010         Optimal: 1477953  99%    
+Average groundings: 6 days
 
 ---------------------------------------------------------------------------------
-PushRight-RelaxLeft: Big-Model 0	[2012-09-28 23:56:32]	Execution: 0:18:47.16
+PushRight-RelaxLeft: Big-Model 0	[2012-10-07 17:08:05]	Execution: 0:02:24.40
 ---------------------------------------------------------------------------------
-Manhours: 17658.5        Adjustments: 1322458     
-Groundings: 1945         Inefficiencies: 249      
-Scheduled: 127041        Violations: 2194         Optimal: 124847  98%     
-Average groundings: 365 days
+Manhours: 40522.4        Adjustments: 40148       
+Groundings: 1455         Inefficiencies: 1398     
+Scheduled: 1538363       Violations: 2853         Optimal: 1535510  99%    
+Average groundings: 9 days
 
 ---------------------------------------------------------------------------------
-PushRight-RelaxLeft: Big-Model 0	[2012-09-29 00:31:09]	Execution: 0:13:51.61
+PushRight: Big-Model 0	[2012-10-07 17:27:49]	Execution: 0:02:32.32
 ---------------------------------------------------------------------------------
-Manhours: 14617.6        Adjustments: 892303      
-Groundings: 1258         Inefficiencies: 580      
-Scheduled: 119751        Violations: 1838         Optimal: 117913  98%     
-Average groundings: 416 days
-
----------------------------------------------------------------------------------
-PushRight-RelaxLeft: Big-Model 0	[2012-09-29 18:40:20]	Execution: 0:13:56.42
----------------------------------------------------------------------------------
-Manhours: 14946.1        Adjustments: 889290      
-Groundings: 1282         Inefficiencies: 588      
-Scheduled: 113728        Violations: 1870         Optimal: 111858  98%     
-Average groundings: 435 days
-
----------------------------------------------------------------------------------
-PushRight-RelaxLeft: Big-Model 0	[2012-09-29 18:59:12]	Execution: 0:13:46.96
----------------------------------------------------------------------------------
-Manhours: 14946.1        Adjustments: 889290      
-Groundings: 1282         Inefficiencies: 588      
-Scheduled: 113728        Violations: 1870         Optimal: 111858  98%     
-Average groundings: 435 days
-
----------------------------------------------------------------------------------
-PushRight-RelaxLeft: Big-Model 0	[2012-09-29 19:22:04]	Execution: 0:18:07.36
----------------------------------------------------------------------------------
-Manhours: 15431.9        Adjustments: 1230874     
-Groundings: 2067         Inefficiencies: 385      
-Scheduled: 123952        Violations: 2452         Optimal: 121500  98%     
-Average groundings: 347 days
-
----------------------------------------------------------------------------------
-PushRight-RelaxLeft: Big-Model 0	[2012-09-29 19:45:52]	Execution: 0:18:07.11
----------------------------------------------------------------------------------
-Manhours: 15431.9        Adjustments: 1230874     
-Groundings: 2067         Inefficiencies: 385      
-Scheduled: 123952        Violations: 2452         Optimal: 121500  98%     
-Average groundings: 347 days
-
----------------------------------------------------------------------------------
-PushRight-RelaxLeft: Big-Model 0	[2012-09-29 20:33:01]	Execution: 0:17:46.57
----------------------------------------------------------------------------------
-Manhours: 15431.9        Adjustments: 1230874     
-Groundings: 2067         Inefficiencies: 385      
-Scheduled: 123952        Violations: 2452         Optimal: 121500  98%     
-Average groundings: 347 days
-
----------------------------------------------------------------------------------
-PushRight: Big-Model 0	[2012-09-30 16:39:53]	Execution: 0:17:54.45
----------------------------------------------------------------------------------
-Manhours: 17441.1        Adjustments: 1278491     
-Groundings: 2176         Inefficiencies: 42       
-Scheduled: 125110        Violations: 2218         Optimal: 122892  98%     
-Average groundings: 344 days
+Manhours: 39080.2        Adjustments: 30155       
+Groundings: 2334         Inefficiencies: 676      
+Scheduled: 1480963       Violations: 3010         Optimal: 1477953  99.8%  
+Average groundings: 6 days

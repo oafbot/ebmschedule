@@ -125,7 +125,7 @@ class Tests:
         else: 
             path = "metrics/"
         optimal = self.total - violations
-        percent = int((float(optimal) / float(self.total)) * 100)
+        percent = round((float(optimal) / float(self.total)) * 100, 2)
         fo = open(path + self.schedule.dataSource + ".txt", "ab+")
         out =  str.ljust("Groundings: " + str(groundings), 25) + \
                str.ljust("Inefficiencies: " + str(inefficiencies), 25) + "\n" + \

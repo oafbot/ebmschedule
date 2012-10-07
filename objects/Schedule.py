@@ -38,17 +38,16 @@ class Schedule:
             LHS is the number of assets *already* scheduled, so if >= maxAssets cannot 
             schedule any additional assets
             """
-            if  date in self._assetsInWork.keys() and \
+            if date in self._assetsInWork.keys() and \
                 len(set(self._assetsInWork[date]).difference([asset.id])) \
                     >= self.maxAssetsInWork:
                 return True
             
             for skill in task.skills:
-                if  date in self._skillsInWork.keys() and \
-                    skill.id in self._skillsInWork[date].keys() and \
-                    self._skillsInWork[date][skill.id] + \
-                        skill.hoursPerDay > skill.availableHours:
-                    return True
+                if task.id != 0 and date in self._skillsInWork.keys() and \
+                   skill.id in self._skillsInWork[date].keys() and \
+                   self._skillsInWork[date][skill.id] + skill.hoursPerDay > skill.availableHours:
+                        return True
             
             if asset.id in self._conflictTasks.keys() and \
                 date in self._conflictTasks[asset.id].keys():
@@ -60,12 +59,13 @@ class Schedule:
                         while '' in meta:
                             meta.remove('')
                         for meta_id in meta:
-                            if int(meta_id) in self._conflictTasks[asset.id][date]: return True
+                            if int(meta_id) in self._conflictTasks[asset.id][date]: 
+                                return True
 
             """If not a metatask check if task falls within the interval."""
             if task.id != 0 and task.withinInterval(self, asset, date):
                 return True
-                            
+                           
         return False
     
     def last(self, asset, task):

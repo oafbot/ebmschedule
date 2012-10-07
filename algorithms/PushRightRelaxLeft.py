@@ -3,7 +3,7 @@ from Algorithm import Algorithm
 
 class PushRightRelaxLeft(Algorithm):
 
-    def __init__(self, input, weight=1.0, name="PushRight-RelaxLeft", relax=-3):
+    def __init__(self, input, weight, name="PushRight-RelaxLeft", relax=-3):
         Algorithm.__init__(self, input, weight, name, relax)
     
     def regularSchedule(self, asset, task, input, start):
@@ -21,7 +21,6 @@ class PushRightRelaxLeft(Algorithm):
                 end = input.schedule.add(asset, task, start)
                 self.console(asset, task, input, start, end)
             else:
-                print "not scheduled"
                 end = start
             
             start = task.next(asset, end)
@@ -48,8 +47,12 @@ class PushRightRelaxLeft(Algorithm):
                                    
             for task in bundle:
                 """For each task in the bundle, schedule in order."""
-                self.overhours = False                
-                task.interval += self.relax
+                self.overhours = False
+                original = task.interval
+                if(task.interval+self.relax > 0):                    
+                    task.interval += self.relax
+                else:
+                    task.interval = 0
                 if task.concurrent or not task.withinInterval(input.schedule, asset, start):
                     """Concurrent task inherits the interval of its parent task."""
                     if(task.concurrent): task.interval = primary.interval
@@ -59,11 +62,12 @@ class PushRightRelaxLeft(Algorithm):
                     """Claculate the start and end dates."""
                     dates = self.calc(task, start, end)
                     start = dates[0]
-                    end = dates[1] 
+                    end = dates[1]
+                    if(task.concurrent and task.id in primary.concur 
+                        and task.interval >= primary.interval): self.skip.add(task.id) 
                 else:
-                    print "not scheduled" 
                     end = start
-                task.interval -= self.relax
+                task.interval = original
             start = primary.next(asset, end)
             
     

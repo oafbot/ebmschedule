@@ -25,27 +25,31 @@ class Config:
         # = Variables and Constants   =
         # =============================
         self.bigdata  = True
-        self.trace    = True
-        
-        self.fixed    = True  # start on a fixed day
-        self.algo     = 0     # 0 : PushRight, 1 : PushRight-RelaxLeft, 2
-        
+        self.algo     = 0     # [0: PushRight], [1: PushRight-RelaxLeft], [2: PushLeft]
+
         self.hours    = 8
-        self.duration = "Y"   # Y : Year, M : Month, C : Custom        
+        self.duration = "Y"   # Y : Year, M : Month, C : Custom
+        
+        self.trace    = True
+        self.fixed    = True  # start on a fixed day
         
         self.pushcal  = False # Push schedule to Googe Calendar
         self.metrics  = False # Write metrics to output file
-        
+        self.testing  = True
+
+        # ======================================
+        # = BE CAREFUL ADJUSTING THE FOLLOWING =
+        # ======================================
         """XML rewriting and limit."""
-        self.reset    = False # reset the initial conditions
-        self.cap      = 1     # cap for the xml gerneration, alter externally
+        self.reset    = False # reset the initial conditions, alter externally
+        self.cap      = 1     # cap for the xml gerneration,  alter externally
                         
         if(not self.fixed):
-            self.reset = True
+            self.reset = True 
                 
         """Set maximum number of assets grounded."""
         if(self.bigdata):
-            self.max = 6
+            self.max = 14
         else:
             self.max = 2
         
@@ -65,6 +69,9 @@ class Config:
         if(self.duration == "Y"):        
             self.start = datetime(self.year, self.month, self.day)
             self.end   = datetime(self.year + 1, self.month, self.day)
+        elif(self.duration == "2"):        
+            self.start = datetime(self.year, self.month, self.day)
+            self.end   = datetime(self.year + 2, self.month, self.day)
         elif(self.duration == "M"):
             self.start = datetime(self.year, self.month, self.day)
             self.end   = datetime(self.year, self.month + 1, self.day)

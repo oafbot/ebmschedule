@@ -3,25 +3,25 @@ from Algorithm import Algorithm
 
 class PushToRight(Algorithm):
     
-    def __init__(self, input, weight=1.0, name="PushRight"):        
-        Algorithm.__init__(self, input, weight, name)        
+    def __init__(self, input, weight, name="PushRight"):        
+        Algorithm.__init__(self, input, weight, name)
                        
     def regularSchedule(self, asset, task, input, start):
         """
         Schedule single tasks.
         While the start date is within the date range,
         Keep Shifting one day forward as long as a schedule conflict exists.
-        """
+        """         
         while(start <= input.schedule.dateRange.end):
             while(input.schedule.blocked(asset, task, start)):
                 """Shift to the right one day when blocked."""
                 start += timedelta(days=1)
                 self.conflicts += 1
-            if not task.withinInterval(input.schedule, asset, start):  
+            if not task.withinInterval(input.schedule, asset, start): 
                 """Add to schedule."""
                 end = input.schedule.add(asset, task, start)
                 self.console(asset, task, input, start, end)
-            else : 
+            else :
                 end = start
             start = task.next(asset, end)
     
@@ -34,7 +34,7 @@ class PushToRight(Algorithm):
         Schedule individual tasks in consecutive order once an empty slot is found.
         """
         metatask = primary.bundleAsTask(bundle, asset)
-
+        
         while(start <= input.schedule.dateRange.end):
             while(input.schedule.blocked(asset, metatask, start)):
                 """Shift to the right one day when blocked."""
@@ -57,7 +57,9 @@ class PushToRight(Algorithm):
                     """Claculate the start and end dates."""
                     dates = self.calc(task, start, end)
                     start = dates[0]
-                    end = dates[1]                    
+                    end = dates[1]
+                    if(task.concurrent and task.id in primary.concur 
+                        and task.interval >= primary.interval): self.skip.add(task.id)
                 else:
                     end = start             
             start = primary.next(asset, end)
