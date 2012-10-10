@@ -74,9 +74,9 @@ class Task:
         newSkill = manpower.skill.copy()
         for _skill in self.skills:
             if newSkill.id == _skill.id:
-                _skill.total += manpower.hours
+                _skill.hours += manpower.hours
                 return
-        newSkill.total = manpower.hours
+        newSkill.hours = manpower.hours
         self.skills.append(newSkill)
     
     def copy(self):

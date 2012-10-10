@@ -43,10 +43,10 @@ class Schedule:
                     >= self.maxAssetsInWork:
                 return True
             
-            for skill in task.skills:
+            for skill in task.skills:                    
                 if task.id != 0 and date in self._skillsInWork.keys() and \
                    skill.id in self._skillsInWork[date].keys() and \
-                   self._skillsInWork[date][skill.id] + skill.hoursPerDay > skill.availableHours:
+                   self._skillsInWork[date][skill.id] + skill.hours > skill.availableHours:
                         return True
             
             if asset.id in self._conflictTasks.keys() and \
@@ -87,15 +87,15 @@ class Schedule:
                 self._assetsInWork[date] = [asset.id]
             elif asset.id not in self._assetsInWork[date]:
                 self._assetsInWork[date].append(asset.id)
-            
+                    
             for skill in task.skills:
                 """Assign skills to the date."""
                 if date not in self._skillsInWork.keys():
-                    self._skillsInWork[date] = { skill.id:skill.hoursPerDay }
+                    self._skillsInWork[date] = { skill.id:skill.hours }
                 elif skill.id not in self._skillsInWork[date].keys():
-                    self._skillsInWork[date][skill.id] = skill.hoursPerDay
+                    self._skillsInWork[date][skill.id] = skill.hours
                 else:
-                    self._skillsInWork[date][skill.id] += skill.hoursPerDay
+                    self._skillsInWork[date][skill.id] += skill.hours       
             
             if asset.id not in self._scheduledTasks.keys():
                 """Assign asset, date, and task to list of scheduled tasks."""

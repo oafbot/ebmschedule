@@ -83,7 +83,9 @@ class Tests:
             for date in SortedByTask[i]:                
                 if(prev is None or date < asset.start):
                     prev = date
-                elif(date >= asset.start and task.interval > 0 and date > task.end(prev)):
+                elif(date >= asset.start and task.interval > 0 and 
+                     date > task.end(prev) and not task.concurrent):
+                    """Do not count concurrent tasks."""
                     difference = (date - prev).days
                     if(difference != timedelta(days=task.interval-1).days and 
                        difference != timedelta(days=task.interval).days):
@@ -98,7 +100,8 @@ class Tests:
                         violation += 1
                         if(difference - task.interval > 0):
                             ground += 1
-                            groundedlist.append(difference - task.interval)
+                            daysgrounded = difference - task.interval
+                            groundedlist.append(daysgrounded)
                         else:
                             ineff += 1
                     prev = task.end(date)

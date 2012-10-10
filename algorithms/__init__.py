@@ -1,5 +1,5 @@
 class Algos:
-    def __init__(self, model, weight):
+    def __init__(self, model, weight, relax):
         import main
         from PushToRight import PushToRight
         from PushRightRelaxLeft import PushRightRelaxLeft
@@ -9,7 +9,7 @@ class Algos:
             if(input.conf.algo == 0):
                 self.algorithm = PushToRight(input, weight)
             elif(input.conf.algo == 1):
-                self.algorithm = PushRightRelaxLeft(input, weight)
+                self.algorithm = PushRightRelaxLeft(input, weight, relax)
             elif(input.conf.algo == 2):
                 self.algorithm = PushToLeft(input, weight)
                 

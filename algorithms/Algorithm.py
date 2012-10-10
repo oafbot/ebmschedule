@@ -7,7 +7,7 @@ class Algorithm:
     """Parent class for algorithms"""
     # __metaclass__ = ABCMeta
     
-    def __init__(self, input, weight, name="Algorithm", relax=0):
+    def __init__(self, input, weight, relax, name="Algorithm"):
         self.name       = name
         self.weight     = weight # 0 <= weight <= 1
         self.totalTasks = len(input.tasks)
@@ -15,9 +15,11 @@ class Algorithm:
         self.prev       = 0
         self.output     = Output(input)
         self.stopwatch  = datetime.now()
-        self.relax      = relax
+        self.relax      = 0 - relax
         self.skip       = set()
         
+        if(self.relax < 0):
+            self.name += "["+str(abs(self.relax))+"]"
         if(input.trace): 
             self.output.console()
         if(input.conf.pushcal): 
@@ -43,8 +45,8 @@ class Algorithm:
             #     ), reverse=True
             # )
             (              
-                (self.weight * ((self.totalhours(task, input.tasks)/(task.totalAvailableHours)) 
-                if task.totalAvailableHours else 0)) * (task.interval/365) +
+                (self.weight * ((self.totalhours(task, input.tasks)) 
+                )) +
                 ((1-self.weight) * (len(task.conflicts)/(self.totalTasks)))
                 ), reverse=True
             )
@@ -123,7 +125,7 @@ class Algorithm:
         """Write out metrics to a file."""
         if(input.conf.metrics):
             self.output.writeMetrics(input, self.conflicts, self.name, exectime, now)
-    
+            
     def calendar(self, input):
         """Initiate the Google Calendar."""
         from outputs.Calendar import Calendar        

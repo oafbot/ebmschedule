@@ -4,7 +4,7 @@ from Algorithm import Algorithm
 class PushToRight(Algorithm):
     
     def __init__(self, input, weight, name="PushRight"):        
-        Algorithm.__init__(self, input, weight, name)
+        Algorithm.__init__(self, input, weight, 0, name)
                        
     def regularSchedule(self, asset, task, input, start):
         """
