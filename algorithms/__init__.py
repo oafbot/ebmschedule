@@ -7,9 +7,9 @@ class Algos:
     
         for input in model:
             if(input.conf.algo == 0):
-                self.algorithm = PushToRight(input, weight)
+                self.algorithm = PushToRight(input, float(weight))
             elif(input.conf.algo == 1):
-                self.algorithm = PushRightRelaxLeft(input, weight, relax)
+                self.algorithm = PushRightRelaxLeft(input, float(weight), float(relax))
             elif(input.conf.algo == 2):
-                self.algorithm = PushToLeft(input, weight)
+                self.algorithm = PushToLeft(input, float(weight))
                 

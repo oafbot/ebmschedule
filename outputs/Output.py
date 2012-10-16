@@ -117,9 +117,10 @@ class Output:
         if self.input.bigdata:
             if algorithm.prev != asset.name: print ""
             print str.ljust(asset.name, 8), str.ljust(task.name, 96), \
-            str.ljust(str(task.interval), 8),     \
+            str.ljust(str(task.interval), 8), \
             str.ljust(str(start)[:-9], 10), "--", \
             str.ljust(str(end)[:-9], 10)
+            # str.ljust(str(task.interval), 8),     \
             # str.ljust(str(task.manhours), 8),     \
             # str.ljust(str(task.id), 8),           \
             algorithm.prev = asset.name
@@ -132,7 +133,7 @@ class Output:
                   str.ljust(str(end)[:-9], 10)
             algorithm.prev = asset.name
     
-    def writeMetrics(self, input, conflicts, name, exectime, now):
+    def writeMetrics(self, input, conflicts, name, weight, exectime, now):
         import os
         if 'tools' in os.getcwd():
             path = "../metrics/"
@@ -143,6 +144,7 @@ class Output:
         fo = open(path + input.schedule.dataSource + ".txt", "ab+")
         out = line+ name + ": " + input.schedule.dataSource + " " + str(input.count) + \
               "\t[" + str(now)[:-7] + "]" + "\tExecution: " + exectime + line + \
+              "Weight: " + str(weight) + "\n" + \
               str.ljust("Manhours: " + str(input.schedule.totalManhours), 25) + \
               str.ljust("Adjustments: " + str(conflicts), 25) + "\n"
               

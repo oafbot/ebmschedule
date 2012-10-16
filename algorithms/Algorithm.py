@@ -1,6 +1,7 @@
 from datetime import datetime
 from datetime import timedelta
 from outputs.Output import Output
+# from collections import Counter
 # from abc import ABCMeta
 
 class Algorithm:
@@ -9,23 +10,23 @@ class Algorithm:
     
     def __init__(self, input, weight, relax, name="Algorithm"):
         self.name       = name
-        self.weight     = weight # 0 <= weight <= 1
+        self.weight     = weight*0.10 # 0 <= weight <= 1
         self.totalTasks = len(input.tasks)
         self.conflicts  = 0
         self.prev       = 0
         self.output     = Output(input)
         self.stopwatch  = datetime.now()
-        self.relax      = 0 - relax
+        self.relax      = (0 - relax)*0.10
         self.skip       = set()
         
         if(self.relax < 0):
-            self.name += "["+str(abs(self.relax))+"]"
+            self.name += "["+str(int(relax))+"]"
         if(input.trace): 
             self.output.console()
         if(input.conf.pushcal): 
             self.calendar(input)        
         
-        self.sort(input)        
+        self.sort(input)
         self.main(input)
         
     def sort(self, input):
@@ -44,9 +45,9 @@ class Algorithm:
             #     ((1-self.weight) * (len(task.conflicts) / (self.totalTasks *1.0)))
             #     ), reverse=True
             # )
+
             (              
-                (self.weight * ((self.totalhours(task, input.tasks)) 
-                )) +
+                (self.weight * ((self.totalhours(task, input.tasks)))) +
                 ((1-self.weight) * (len(task.conflicts)/(self.totalTasks)))
                 ), reverse=True
             )
@@ -72,17 +73,40 @@ class Algorithm:
         self.results = input
     
     def totalhours(self, task, tasks):
-        total = task.manhours 
+        total = self.taskcost(task)
         for t in tasks:
             if t.id in task.prep:
-                total += t.manhours
+                total += self.taskcost(t)
+                total += self.totalhours(self, t, tasks)
+                # total += t.manhours
             if t.id in task.prereq:
-                total += t.manhours
+                total += self.taskcost(t)
+                total += self.totalhours(self, t, tasks)
+                # total += t.manhours
             if t.id in task.subseq:
-                total += t.manhours
+                total += self.taskcost(t)
+                total += self.totalhours(self, t, tasks)
+                # total += t.manhours
             if t.id in task.concur:
-                total += t.manhours
+                total += self.taskcost(t)
+                total += self.totalhours(self, t, tasks)
+                # total += t.manhours
         return total
+
+    def taskcost(self, task):
+        """Calculate the cost ratio for skills required for a task."""
+        cost = 0
+        # skills = []
+        # for s in task.skills:
+        #     skills.append(s.id)
+        # for manpower in task.manpowers:            
+        #   skills.append(manpower.skill.id)
+        # counter = Counter(skills)
+        for manpower in task.manpowers:            
+            """required * hours / available * workday"""
+            # cost += float(counter[manpower.skill.id]*manpower.hours)/(manpower.skill.availableHours)
+            cost += (1.0*manpower.hours)/(manpower.skill.hoursPerDay)
+        return cost
         
     def calc(self, task, start, end):
         """Find the the most costly task."""
@@ -124,7 +148,7 @@ class Algorithm:
         
         """Write out metrics to a file."""
         if(input.conf.metrics):
-            self.output.writeMetrics(input, self.conflicts, self.name, exectime, now)
+            self.output.writeMetrics(input, self.conflicts, self.name, self.weight, exectime, now)
             
     def calendar(self, input):
         """Initiate the Google Calendar."""

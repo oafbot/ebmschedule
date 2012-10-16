@@ -1,4 +1,5 @@
 from datetime import timedelta
+from math import ceil
 class Task:
     
     def __init__(self, id, name, unit, threshold, interval, manpowers, 
@@ -23,9 +24,9 @@ class Task:
         self.totalAvailableHours = 0        
         self.required            = False
         self.concurrent          = False
-        # self.relax               = timedelta(days=int(self.interval/2))
+        # self.relax               = timedelta(days=int(ceil(self.interval/2)))
         self.relax               = timedelta(days=1)
-        self.requisite_interval  = int(round(self.interval/1))
+        self.requisite_interval  = int(ceil(self.interval/2))
         
         if len(manpowers): self.precal() #TODO: Should come from sequencing
 
@@ -57,7 +58,8 @@ class Task:
         """Return the sum of the date and the time difference between today and 'days'-1."""
         from datetime import timedelta
         from math import floor
-        days -= 1
+        if days > 0:
+            days -= 1
         return date + timedelta(days=floor(days)) #todo: decrement precision if decimal
     
     def precal(self):
@@ -65,7 +67,7 @@ class Task:
         from math import ceil
         for manpower in self.manpowers:
             #TODO: Don't hard-code
-            self.days = ceil(max(self.days, manpower.hours / (manpower.skill.hoursPerDay *1.0))) 
+            self.days = int(max(self.days, ceil(manpower.hours / manpower.skill.hoursPerDay))) 
             self.sumSkills(manpower)
             self.manhours += manpower.hours
     
@@ -98,7 +100,9 @@ class Task:
         """Check the constrains and bundle tasks together when appropriate."""
         if self.prereq: self.satisfyRequisite(bundle, asset, input)              # prerequisite
         if self.prep: bundle = self.bundle(bundle, self.prep, asset, input)      # prepatory
-        if not bundle or self not in bundle: bundle.append(self)                 # primary task            
+        if not bundle or self not in bundle: 
+            bundle.append(self)
+            self.primary = True                  # primary task            
         if self.concur: bundle = self.concurrence(bundle, asset, input)          # concurrent
         if self.subseq: bundle = self.bundle(bundle, self.subseq, asset, input)  # subsequent
         return bundle
@@ -190,12 +194,19 @@ class Task:
         
         interval = timedelta(days=self.interval)
         end = self.end(start)
-        before = DateRange(start - (interval - self.relax), start)
-        after  = DateRange(end, end + (interval - self.relax))
         dates = schedule._scheduledTasks[asset.id].keys()
         
-        # if(self.interval > 60):
-            
+        # if(self.interval <= 7):
+        #     before = DateRange(start - (interval - timedelta(days=1)), start)
+        #     after  = DateRange(end, end + (interval - timedelta(days=1)))
+        # elif(self.interval <= 14):    
+        #     before = DateRange(start - (interval - timedelta(days=int(ceil(self.interval/4)))), start)
+        #     after  = DateRange(end, end + (interval - timedelta(days=int(ceil(self.interval/4)))))        
+        # else:
+            # return False 
+        before = DateRange(start - (interval - self.relax), start)
+        after  = DateRange(end, end + (interval - self.relax))
+        
         for date in dates:
             """If the task is scheduled for that date."""
             if self.id in schedule._scheduledTasks[asset.id][date]:

@@ -6,7 +6,7 @@ from tests.Tests import Tests
 if __name__ == "__main__":
     """Handle command line args."""
     counter = sys.argv[1] if len(sys.argv)>1 else 0  
-    weight  = sys.argv[2] if len(sys.argv)>2 else 1
+    weight  = sys.argv[2] if len(sys.argv)>2 else 5
     relax   = sys.argv[3] if len(sys.argv)>3 else 3
     
     """Construct the model."""

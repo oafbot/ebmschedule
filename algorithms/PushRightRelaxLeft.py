@@ -1,5 +1,6 @@
 from datetime import timedelta
 from Algorithm import Algorithm
+from math import ceil
 
 class PushRightRelaxLeft(Algorithm):
 
@@ -14,18 +15,16 @@ class PushRightRelaxLeft(Algorithm):
         """
         while(start <= input.schedule.dateRange.end):
             oInterval = task.interval
-            start = self.shift(asset, task, start, start, oInterval, 0, input.schedule)
-            # task.interval = oInterval
+            start = self.shift(asset, task, start, start, oInterval, input.schedule)
             
             if not task.withinInterval(input.schedule, asset, start):  
+                task.interval = oInterval
                 end = input.schedule.add(asset, task, start)
                 self.console(asset, task, input, start, end)
             else:
-                end = start
-            
+                end = start            
             start = task.next(asset, end)
-            task.interval = oInterval
-            
+          
     def bundleSchedule(self, bundle, asset, input, primary, start):
         """
         Schedule bundled tasks.
@@ -35,10 +34,10 @@ class PushRightRelaxLeft(Algorithm):
         Schedule individual tasks in consecutive order once an empty slot is found.
         """
         metatask = primary.bundleAsTask(bundle, asset)
-        
+
         while(start <= input.schedule.dateRange.end):
             oInterval = metatask.interval
-            start = self.shift(asset, metatask, start, start, oInterval, 0, input.schedule)            
+            start = self.shift(asset, metatask, start, start, oInterval, input.schedule)            
             metatask.interval = oInterval
                         
             self.remainder_hours = 0            # The hours carried over from the preceding task
@@ -49,15 +48,16 @@ class PushRightRelaxLeft(Algorithm):
                 """For each task in the bundle, schedule in order."""
                 self.overhours = False
                 original = task.interval
-                if(task.interval+self.relax > 0):                    
-                    task.interval += self.relax
+                if(task.interval + int(ceil(task.interval * self.relax)) > 0):                    
+                    task.interval += int(ceil(task.interval * self.relax))
                 else:
                     task.interval = 0
-                if task.concurrent or not task.withinInterval(input.schedule, asset, start):
+                if task.concurrent or task.primary or not task.withinInterval(input.schedule, asset, start):
                     """Concurrent task inherits the interval of its parent task."""
                     if(task.concurrent): task.interval = primary.interval
                     """Add to schedule."""
-                    end = input.schedule.add(asset, task, start)     
+                    task.interval = original 
+                    end = input.schedule.add(asset, task, start)
                     self.console(asset, task, input, start, end)
                     """Claculate the start and end dates."""
                     dates = self.calc(task, start, end)
@@ -67,24 +67,44 @@ class PushRightRelaxLeft(Algorithm):
                         and task.interval >= primary.interval): self.skip.add(task.id) 
                 else:
                     end = start
-                task.interval = original
+                
             start = primary.next(asset, end)
-            
-    
-    def shift(self, asset, task, start, orig, interval, n, schedule):
+                
+    def shift(self, asset, task, start, orig, interval, schedule):
+        floor = start + timedelta(days=int(ceil(interval * self.relax)))
+        push  = False       
         while(schedule.blocked(asset, task, start)):
-            if n > self.relax and start - timedelta(days=1) >= asset.start:
+            if start > floor and not push and floor > asset.start:
                 """Adjust the interval so it doesn't stumble on the interval check."""
-                task.interval = interval + self.relax
+                task.interval = interval + int(ceil(interval * self.relax))
                 start -= timedelta(days=1)
-                n -= 1
                 self.conflicts += 1
                 # print "shove" 
             else:
                 if start < orig:
                     start = orig
+                push = True
                 task.interval = interval
                 start += timedelta(days=1)
                 # print "push"
                 self.conflicts += 1
         return start
+
+    # def shift(self, asset, task, start, orig, interval, schedule):
+    #     n = 0
+    #     while(schedule.blocked(asset, task, start)):
+    #         if n > self.relax and start - timedelta(days=1) >= asset.start:
+    #             """Adjust the interval so it doesn't stumble on the interval check."""
+    #             task.interval = interval + self.relax
+    #             start -= timedelta(days=1)
+    #             n -= 1
+    #             self.conflicts += 1
+    #             # print "shove" 
+    #         else:
+    #             if start < orig:
+    #                 start = orig
+    #             task.interval = interval
+    #             start += timedelta(days=1)
+    #             # print "push"
+    #             self.conflicts += 1
+    #     return start

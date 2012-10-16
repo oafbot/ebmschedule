@@ -27,6 +27,8 @@ class Schedule:
     
     def blocked(self, asset, task, date):
         """Return False if task can be scheduled on that day."""
+        from datetime import timedelta
+        
         _task = task.schedule(date) #Create scheduled task (prevent threading issues)
         
         for date in _task.dateRange.range():
@@ -38,34 +40,56 @@ class Schedule:
             LHS is the number of assets *already* scheduled, so if >= maxAssets cannot 
             schedule any additional assets
             """
-            if date in self._assetsInWork.keys() and \
-                len(set(self._assetsInWork[date]).difference([asset.id])) \
-                    >= self.maxAssetsInWork:
-                return True
-            
+            if (date in self._assetsInWork.keys() and len(
+               set(self._assetsInWork[date]).difference([asset.id])) >= self.maxAssetsInWork):
+                    return True
+
+            # for skill in task.skills:
+            #     if  date in self._skillsInWork.keys() and \
+            #         skill.id in self._skillsInWork[date].keys() and \
+            #         self._skillsInWork[date][skill.id] + \
+            #             skill.hoursPerDay > skill.availableHours:
+            #         return True
+
             for skill in task.skills:                    
-                if task.id != 0 and date in self._skillsInWork.keys() and \
-                   skill.id in self._skillsInWork[date].keys() and \
-                   self._skillsInWork[date][skill.id] + skill.hours > skill.availableHours:
-                        return True
+                """Check if the required skills are available."""
+                for d in range(0, task.days):
+                    date += timedelta(days=d)
+                    
+                    if(task.days <= 1):
+                        """If the task can be completed in a day."""
+                        hours = skill.hours
+                    elif(d == task.days-1):
+                        """If it is the last day of a multi-day task."""
+                        hours = skill.hours % skill.hoursPerDay
+                    else:
+                        """Otherwise schedule for full workday."""
+                        hours = skill.hoursPerDay
+                        
+                    if (task.id != 0 and date in self._skillsInWork.keys() and
+                       skill.id in self._skillsInWork[date].keys() and
+                       self._skillsInWork[date][skill.id] + hours > skill.availableHours):
+                            return True
             
-            if asset.id in self._conflictTasks.keys() and \
-                date in self._conflictTasks[asset.id].keys():
+            if (asset.id in self._conflictTasks.keys() and
+                date in self._conflictTasks[asset.id].keys()):
+                    """Check if there are conflicts."""
                     if task.id in self._conflictTasks[asset.id][date]:
                         return True
-                    """Catch outside case where task is a Meta-task."""
-                    if task.id == 0:
+                    """Catch outside case where task is a Meta-task."""                    
+                    if task.id == 0:                        
                         meta = task.name.split("-")
                         while '' in meta:
                             meta.remove('')
                         for meta_id in meta:
                             if int(meta_id) in self._conflictTasks[asset.id][date]: 
                                 return True
-
-            """If not a metatask check if task falls within the interval."""
+            
             if task.id != 0 and task.withinInterval(self, asset, date):
+                """If not a metatask check if task falls within the interval."""
+                # print "Interval", date
                 return True
-                           
+                                           
         return False
     
     def last(self, asset, task):
