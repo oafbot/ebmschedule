@@ -3,6 +3,7 @@ from datetime import datetime
 from collections import namedtuple
 from objects.DateRange import DateRange
 # import thread
+from time import sleep
 
 class Tests:
     def __init__(self, algorithm):
@@ -13,9 +14,7 @@ class Tests:
         self.assets = self.model.assets        
         self.total = 0
         self.stopwatch = datetime.now()
-        # self.computed = 0
-        # self.terminated = False
-        # self.status = 0
+
         self.IntervalCheck()
         self.ConflictCheck()
     
@@ -32,9 +31,6 @@ class Tests:
         while(not self.terminated):
             d = datetime.now() - start
             print str(d.seconds/60)+":"+str(d.seconds%60)
-        #     # time.sleep(2)
-        #     counter += 1
-        #     print counter
             
         
     def ConflictCheck(self):
@@ -45,8 +41,7 @@ class Tests:
         SortedByTask = {}
         for asset in self.assets:
             dates = self.schedule._scheduledTasks[asset.id].keys() 
-            dates.sort(key=lambda d: (d.year, d.month, d.day))
-            
+            # dates.sort(key=lambda d: (d.year, d.month, d.day))        
             for date in dates:
                 for task in self.tasks:
                     if task.id in self.schedule._scheduledTasks[asset.id][date]:
@@ -54,7 +49,8 @@ class Tests:
                         if( Index(Asset=asset.id, Task=task.id) not in SortedByTask):
                             SortedByTask[Index(Asset=asset.id, Task=task.id)] = []
                         for t in self.schedule._schedule[asset.id]:
-                            if(t.dateRange.start == date):
+                            if(t.dateRange.start == date and date not in 
+                                SortedByTask[Index(Asset=asset.id, Task=task.id)]):
                                 SortedByTask[Index(Asset=asset.id, Task=task.id)].append(date)
                                 self.total += 1
         return SortedByTask
@@ -77,59 +73,56 @@ class Tests:
                    \n-------------------------------------------"
         
         for i in SortedIndecies:
-            """Iterate through the Tupple Indicies."""
-            
+            """Iterate through the Tupple Indicies."""            
             prev = None
             daterange = None
                         
             for a in self.assets:                    
                 """Find the corresponding Asset."""
-                if(a.id == i.Asset):
-                    asset = a  
+                if(a.id == i.Asset): asset = a  
             for t in self.tasks:
                 """Find the corresponding Task."""
-                if(t.id == i.Task):
-                    task = t
-            if(asset.id != prev_asset):
+                if(t.id == i.Task): task = t
+                        
+            if(asset.id != prev_asset and self.model.conf.testout):
                 """If it is a new Asset, reset date."""
-                if(self.model.conf.testout):
-                    print "\nAsset:", asset.name
-                    print "-------------------------------------------"
-            prev_asset = asset.id
+                active = set()
+                print "\nAsset:", asset.name, "\n-------------------------------------------"
             
+            prev_asset = asset.id
             SortedByTask[i].sort(key=lambda d: (d.year, d.month, d.day))
 
             for date in SortedByTask[i]:                
+                
                 if(prev is None or date < asset.start):
-                    prev = date
-                elif(date >= asset.start and task.interval > 0 and 
-                     date > task.end(prev) and not task.concurrent):
-                    """Do not count concurrent tasks."""
-                    difference = (date - prev).days
-                    if(difference != timedelta(days=task.interval-1).days and 
-                       difference != timedelta(days=task.interval).days):
-                        """If the difference is not the same as the interval."""
-                        # if(self.model.conf.trace and abs(difference - task.interval) > 7):
-                        diff = difference - task.interval
-                        drift = self.hilite("+"+str(diff), 0) if diff > 0 else self.hilite(diff)
+                    prev = date                
+                elif(date >= asset.start and task.interval > 0 and date > task.end(prev)):
+                    if not task.concurrent:
+                        """Do not count concurrent tasks."""
+                        difference = (date - prev).days
+                    
+                        if(difference != timedelta(days=task.interval-1).days and
+                           difference != timedelta(days=task.interval).days and 
+                           date not in active):
+                            """If the difference is not the same as the interval.""" 
+                            active.update([date])
+                            drift = difference - task.interval
+                            violation += 1
                         
-                        if(self.model.conf.testout and abs(diff) > 0):
-                            print "Task: " + str(task.id), task.name
-                            print "Last:", str(task.end(prev))[:-9], "\tInterval:   ", \
-                                   self.strfdelta(timedelta(days=task.interval), "{days} days")
-                            print "Date:", str(date)[:-9], \
-                                  "\tDifference: ", difference, "days\t", str.rjust(drift, 6)
-                            print "-------------------------------------------"
-                        violation += 1
-                        if(difference - task.interval > 0):
-                            ground += 1
-                            daysgrounded = difference - task.interval
-                            groundedlist.append(daysgrounded)
-                        else:
-                            ineff += 1
+                            if(difference - task.interval > 0):
+                                ground += 1
+                                daysgrounded = difference - task.interval
+                                groundedlist.append(daysgrounded)
+                            else:
+                                ineff += 1
+                        
+                            if(self.model.conf.testout and abs(drift) > 0):                            
+                                self.console(task, prev, date, difference, drift)
+                    """Increment previous task date."""
                     prev = task.end(date)
                 else:
-                    prev = None
+                    prev = date
+        
         average_grounded = sum(groundedlist)/len(groundedlist) if len(groundedlist) > 0 else 0
         
         print "\n" + \
@@ -181,3 +174,18 @@ class Tests:
                 attr.append('1')
             return '\033[%sm%s\x1b[0m' % (';'.join(attr), txt)
         return txt
+    
+    def lineout(self, output):
+        length = len(str(output - 1))
+        delete = "\b" * (length + 1)
+        print "{0}{1:{2}}".format(delete, output, length),
+            
+    def console(self, task, prev, date, difference, drift):
+        driftout = self.hilite("+"+str(drift), 0) if drift > 0 else self.hilite(drift)
+        
+        print "Task: " + str(task.id), task.name
+        print "Last:", str(task.end(prev))[:-9], "\tInterval:   ", \
+               self.strfdelta(timedelta(days=task.interval), "{days} days")
+        print "Date:", str(date)[:-9], \
+              "\tDifference: ", difference, "days\t", str.rjust(driftout, 6)
+        print "-------------------------------------------"

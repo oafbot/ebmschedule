@@ -108,6 +108,6 @@ class InitialConditions:
                     
         _task = etree.SubElement(_asset, 'Task')
         _task.set('id', str(task.id))
-        _task.set('name', task.name)
+        # _task.set('name', task.name)
         _task.text = date
         

@@ -89,22 +89,3 @@ class PushRightRelaxLeft(Algorithm):
                 # print "push"
                 self.conflicts += 1
         return start
-
-    # def shift(self, asset, task, start, orig, interval, schedule):
-    #     n = 0
-    #     while(schedule.blocked(asset, task, start)):
-    #         if n > self.relax and start - timedelta(days=1) >= asset.start:
-    #             """Adjust the interval so it doesn't stumble on the interval check."""
-    #             task.interval = interval + self.relax
-    #             start -= timedelta(days=1)
-    #             n -= 1
-    #             self.conflicts += 1
-    #             # print "shove" 
-    #         else:
-    #             if start < orig:
-    #                 start = orig
-    #             task.interval = interval
-    #             start += timedelta(days=1)
-    #             # print "push"
-    #             self.conflicts += 1
-    #     return start

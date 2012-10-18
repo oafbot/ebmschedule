@@ -1,14 +1,19 @@
+# ============================================
+# = Script to generate initial conditions    =
+# ============================================
+
 import sys
 sys.path.append( '../' )
 from inputs.Config import Config 
 config = Config()
 config.reset = True
 config.fixed = True
+
 # ===========================================
 # = ALL YOUR CONFIGURATIONS ARE BELOW TO US =
 # ===========================================
-config.bigdata = False
-config.cap = 100
+config.bigdata = True
+config.cap = 10
 
 
 if(config.bigdata): 

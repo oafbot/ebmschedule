@@ -196,14 +196,6 @@ class Task:
         end = self.end(start)
         dates = schedule._scheduledTasks[asset.id].keys()
         
-        # if(self.interval <= 7):
-        #     before = DateRange(start - (interval - timedelta(days=1)), start)
-        #     after  = DateRange(end, end + (interval - timedelta(days=1)))
-        # elif(self.interval <= 14):    
-        #     before = DateRange(start - (interval - timedelta(days=int(ceil(self.interval/4)))), start)
-        #     after  = DateRange(end, end + (interval - timedelta(days=int(ceil(self.interval/4)))))        
-        # else:
-            # return False 
         before = DateRange(start - (interval - self.relax), start)
         after  = DateRange(end, end + (interval - self.relax))
         

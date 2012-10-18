@@ -1,6 +1,7 @@
 class Schedule:
     
     def __init__(self, dataSource, dateRange, maxAssetsInWork):
+        from objects import Usage
         self.dataSource      = dataSource
         self.dateRange       = dateRange
         self.maxAssetsInWork = maxAssetsInWork        
@@ -9,7 +10,9 @@ class Schedule:
         self._skillsInWork   = {}   # date   >> skills
         self._scheduledTasks = {}   # assets >> date >> tasks
         self._conflictTasks  = {}   # assets >> date >> conflicts
+        self.usage           = Usage()
         self.totalManhours   = 0
+        self.hoursPerDay     = 8
         self.forced          = []        
         self.cal             = None
         
@@ -43,13 +46,13 @@ class Schedule:
             if (date in self._assetsInWork.keys() and len(
                set(self._assetsInWork[date]).difference([asset.id])) >= self.maxAssetsInWork):
                     return True
-
-            # for skill in task.skills:
-            #     if  date in self._skillsInWork.keys() and \
-            #         skill.id in self._skillsInWork[date].keys() and \
-            #         self._skillsInWork[date][skill.id] + \
-            #             skill.hoursPerDay > skill.availableHours:
-            #         return True
+            
+            if (date.date(), asset.id) in self.usage.dates:
+                usage = self.usage.dates[(date.date(), asset.id)]
+                if usage > self.hoursPerDay:
+                    return True
+            else:
+                usage = 0
 
             for skill in task.skills:                    
                 """Check if the required skills are available."""
@@ -65,10 +68,12 @@ class Schedule:
                     else:
                         """Otherwise schedule for full workday."""
                         hours = skill.hoursPerDay
-                        
+                    
+                    available = skill.availableHours - (usage * skill.available)    
+                    
                     if (task.id != 0 and date in self._skillsInWork.keys() and
                        skill.id in self._skillsInWork[date].keys() and
-                       self._skillsInWork[date][skill.id] + hours > skill.availableHours):
+                       self._skillsInWork[date][skill.id] + hours > available):
                             return True
             
             if (asset.id in self._conflictTasks.keys() and

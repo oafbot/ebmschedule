@@ -1,8 +1,6 @@
 from datetime import datetime
 from datetime import timedelta
 from outputs.Output import Output
-# from collections import Counter
-# from abc import ABCMeta
 
 class Algorithm:
     """Parent class for algorithms"""
@@ -39,16 +37,9 @@ class Algorithm:
         # prioritize tasks with large intervals
         # prioritize tasks with many associated tasks.
         input.tasks.sort(key=lambda task: 
-            # (    
-            #     (self.weight * ((task.manhours / (task.totalAvailableHours *1.0)) 
-            #     if task.totalAvailableHours else 0)) + 
-            #     ((1-self.weight) * (len(task.conflicts) / (self.totalTasks *1.0)))
-            #     ), reverse=True
-            # )
-
             (              
-                (self.weight * ((self.totalhours(task, input.tasks)))) +
-                ((1-self.weight) * (len(task.conflicts)/(self.totalTasks)))
+                (self.weight * self.totalhours(task, input.tasks)) +
+                ((1-self.weight) * (len(task.conflicts) / (self.totalTasks)))
                 ), reverse=True
             )
             
@@ -96,15 +87,7 @@ class Algorithm:
     def taskcost(self, task):
         """Calculate the cost ratio for skills required for a task."""
         cost = 0
-        # skills = []
-        # for s in task.skills:
-        #     skills.append(s.id)
-        # for manpower in task.manpowers:            
-        #   skills.append(manpower.skill.id)
-        # counter = Counter(skills)
-        for manpower in task.manpowers:            
-            """required * hours / available * workday"""
-            # cost += float(counter[manpower.skill.id]*manpower.hours)/(manpower.skill.availableHours)
+        for manpower in task.manpowers:
             cost += (1.0*manpower.hours)/(manpower.skill.hoursPerDay)
         return cost
         
