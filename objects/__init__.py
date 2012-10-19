@@ -30,21 +30,14 @@ class Manpower:
         self.skill = skill
         self.hours = hours
         
-        
+                
 class Usage:
     def __init__(self):
         self.dates = {}
-        # for date in daterange.range():
-        #     self.schedule[date] = hours
-        # self.schedule = sorted(self.schedule)
         
     def add(self, date, asset, usage):
-        # if date not in self.schedule:
-        #     self.schedule[date] = {}    
-        # self.schedule[date].update({asset: usage})
         if (date, asset) not in self.dates:
             self.dates[(date, asset)] = usage
         else:
-            # print date, self.dates[(date, asset)], usage
             self.dates[(date, asset)] += usage
         

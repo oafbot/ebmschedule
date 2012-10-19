@@ -3,7 +3,6 @@ from datetime import datetime
 from collections import namedtuple
 from objects.DateRange import DateRange
 # import thread
-from time import sleep
 
 class Tests:
     def __init__(self, algorithm):
@@ -16,34 +15,29 @@ class Tests:
         self.stopwatch = datetime.now()
 
         self.IntervalCheck()
-        self.ConflictCheck()
     
     def IntervalCheck(self):                
         """Find and flag interval violations."""
         Index = namedtuple("Index", ["Asset", "Task"])
         SortedByTask = self.SortByTask(Index)
         self.IntervalViolations(SortedByTask)
-    
-    def Timer(self):
-        import time
-        counter = 0
-        start = datetime.now()
-        while(not self.terminated):
-            d = datetime.now() - start
-            print str(d.seconds/60)+":"+str(d.seconds%60)
-            
-        
-    def ConflictCheck(self):
-        pass
             
     def SortByTask(self, Index):
         """Sort the schedule by Asset and Task."""
         SortedByTask = {}
+        count = 0.00
+
         for asset in self.assets:
             dates = self.schedule._scheduledTasks[asset.id].keys() 
             # dates.sort(key=lambda d: (d.year, d.month, d.day))        
-            for date in dates:
+            for n, date in enumerate(dates):                
+                # self.statusbar(count, len(self.assets), "Processed")
+                if(n % len(self.tasks) == 0):
+                    x = (n / len(self.tasks) * 10)
+                    y = 1
+                
                 for task in self.tasks:
+                    self.statusbar(count + x, len(self.assets) + y, "Processed")
                     if task.id in self.schedule._scheduledTasks[asset.id][date]:
                         """If the task is in the schedule for that day."""
                         if( Index(Asset=asset.id, Task=task.id) not in SortedByTask):
@@ -53,6 +47,8 @@ class Tests:
                                 SortedByTask[Index(Asset=asset.id, Task=task.id)]):
                                 SortedByTask[Index(Asset=asset.id, Task=task.id)].append(date)
                                 self.total += 1
+            count += 1.00
+        self.lineout("Processed: |" + "==|" * 10 + " 100%\n")
         return SortedByTask
     
     def IntervalViolations(self, SortedByTask):
@@ -64,6 +60,7 @@ class Tests:
         violation = 0
         ground = 0
         ineff  = 0
+        active = set()
         groundedlist = []
         self.terminated = True
         
@@ -76,7 +73,7 @@ class Tests:
             """Iterate through the Tupple Indicies."""            
             prev = None
             daterange = None
-                        
+            
             for a in self.assets:                    
                 """Find the corresponding Asset."""
                 if(a.id == i.Asset): asset = a  
@@ -176,16 +173,22 @@ class Tests:
         return txt
     
     def lineout(self, output):
-        length = len(str(output - 1))
+        length = len(str(output))
         delete = "\b" * (length + 1)
         print "{0}{1:{2}}".format(delete, output, length),
+    
+    def statusbar(self, numerator, denominator, label):
+        import sys
+        if sys.stdout.isatty():
+            perc = numerator/denominator
+            self.lineout(label + ": |" + "==|" * int(perc*10) + int(10-(perc*10))*"---" + " " + str(int(perc*100))+"%")
             
     def console(self, task, prev, date, difference, drift):
-        driftout = self.hilite("+"+str(drift), 0) if drift > 0 else self.hilite(drift)
+        drift = self.hilite("+"+str(drift), 0) if drift > 0 else self.hilite(drift)
         
         print "Task: " + str(task.id), task.name
         print "Last:", str(task.end(prev))[:-9], "\tInterval:   ", \
                self.strfdelta(timedelta(days=task.interval), "{days} days")
         print "Date:", str(date)[:-9], \
-              "\tDifference: ", difference, "days\t", str.rjust(driftout, 6)
+              "\tDifference: ", difference, "days\t", str.rjust(str(drift), 6)
         print "-------------------------------------------"

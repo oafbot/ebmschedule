@@ -4,7 +4,6 @@ from outputs.Output import Output
 
 class Algorithm:
     """Parent class for algorithms"""
-    # __metaclass__ = ABCMeta
     
     def __init__(self, input, weight, relax, name="Algorithm"):
         self.name       = name
@@ -127,8 +126,7 @@ class Algorithm:
               self.name + ":", input.schedule.dataSource, input.count, \
               "    Manhours:", input.schedule.totalManhours, \
               "    Adjustments:", self.conflicts, \
-              "    Execution:", exectime
-        
+              "    Execution:", exectime, "\n"        
         """Write out metrics to a file."""
         if(input.conf.metrics):
             self.output.writeMetrics(input, self.conflicts, self.name, self.weight, exectime, now)
