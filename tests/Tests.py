@@ -13,7 +13,6 @@ class Tests:
         self.assets = self.model.assets        
         self.total = 0
         self.stopwatch = datetime.now()
-
         self.IntervalCheck()
     
     def IntervalCheck(self):                
@@ -28,20 +27,17 @@ class Tests:
         count = 0.00
 
         for asset in self.assets:
-            dates = self.schedule._scheduledTasks[asset.id].keys() 
-            # dates.sort(key=lambda d: (d.year, d.month, d.day))        
+            dates = self.schedule._scheduledTasks[asset.id].keys()
+            
             for n, date in enumerate(dates):                
-                # self.statusbar(count, len(self.assets), "Processed")
-                if(n % len(self.tasks) == 0):
-                    x = (n / len(self.tasks) * 10)
-                    y = 1
+                self.statusbar(count, len(self.assets), "Processed")                                                
                 
                 for task in self.tasks:
-                    self.statusbar(count + x, len(self.assets) + y, "Processed")
                     if task.id in self.schedule._scheduledTasks[asset.id][date]:
                         """If the task is in the schedule for that day."""
                         if( Index(Asset=asset.id, Task=task.id) not in SortedByTask):
                             SortedByTask[Index(Asset=asset.id, Task=task.id)] = []
+                        
                         for t in self.schedule._schedule[asset.id]:
                             if(t.dateRange.start == date and date not in 
                                 SortedByTask[Index(Asset=asset.id, Task=task.id)]):
@@ -63,11 +59,7 @@ class Tests:
         active = set()
         groundedlist = []
         self.terminated = True
-        
-        if(self.model.conf.testout):
-            print "\n-------------------------------------------\
-                   \n------------- INTERVAL CHECKS -------------\
-                   \n-------------------------------------------"
+        self.console("Banner", None)
         
         for i in SortedIndecies:
             """Iterate through the Tupple Indicies."""            
@@ -79,28 +71,25 @@ class Tests:
                 if(a.id == i.Asset): asset = a  
             for t in self.tasks:
                 """Find the corresponding Task."""
-                if(t.id == i.Task): task = t
-                        
-            if(asset.id != prev_asset and self.model.conf.testout):
-                """If it is a new Asset, reset date."""
+                if(t.id == i.Task): task = t                       
+            if(asset.id != prev_asset):
+                """If it is a new Asset, reset the set containing dates Asset is worked on."""
                 active = set()
-                print "\nAsset:", asset.name, "\n-------------------------------------------"
+                self.console("Asset", asset.name)
             
             prev_asset = asset.id
             SortedByTask[i].sort(key=lambda d: (d.year, d.month, d.day))
-
-            for date in SortedByTask[i]:                
-                
+                        
+            for date in SortedByTask[i]:
                 if(prev is None or date < asset.start):
                     prev = date                
                 elif(date >= asset.start and task.interval > 0 and date > task.end(prev)):
-                    if not task.concurrent:
+                    if date not in active and not task.concurrent:
                         """Do not count concurrent tasks."""
                         difference = (date - prev).days
                     
                         if(difference != timedelta(days=task.interval-1).days and
-                           difference != timedelta(days=task.interval).days and 
-                           date not in active):
+                           difference != timedelta(days=task.interval).days):
                             """If the difference is not the same as the interval.""" 
                             active.update([date])
                             drift = difference - task.interval
@@ -110,11 +99,11 @@ class Tests:
                                 ground += 1
                                 daysgrounded = difference - task.interval
                                 groundedlist.append(daysgrounded)
-                            else:
+                            elif not task.subseq and not task.prereq:
                                 ineff += 1
                         
-                            if(self.model.conf.testout and abs(drift) > 0):                            
-                                self.console(task, prev, date, difference, drift)
+                            if(abs(drift) > 7):                            
+                                self.console("Task", [task, prev, date, difference, drift])
                     """Increment previous task date."""
                     prev = task.end(date)
                 else:
@@ -181,14 +170,26 @@ class Tests:
         import sys
         if sys.stdout.isatty():
             perc = numerator/denominator
-            self.lineout(label + ": |" + "==|" * int(perc*10) + int(10-(perc*10))*"---" + " " + str(int(perc*100))+"%")
+            bar  = ": |" + "==|" * int(perc*10) + int(10-(perc*10))*"---" + " "
+            self.lineout(label + bar + str(int(perc*100))+"%")
             
-    def console(self, task, prev, date, difference, drift):
-        drift = self.hilite("+"+str(drift), 0) if drift > 0 else self.hilite(drift)
+    def console(self, type, args):
+        if(self.model.conf.testout):
+            if(type=="Banner"):
+                print "\n-------------------------------------------\
+                       \n------------- INTERVAL CHECKS -------------\
+                       \n-------------------------------------------"
         
-        print "Task: " + str(task.id), task.name
-        print "Last:", str(task.end(prev))[:-9], "\tInterval:   ", \
-               self.strfdelta(timedelta(days=task.interval), "{days} days")
-        print "Date:", str(date)[:-9], \
-              "\tDifference: ", difference, "days\t", str.rjust(str(drift), 6)
-        print "-------------------------------------------"
+            elif(type == "Asset"):
+                print "\nAsset:", args, "\n-------------------------------------------"
+        
+            elif(type == "Task"):
+                task, prev, date, difference, drift = args                
+                drift = self.hilite("+"+str(drift), 0) if drift > 0 else self.hilite(drift)
+        
+                print "Task: " + str(task.id), task.name
+                print "Last:", str(task.end(prev))[:-9], "\tInterval:   ", \
+                       self.strfdelta(timedelta(days=task.interval), "{days} days")
+                print "Date:", str(date)[:-9], \
+                      "\tDifference: ", difference, "days\t", str.rjust(str(drift), 6)
+                print "-------------------------------------------"

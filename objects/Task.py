@@ -24,8 +24,8 @@ class Task:
         self.totalAvailableHours = 0        
         self.required            = False
         self.concurrent          = False
-        # self.relax               = timedelta(days=int(ceil(self.interval/2)))
-        self.relax               = timedelta(days=1)
+        self.relax               = timedelta(days=int(ceil(self.interval/4)))
+        # self.relax               = timedelta(days=1)
         self.requisite_interval  = int(ceil(self.interval/2))
         
         if len(manpowers): self.precal() #TODO: Should come from sequencing
@@ -181,11 +181,17 @@ class Task:
         for task in bundle:
             for manpower in task.manpowers:
                 mp += task.manpowers
+            
             cf.union(task.conflicts)
             name += str(task.id) + "-"
-            if task.threshold > threshold: threshold = task.threshold
-            if task.interval > interval: interval = task.interval
+            
+            if task.primary: 
+                prime = task
+                interval = task.interval
+                threshold = task.threshold
+        
         metatask = Task(0, name, 1, threshold, interval, mp, cf)
+        metatask.primary = prime
         return metatask
     
     def withinInterval(self, schedule, asset, start):

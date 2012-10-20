@@ -43,13 +43,16 @@ class Schedule:
             LHS is the number of assets *already* scheduled, so if >= maxAssets cannot 
             schedule any additional assets
             """
+            
             if (date in self._assetsInWork.keys() and len(
                set(self._assetsInWork[date]).difference([asset.id])) >= self.maxAssetsInWork):
+                    # print "Asset"
                     return True
             
             if (date.date(), asset.id) in self.usage.dates:
                 usage = self.usage.dates[(date.date(), asset.id)]
                 if usage > self.hoursPerDay:
+                    # print "Usage"
                     return True
             else:
                 usage = 0
@@ -74,12 +77,14 @@ class Schedule:
                     if (task.id != 0 and date in self._skillsInWork.keys() and
                        skill.id in self._skillsInWork[date].keys() and
                        self._skillsInWork[date][skill.id] + hours > available):
+                            # print "Skills"
                             return True
             
             if (asset.id in self._conflictTasks.keys() and
                 date in self._conflictTasks[asset.id].keys()):
                     """Check if there are conflicts."""
                     if task.id in self._conflictTasks[asset.id][date]:
+                        # print "conflict"
                         return True
                     """Catch outside case where task is a Meta-task."""                    
                     if task.id == 0:                        
@@ -88,13 +93,18 @@ class Schedule:
                             meta.remove('')
                         for meta_id in meta:
                             if int(meta_id) in self._conflictTasks[asset.id][date]: 
+                                # print "conflict bundle"
                                 return True
             
             if task.id != 0 and task.withinInterval(self, asset, date):
                 """If not a metatask check if task falls within the interval."""
-                # print "Interval", date
+                # print "interval"
                 return True
-                                           
+            elif task.id == 0 and task.primary.withinInterval(self, asset, date):
+                """If a metatask, check if the primary task falls within the interval."""
+                # print "interval bundle"
+                return True
+                                                           
         return False
     
     def last(self, asset, task):

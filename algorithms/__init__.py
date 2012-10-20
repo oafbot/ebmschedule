@@ -11,5 +11,4 @@ class Algos:
             elif(input.conf.algo == 1):
                 self.algorithm = PushRightRelaxLeft(input, float(weight), float(relax))
             elif(input.conf.algo == 2):
-                self.algorithm = PushToLeft(input, float(weight))
-                
+                self.algorithm = PushToLeft(input, float(weight))                

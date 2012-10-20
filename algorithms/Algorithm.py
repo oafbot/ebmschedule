@@ -38,7 +38,7 @@ class Algorithm:
         input.tasks.sort(key=lambda task: 
             (              
                 (self.weight * self.totalhours(task, input.tasks)) +
-                ((1-self.weight) * (len(task.conflicts) / (self.totalTasks)))
+                ((1-self.weight) * (self.totalconflicts(task, input.tasks) / (self.totalTasks)))
                 ), reverse=True
             )
             
@@ -82,7 +82,24 @@ class Algorithm:
                 total += self.totalhours(self, t, tasks)
                 # total += t.manhours
         return total
-
+    
+    def totalconflicts(self, task, tasks):
+        total = len(task.conflicts)
+        for t in tasks:
+            if t.id in task.prep:
+                total += len(t.conflicts)
+                total += self.totalconflicts(self, t, tasks)
+            if t.id in task.prereq:
+                total += len(t.conflicts)
+                total += self.totalconflicts(self, t, tasks)
+            if t.id in task.subseq:
+                total += len(t.conflicts)
+                total += self.totalconflicts(self, t, tasks)
+            if t.id in task.concur:
+                total += len(t.conflicts)
+                total += self.totalconflicts(self, t, tasks)
+        return total        
+    
     def taskcost(self, task):
         """Calculate the cost ratio for skills required for a task."""
         cost = 0
