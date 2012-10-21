@@ -144,8 +144,7 @@ class Tests:
         fo.close()
         fo = open(path + self.schedule.dataSource + ".csv", "ab+")
         if os.stat(path + self.schedule.dataSource + ".csv")[6]==0:
-            csv = "Algorithm,Data,Weight,Manhours,Groundings,Inefficiencies,\
-                  Scheduled,Violations,Optimal,Average,Usage\n"
+            csv = "Algorithm,Data,Weight,Manhours,Groundings,Inefficiencies,Scheduled,Violations,Optimal,Average,Usage\n"
         else: 
             csv = ""
         csv += self.algorithm.name + "," + str(self.model.count) + "," + \

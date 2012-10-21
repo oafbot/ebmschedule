@@ -1,3 +1,0 @@
-Groundings: 192          Inefficiencies: 333      
-Scheduled: 27000         Violations: 967          Optimal: 26033  96.42%   
-Average ground: 4 days   Usage: 15                
