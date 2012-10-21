@@ -12,3 +12,4 @@ inputs/*
 .tm_properties
 *.json
 metrics/*.txt
+*.csv

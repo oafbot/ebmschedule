@@ -20,9 +20,19 @@ If task was not scheduled try pushing forward until ceiling is reached.
 * ***Relax*** is the percentage of interval to relax left. Ranges from 1 to 9 (represents 10% to 90%)
 
 ## Tools
-#### crunch.py
-Assign algorithm to run. 
-0 is PushRight, 1 is PushRight-RelaxLeft.
-Run main.py N number of times with varying weights and relaxing (if relax left algorithm). 
-#### gencon.py
+### crunch.py
+Run main.py N number of times with varying weights and relaxing (if relax left algorithm).
+
+#### Usage: 
+	$ ./crunch.py [-h] [--start START] [--end END] [--algo ALGO]
+#### Example:
+	$ ./crunch.py --algo 1 --start 0 --end 1 
+
+#### Options:
+*  ***-h, --help*** Show help message.
+*  ***--start***  Load initial conditions starting with this dataset.
+*  ***--end***    Last dataset of initial conditions to load.
+*  ***--algo***   The algorithm to use. 0 is PushRight, 1 is PushRightRelaxLeft
+ 
+### gencon.py
 Generate initial conditions.

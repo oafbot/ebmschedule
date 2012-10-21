@@ -8,9 +8,6 @@ import argparse
 
 if __name__ == "__main__":
     """Handle command line args."""
-    # alg = sys.argv[2] if len(sys.argv)>2 else 0
-    # end = sys.argv[3] if len(sys.argv)>3 else 10
-    # lax = 6 if alg > 0 else 2
     parser = argparse.ArgumentParser(prog='crunch')
     parser.add_argument('--start', type=int, help='Load initial conditions starting with this dataset.')
     parser.add_argument('--end',   type=int, help='Last dataset of initial conditions to load.')

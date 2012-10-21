@@ -8,7 +8,7 @@ if __name__ == "__main__":
     algo    = sys.argv[1] if len(sys.argv)>1 else -1
     counter = sys.argv[2] if len(sys.argv)>2 else  0
     weight  = sys.argv[3] if len(sys.argv)>3 else  5
-    relax   = sys.argv[4] if len(sys.argv)>4 else  3
+    relax   = sys.argv[4] if len(sys.argv)>4 else  5
 
     """Construct the model."""
     model = inputs.Inputs(counter, algo).model

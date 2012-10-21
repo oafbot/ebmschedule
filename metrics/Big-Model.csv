@@ -1,0 +1,2 @@
+Algorithm,Data,Weight,Manhours,Groundings,Inefficiencies,                  Scheduled,Violations,Optimal,Average,Usage
+PushRight-RelaxLeft[5],0,0.0,14188.8,192,333,27000,967,26033,4,15
