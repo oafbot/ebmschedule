@@ -23,6 +23,6 @@ if __name__ == "__main__":
     if(algorithm.results.conf.testing):
         test = Tests(algorithm)
 
-    # Display Metrics
+    """"Display metrics."""
     # metrics
 

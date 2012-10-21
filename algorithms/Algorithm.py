@@ -141,7 +141,7 @@ class Algorithm:
         exectime = str(now - self.stopwatch)[:-4]
         print "\n", \
               self.name + ":", input.schedule.dataSource, input.count, \
-              "    Manhours:", input.schedule.totalManhours, \
+              "    Weight:", self.weight, \
               "    Adjustments:", self.conflicts, \
               "    Execution:", exectime, "\n"        
         """Write out metrics to a file."""
@@ -154,3 +154,9 @@ class Algorithm:
         if not input.schedule.cal: 
             input.schedule.cal = Calendar()
         input.schedule.cal.Connect(input)
+    
+    def usageViolation(self, date, original, schedule, asset):
+        """Record usage violations."""
+        if date > original and schedule.used and date not in asset.violation:
+            asset.violation.update([date])
+            schedule.totalUsage += 1

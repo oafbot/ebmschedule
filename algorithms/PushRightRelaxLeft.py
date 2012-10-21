@@ -76,6 +76,8 @@ class PushRightRelaxLeft(Algorithm):
     def shift(self, asset, task, start, orig, interval, schedule):
         floor = start + timedelta(days=int(ceil(interval * self.relax)))
         push  = False
+        schedule.used = False
+        
         while(schedule.blocked(asset, task, start)):
             if start > floor and not push and floor > asset.start:
                 """Adjust the interval so it doesn't stumble on the interval check."""
@@ -90,5 +92,6 @@ class PushRightRelaxLeft(Algorithm):
                 task.interval = interval
                 start += timedelta(days=1)
                 self.conflicts += 1
-                # print "push"                
+                # print "push" 
+        self.usageViolation(start, orig, schedule, asset)
         return start

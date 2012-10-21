@@ -11,6 +11,8 @@ class Schedule:
         self._scheduledTasks = {}   # assets >> date >> tasks
         self._conflictTasks  = {}   # assets >> date >> conflicts
         self.usage           = Usage()
+        self.used            = False
+        self.totalUsage      = 0
         self.totalManhours   = 0
         self.hoursPerDay     = 8
         self.forced          = []        
@@ -33,6 +35,7 @@ class Schedule:
         from datetime import timedelta
         
         _task = task.schedule(date) #Create scheduled task (prevent threading issues)
+        # self.usageflag = False
         
         for date in _task.dateRange.range():
             """
@@ -53,6 +56,7 @@ class Schedule:
                 usage = self.usage.dates[(date.date(), asset.id)]
                 if usage > self.hoursPerDay:
                     # print "Usage"
+                    self.used = True
                     return True
             else:
                 usage = 0
@@ -78,6 +82,7 @@ class Schedule:
                        skill.id in self._skillsInWork[date].keys() and
                        self._skillsInWork[date][skill.id] + hours > available):
                             # print "Skills"
+                            if usage > 0: self.used = True
                             return True
             
             if (asset.id in self._conflictTasks.keys() and
@@ -154,7 +159,8 @@ class Schedule:
                 self._conflictTasks[asset.id][date].union(task.conflicts)
 
         """Tally manhours."""
-        self.totalManhours += task.manhours
+        if date <= self.dateRange.end:
+            self.totalManhours += task.manhours
         """Call Google Calendar scheduler."""
         from inputs.Config import Config
         if(Config().pushcal and not forced):

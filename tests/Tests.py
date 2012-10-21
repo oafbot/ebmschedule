@@ -44,7 +44,7 @@ class Tests:
                                 SortedByTask[Index(Asset=asset.id, Task=task.id)].append(date)
                                 self.total += 1
             count += 1.00
-        self.lineout("Processed: |" + "==|" * 10 + " 100%\n")
+        self.lineout("Processed: |" + "==|" * 10 + " 100%")
         return SortedByTask
     
     def IntervalViolations(self, SortedByTask):
@@ -57,7 +57,7 @@ class Tests:
         ground = 0
         ineff  = 0
         active = set()
-        groundedlist = []
+        grounded = []
         self.terminated = True
         self.console("Banner", None)
         
@@ -94,13 +94,20 @@ class Tests:
                             active.update([date])
                             drift = difference - task.interval
                             violation += 1
-                        
+                                                        
                             if(difference - task.interval > 0):
-                                ground += 1
-                                daysgrounded = difference - task.interval
-                                groundedlist.append(daysgrounded)
+                                if(date - timedelta(days=1) not in active or 
+                                   date + timedelta(days=1) not in active): 
+                                   """Count groundings that are non-consecutive and distinct."""
+                                   ground += 1
+                                   # violation += 1
+                                grounded.append(drift)
                             elif not task.subseq and not task.prereq:
-                                ineff += 1
+                                if(date - timedelta(days=1) not in active or 
+                                   date + timedelta(days=1) not in active):
+                                   """Count inefficiencies that are non-consecutive and distinct."""
+                                   ineff += 1
+                                   # violation += 1
                         
                             if(abs(drift) > 7):                            
                                 self.console("Task", [task, prev, date, difference, drift])
@@ -109,19 +116,12 @@ class Tests:
                 else:
                     prev = date
         
-        average_grounded = sum(groundedlist)/len(groundedlist) if len(groundedlist) > 0 else 0
+        average = sum(grounded)/len(grounded) if len(grounded) > 0 else 0
         
-        print "\n" + \
-              str.ljust("Violations: " + str(violation), 25) + \
-              str.ljust("Groundings: " + str(ground), 25) + \
-              str.ljust("Inefficiencies:   " + str(ineff), 25 ) + "\n" + \
-              str.ljust("Scheduled:  " + str(self.total), 25) + \
-              str.ljust("Optimal:    " + str(self.total - violation), 25) + \
-              str.ljust("Average grounded: " + str(average_grounded) + " days", 25 ), \
-              str.ljust("Execution: " + str(datetime.now()-self.stopwatch)[:-4], 25)
-                
+        self.console("Summary", [violation, ground, ineff, average])
+              
         if(self.model.conf.metrics):
-            self.writeMetrics(violation, ground, ineff, average_grounded)
+            self.writeMetrics(violation, ground, ineff, average)
         
     def writeMetrics(self, violations, groundings, inefficiencies, average_grounded):
         """Write out metrics to a file."""
@@ -138,8 +138,22 @@ class Tests:
                str.ljust("Scheduled: " + str(self.total), 25) + \
                str.ljust("Violations: " + str(violations), 25) + \
                str.ljust("Optimal: " + str(optimal) + "  " + str(percent) + "%", 25) + "\n" + \
-               str.ljust("Average groundings: " + str(average_grounded) + " days", 25) + "\n"       
+               str.ljust("Average ground: " + str(average_grounded) + " days", 25)  + \
+               str.ljust("Usage: " + str(self.schedule.totalUsage), 25 )     
         fo.write(out)
+        fo.close()
+        fo = open(path + self.schedule.dataSource + ".csv", "ab+")
+        if os.stat(path + self.schedule.dataSource + ".csv")[6]==0:
+            csv = "Algorithm,Data,Weight,Manhours,Groundings,Inefficiencies,\
+                  Scheduled,Violations,Optimal,Average,Usage\n"
+        else: 
+            csv = ""
+        csv += self.algorithm.name + "," + str(self.model.count) + "," + \
+               str(self.algorithm.weight) + "," + str(self.schedule.totalManhours) + "," + \
+               str(groundings) + "," + str(inefficiencies) + "," + str(self.total) + "," + \
+               str(violations) + "," + str(optimal) + "," + str(average_grounded) + "," + \
+               str(self.schedule.totalUsage) + "\n"  
+        fo.write(csv)
         fo.close()
               
     def strfdelta(self, tdelta, fmt):
@@ -193,3 +207,16 @@ class Tests:
                 print "Date:", str(date)[:-9], \
                       "\tDifference: ", difference, "days\t", str.rjust(str(drift), 6)
                 print "-------------------------------------------"
+                
+        if(type == "Summary"):
+            violation, ground, ineff, average = args
+            print str.ljust("\tExecution: " + str(datetime.now()-self.stopwatch)[:-4], 25) + \
+                  "\n\n" + \
+                  str.ljust("Scheduled:", 10), str.ljust(str(self.total), 10), \
+                  str.ljust("Optimal:", 10), str.ljust(str(self.total - violation), 10), \
+                  str.ljust("Violation:", 10), str.ljust(str(violation), 10), \
+                  str.ljust("Grounding:", 10), str.ljust(str(ground), 10), \
+                  str.ljust("Inefficiency:", 10), str.ljust(str(ineff), 10) + "\n" + \
+                  str.ljust("Manhours:", 10), str.ljust(str(self.schedule.totalManhours), 10), \
+                  str.ljust("Average:", 10), str.ljust(str(average) + " days", 10), \
+                  str.ljust("Usage:", 10), str.ljust(str(self.schedule.totalUsage), 10) + "\n\n"

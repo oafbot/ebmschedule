@@ -3,7 +3,8 @@ class Asset:
         self.id    = id
         self.name  = name
         self.start = start        
-        
+        self.violation = set() # usage violation
+    
     def __contains__(self, assets): 
         for _asset in assets: 
             if _asset.id == self.id: 
