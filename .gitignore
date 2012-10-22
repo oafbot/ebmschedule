@@ -11,3 +11,5 @@ inputs/*
 .ropeproject/*
 .tm_properties
 *.json
+metrics/*.txt
+*.csv
