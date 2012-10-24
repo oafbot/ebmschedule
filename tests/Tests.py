@@ -7,6 +7,7 @@ from objects.DateRange import DateRange
 class Tests:
     def __init__(self, algorithm):
         self.algorithm = algorithm
+        self.output = self.algorithm.output
         self.model = self.algorithm.results
         self.schedule = self.model.schedule
         self.tasks = self.model.tasks
@@ -30,7 +31,7 @@ class Tests:
             dates = self.schedule._scheduledTasks[asset.id].keys()
             
             for n, date in enumerate(dates):                
-                self.statusbar(count, len(self.assets), "Processed")                                                
+                self.output.statusbar(count, len(self.assets), "Processed")                                                
                 
                 for task in self.tasks:
                     if task.id in self.schedule._scheduledTasks[asset.id][date]:
@@ -44,7 +45,7 @@ class Tests:
                                 SortedByTask[Index(Asset=asset.id, Task=task.id)].append(date)
                                 self.total += 1
             count += 1.00
-        self.lineout("Processed: |" + "==|" * 10 + " 100%")
+        self.output.lineout("Processed: |" + "==|" * 10 + " 100%")
         return SortedByTask
     
     def IntervalViolations(self, SortedByTask):
@@ -154,37 +155,6 @@ class Tests:
                str(self.schedule.totalUsage) + "\n"  
         fo.write(csv)
         fo.close()
-              
-    def strfdelta(self, tdelta, fmt):
-        d = {"days": tdelta.days}
-        d["hours"], rem = divmod(tdelta.seconds, 3600)
-        d["minutes"], d["seconds"] = divmod(rem, 60)
-        return fmt.format(**d)
-    
-    def hilite(self, txt, status=True, bold=True):
-        import sys
-        if sys.stdout.isatty():
-            attr = []
-            if status:
-                attr.append('32') #green
-            else:
-                attr.append('31') #red
-            if bold:
-                attr.append('1')
-            return '\033[%sm%s\x1b[0m' % (';'.join(attr), txt)
-        return txt
-    
-    def lineout(self, output):
-        length = len(str(output))
-        delete = "\b" * (length + 1)
-        print "{0}{1:{2}}".format(delete, output, length),
-    
-    def statusbar(self, numerator, denominator, label):
-        import sys
-        if sys.stdout.isatty():
-            perc = numerator/denominator
-            bar  = ": |" + "==|" * int(perc*10) + int(10-(perc*10))*"---" + " "
-            self.lineout(label + bar + str(int(perc*100))+"%")
             
     def console(self, type, args):
         if(self.model.conf.testout):
@@ -198,19 +168,19 @@ class Tests:
         
             elif(type == "Task"):
                 task, prev, date, difference, drift = args                
-                drift = self.hilite("+"+str(drift), 0) if drift > 0 else self.hilite(drift)
+                drift = self.output.hilite("+"+str(drift), 0) if drift > 0 else self.output.hilite(drift)
         
                 print "Task: " + str(task.id), task.name
                 print "Last:", str(task.end(prev))[:-9], "\tInterval:   ", \
-                       self.strfdelta(timedelta(days=task.interval), "{days} days")
+                       self.output.strfdelta(timedelta(days=task.interval), "{days} days")
                 print "Date:", str(date)[:-9], \
                       "\tDifference: ", difference, "days\t", str.rjust(str(drift), 6)
                 print "-------------------------------------------"
                 
         if(type == "Summary"):
             violation, ground, ineff, average = args
-            print str.ljust("\tExecution: " + str(datetime.now()-self.stopwatch)[:-4], 25) + \
-                  "\n\n" + \
+            print str.ljust(" " * 33 + "Execution: " + \
+                  str(datetime.now()-self.stopwatch)[:-4], 25), "\n\n" + \
                   str.ljust("Scheduled:", 10), str.ljust(str(self.total), 10), \
                   str.ljust("Optimal:", 10), str.ljust(str(self.total - violation), 10), \
                   str.ljust("Violation:", 10), str.ljust(str(violation), 10), \
@@ -218,4 +188,4 @@ class Tests:
                   str.ljust("Inefficiency:", 10), str.ljust(str(ineff), 10) + "\n" + \
                   str.ljust("Manhours:", 10), str.ljust(str(self.schedule.totalManhours), 10), \
                   str.ljust("Average:", 10), str.ljust(str(average) + " days", 10), \
-                  str.ljust("Usage:", 10), str.ljust(str(self.schedule.totalUsage), 10) + "\n\n"
+                  str.ljust("Usage:", 10), str.ljust(str(self.schedule.totalUsage), 10) + "\n"

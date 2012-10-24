@@ -25,6 +25,7 @@ class Task:
         self.required            = False
         self.concurrent          = False
         self.relax               = timedelta(days=int(ceil(self.interval/4)))
+        # self.relax               = timedelta(days=self.interval)
         # self.relax               = timedelta(days=1)
         self.requisite_interval  = int(ceil(self.interval/2))
         

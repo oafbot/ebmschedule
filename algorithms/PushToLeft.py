@@ -3,8 +3,8 @@ from Algorithm import Algorithm
 
 class PushToLeft(Algorithm):
     
-    def __init__(self, input, weight=1.0, name="PushLeft"):        
-        Algorithm.__init__(self, input, weight, name)        
+    def __init__(self, input, weight, name="PushLeft"):        
+        Algorithm.__init__(self, input, weight, 0, name)
                        
     def regularSchedule(self, asset, task, input, start):
         """
@@ -13,17 +13,28 @@ class PushToLeft(Algorithm):
         Keep Shifting one day forward as long as a schedule conflict exists.
         """
         loopend = False
-        while(start <= input.schedule.dateRange.end):            
+        while(start <= input.schedule.dateRange.end):
+            input.schedule.used = False
+            original = start
+            
             while(start > input.schedule.last(asset, task) and not loopend):
                 if(input.schedule.blocked(asset, task, start)):
                     start -= timedelta(days=1)
                     self.conflicts += 1
+                
+                    if(start <= input.schedule.last(asset, task)):
+                        loopend = True
+                        start = original
+                        self.forced += 1
                 else:
                     loopend = True
-            if not task.withinInterval(input.schedule, asset, start):  
+            
+            self.usageViolation(start, original, input.schedule, asset)
+            
+            if not task.withinInterval(input.schedule, asset, start):
                 end = input.schedule.add(asset, task, start)
                 self.console(asset, task, input, start, end)
-            else: 
+            else:
                 end = start
             start = task.next(asset, end)
     
@@ -39,12 +50,21 @@ class PushToLeft(Algorithm):
         loopend = False
         
         while(start <= input.schedule.dateRange.end):            
+            input.schedule.used = False
+            original = start
+            
             while(start > input.schedule.last(asset, primary) and not loopend): 
                 if(input.schedule.blocked(asset, metatask, start)):
                     start -= timedelta(days=1)
                     self.conflicts += 1
+                    if(start <= input.schedule.last(asset, primary)):
+                        loopend = True
+                        start = original
+                        self.forced += 1
                 else:
                     loopend = True
+            
+            self.usageViolation(start, original, input.schedule, asset)
             
             self.remainder_hours = 0            # The hours carried over from the preceding task
             self.maxhours = primary.hoursPerDay # The work hours in a day
@@ -52,15 +72,17 @@ class PushToLeft(Algorithm):
                         
             for task in bundle:
                 """For each task in the bundle, schedule in order."""
-                self.overhours  = False
-                
-                if not task.withinInterval(input.schedule, asset, start):        
+                self.overhours = False
+                if task.concurrent or not task.withinInterval(input.schedule, asset, start):
                     end = input.schedule.add(asset, task, start)
                     self.console(asset, task, input, start, end)
+                    """Claculate the start and end dates."""
                     dates = self.calc(task, start, end)
                     start = dates[0]
-                    end = dates[1]  
+                    end = dates[1]
+                    if(task.concurrent and task.id in primary.concur 
+                        and task.interval >= primary.interval): self.skip.add(task.id)  
                 else:
-                    end = start             
+                    end = start                         
             start = primary.next(asset, end)
             

@@ -15,15 +15,16 @@ class Algorithm:
         self.stopwatch  = datetime.now()
         self.relax      = (0 - relax)*0.10
         self.skip       = set()
+        self.forced     = 0
         
         if(self.relax < 0):
             self.name += "["+str(int(relax))+"]"
         if(input.trace): 
             self.output.console()
         if(input.conf.pushcal): 
-            self.calendar(input)        
-        
-        self.sort(input)
+            self.calendar(input)
+        if self.name != "PushLeft":
+            self.sort(input)
         self.main(input)
         
     def sort(self, input):
@@ -139,11 +140,11 @@ class Algorithm:
         """Print out the cost analysis for the algorithm."""
         now = datetime.now()
         exectime = str(now - self.stopwatch)[:-4]
-        print "\n", \
-              self.name + ":", input.schedule.dataSource, input.count, \
-              "    Weight:", self.weight, \
-              "    Adjustments:", self.conflicts, \
-              "    Execution:", exectime, "\n"        
+        forced = "    Forced: " + str(self.forced) if self.forced else ""
+        weight = str(self.weight)
+        data = (self.name, input.schedule.dataSource, input.count, self.weight, self.conflicts, forced)
+        output = "%s: %s %s    Weight: %s    Adjustments: %s %s" % data
+        print "\n", str.ljust(output, 80), "Execution:", exectime, "\n"
         """Write out metrics to a file."""
         if(input.conf.metrics):
             self.output.writeMetrics(input, self.conflicts, self.name, self.weight, exectime, now)

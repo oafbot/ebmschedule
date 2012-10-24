@@ -147,7 +147,41 @@ class Output:
               "Weight: " + str(weight) + "\n" + \
               str.ljust("Manhours: " + str(input.schedule.totalManhours), 25) + \
               str.ljust("Adjustments: " + str(conflicts), 25) + "\n"
-              
 
         fo.write( out )
         fo.close()
+        
+    def strfdelta(self, tdelta, fmt):
+        """Convert timedelta to days."""
+        d = {"days": tdelta.days}
+        d["hours"], rem = divmod(tdelta.seconds, 3600)
+        d["minutes"], d["seconds"] = divmod(rem, 60)
+        return fmt.format(**d)
+
+    def hilite(self, txt, status=True, bold=True):
+        """Hilite text in color terminals."""
+        import sys
+        if sys.stdout.isatty():
+            attr = []
+            if status:
+                attr.append('32') #green
+            else:
+                attr.append('31') #red
+            if bold:
+                attr.append('1')
+            return '\033[%sm%s\x1b[0m' % (';'.join(attr), txt)
+        return txt
+
+    def lineout(self, output):
+        """Dynamic single line output."""
+        length = len(str(output))
+        delete = "\b" * (length + 1)
+        print "{0}{1:{2}}".format(delete, output, length),
+
+    def statusbar(self, numerator, denominator, label):
+        """Progress bar rendering."""
+        import sys
+        if sys.stdout.isatty():
+            perc = numerator/denominator
+            bar  = ": |" + "==|" * int(perc*10) + int(10-(perc*10))*"---" + " "
+            self.lineout(label + bar + str(int(perc*100))+"%")        

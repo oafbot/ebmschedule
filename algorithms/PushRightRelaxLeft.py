@@ -1,7 +1,6 @@
 from datetime import timedelta
 from Algorithm import Algorithm
 from math import ceil
-from copy import deepcopy
 
 class PushRightRelaxLeft(Algorithm):
 
