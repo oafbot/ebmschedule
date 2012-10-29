@@ -7,7 +7,7 @@ from objects.DateRange import DateRange
 
 class Model:
     
-    def __init__(self, count, config=Config()):                   
+    def __init__(self, count, metrics, config=Config()):                   
         self.conf    = config
         self.name    = "Simple-Model"        
         self.trace   = self.conf.trace
@@ -16,8 +16,9 @@ class Model:
         self.end     = self.conf.end
         self.hours   = self.conf.hours
         self.count   = count
+        self.metrics = metrics
                                
-        schedule = Schedule(self.name, DateRange(self.start, self.end), self.conf.max)
+        schedule = Schedule(self.name, DateRange(self.start, self.end), self.conf.max, self.hours)
         
         assets = {
             1: Asset(1, 'E-6B 01', self.start),
@@ -36,7 +37,7 @@ class Model:
             1: Task(
                 id=1, 
                 name='Change Oil', 
-                unit=1, 
+                workhours=self.hours, 
                 threshold=5, 
                 interval=14, 
                 manpowers=[
@@ -53,7 +54,7 @@ class Model:
             2: Task(
                 id=2, 
                 name='Paint',
-                unit=1, 
+                workhours=self.hours, 
                 threshold=20,
                 interval=30, 
                 manpowers=[
@@ -68,7 +69,7 @@ class Model:
             3: Task(
                 id=3,
                 name='Pitot probe',
-                unit=1,
+                workhours=self.hours,
                 threshold=8,
                 interval=20,
                 manpowers=[
@@ -84,7 +85,7 @@ class Model:
             4: Task(
               id=4, 
               name='Engine Assembly', 
-              unit=1, 
+              workhours=self.hours, 
               threshold=10, 
               interval=40, 
               manpowers=[
@@ -100,7 +101,7 @@ class Model:
             5: Task(
               id=5, 
               name='Remove Panel', 
-              unit=1, 
+              workhours=self.hours, 
               threshold=0, 
               interval=0, 
               manpowers=[
@@ -115,7 +116,7 @@ class Model:
             6: Task(
               id=6, 
               name='Add Panel', 
-              unit=1, 
+              workhours=self.hours, 
               threshold=0, 
               interval=0, 
               manpowers=[
@@ -130,7 +131,7 @@ class Model:
             7: Task(
               id=7, 
               name='Wash', 
-              unit=1, 
+              workhours=self.hours, 
               threshold=0, 
               interval=7, 
               manpowers=[
@@ -147,7 +148,7 @@ class Model:
             8: Task(
               id=8, 
               name='Replace Filter', 
-              unit=1, 
+              workhours=self.hours, 
               threshold=0, 
               interval=21, 
               manpowers=[
@@ -162,7 +163,7 @@ class Model:
             9: Task(
               id=9, 
               name='Dismantle Bulkhead', 
-              unit=1, 
+              workhours=self.hours, 
               threshold=0, 
               interval=0, 
               manpowers=[
@@ -182,4 +183,4 @@ class Model:
       
         conditions = InitialConditions(self.name, self.count, self.conf)
         self.schedule = conditions.set(assets, tasks, schedule)
-        
+        self.metrics.NumberOfAssets = len(assets)

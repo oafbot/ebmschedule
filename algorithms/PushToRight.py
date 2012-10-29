@@ -16,15 +16,17 @@ class PushToRight(Algorithm):
             input.schedule.used = False
             origin = start
                         
-            while(input.schedule.blocked(asset, task, start)):
+            while(input.schedule.blocked(asset, task, start, self.stupid)):
                 """Shift to the right one day when blocked."""
                 start += timedelta(days=1)
                 self.conflicts += 1
             
             self.usageViolation(start, origin, input.schedule, asset)
+            self.recordInterval(start, origin)
             
-            if not task.withinInterval(input.schedule, asset, start): 
+            if not task.withinInterval(input.schedule, asset, start, self.stupid): 
                 """Add to schedule."""
+                self.totalScheduled += 1
                 end = input.schedule.add(asset, task, start)
                 self.console(asset, task, input, start, end)
             else:
@@ -45,12 +47,13 @@ class PushToRight(Algorithm):
             input.schedule.used = False
             origin = start
                         
-            while(input.schedule.blocked(asset, metatask, start)):
+            while(input.schedule.blocked(asset, metatask, start, self.stupid)):
                 """Shift to the right one day when blocked."""
                 start += timedelta(days=1)
                 self.conflicts += 1
             
             self.usageViolation(start, origin, input.schedule, asset)
+            self.recordInterval(start, origin)
                         
             self.remainder_hours = 0             # The hours carried over from the preceding task
             self.maxhours = primary.hoursPerDay  # The work hours in a day
@@ -59,10 +62,11 @@ class PushToRight(Algorithm):
             for task in bundle:
                 """For each task in the bundle, schedule in order."""
                 self.overhours  = False
-                if task.concurrent or not task.withinInterval(input.schedule, asset, start):        
+                if task.concurrent or not task.withinInterval(input.schedule, asset, start, self.stupid):        
                     """Concurrent task inherits the interval of its parent task."""
                     if task.concurrent: task.interval = primary.interval                        
                     """Add to schedule."""
+                    self.totalScheduled += 1
                     end = input.schedule.add(asset, task, start)
                     self.console(asset, task, input, start, end)                   
                     """Claculate the start and end dates."""

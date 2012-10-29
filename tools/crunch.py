@@ -18,18 +18,19 @@ if __name__ == "__main__":
     algo  = args['algo' ] if args['algo' ] is not None else 0
     start = args['start'] if args['start'] is not None else 0
     end   = args['end'  ] if args['end'  ] is not None else 0
-    lax   = 10 if algo > 0 else 2
+    lax   = 4 if algo == 1 else 2
     
-    count = 0
-    runs  = len(range(start, end+1)) * 11 * len(range(1, lax)) 
+    weights = [0, 5, 10] if algo != 2 else [0]
+    count = 0     
+    runs  = len(range(start, end+1)) * len(weights) * len(range(1, lax)) 
     timer = datetime.now()
 
     for data in range(start, end+1):
         """Load initial condition dataset corresponding to data."""
-        for weight in range(0, 11):
-            """Vary weight from 0 to 1.0. Increment by 0.1."""
+        for weight in weights:
+            """Vary weight from 0 to 1.0. Increment by 0.5."""
             for relax in range(1, lax):
-                """Vary the relaxing 10 percent to (lax-1)*10 percent."""
+                """Vary the relaxing 25 percent to (lax-1)*25 percent."""
                 count += 1               
                 print "Running", count, "out of", runs
                 subprocess.call(["../main.py", str(algo), str(data), str(weight), str(relax)])

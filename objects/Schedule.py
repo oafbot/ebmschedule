@@ -1,6 +1,6 @@
 class Schedule:
     
-    def __init__(self, dataSource, dateRange, maxAssetsInWork):
+    def __init__(self, dataSource, dateRange, maxAssetsInWork, hours):
         from objects import Usage
         self.dataSource      = dataSource
         self.dateRange       = dateRange
@@ -14,9 +14,10 @@ class Schedule:
         self.used            = False
         self.totalUsage      = 0
         self.totalManhours   = 0
-        self.hoursPerDay     = 8
+        self.hoursPerDay     = hours
         self.forced          = []        
         self.cal             = None
+        # self.metrics         = metrics
         
     def force(self, asset, task, dateRange):
         """Force an asset to be scheduled for specified task to be performed."""
@@ -30,7 +31,7 @@ class Schedule:
         self._addToSchedule(asset, _task)
         return _task.dateRange.end
     
-    def blocked(self, asset, task, date):
+    def blocked(self, asset, task, date, stupidity):
         """Return False if task can be scheduled on that day."""
         from datetime import timedelta
         
@@ -46,9 +47,10 @@ class Schedule:
             LHS is the number of assets *already* scheduled, so if >= maxAssets cannot 
             schedule any additional assets
             """
+            # date = date.date()
             
-            if (date in self._assetsInWork.keys() and len(
-               set(self._assetsInWork[date]).difference([asset.id])) >= self.maxAssetsInWork):
+            if (date.date() in self._assetsInWork.keys() and len(
+               set(self._assetsInWork[date.date()]).difference([asset.id])) >= self.maxAssetsInWork):
                     # print "Asset"
                     return True
             
@@ -101,11 +103,11 @@ class Schedule:
                                 # print "conflict bundle"
                                 return True
             
-            if task.id != 0 and task.withinInterval(self, asset, date):
+            if task.id != 0 and task.withinInterval(self, asset, date, stupidity):
                 """If not a metatask check if task falls within the interval."""
                 # print "interval"
                 return True
-            elif task.id == 0 and task.primary.withinInterval(self, asset, date):
+            elif task.id == 0 and task.primary.withinInterval(self, asset, date, stupidity):
                 """If a metatask, check if the primary task falls within the interval."""
                 # print "interval bundle"
                 return True
@@ -126,11 +128,12 @@ class Schedule:
         self._schedule[asset.id].append(task)
         
         for date in task.dateRange.range():
+            # date = date.date()
             """Assign asset to the date."""
-            if date not in self._assetsInWork.keys():
-                self._assetsInWork[date] = [asset.id]
-            elif asset.id not in self._assetsInWork[date]:
-                self._assetsInWork[date].append(asset.id)
+            if date.date() not in self._assetsInWork.keys():
+                self._assetsInWork[date.date()] = [asset.id]
+            elif asset.id not in self._assetsInWork[date.date()]:
+                self._assetsInWork[date.date()].append(asset.id)
                     
             for skill in task.skills:
                 """Assign skills to the date."""
@@ -158,9 +161,9 @@ class Schedule:
                 self._conflictTasks[asset.id][date] = \
                 self._conflictTasks[asset.id][date].union(task.conflicts)
 
-        """Tally manhours."""
-        if date <= self.dateRange.end:
-            self.totalManhours += task.manhours
+            """Tally manhours."""
+            if date <= self.dateRange.end and date >= self.dateRange.start:
+                self.totalManhours += task.manhours
         """Call Google Calendar scheduler."""
         from inputs.Config import Config
         if(Config().pushcal and not forced):

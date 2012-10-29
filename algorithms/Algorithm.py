@@ -13,12 +13,17 @@ class Algorithm:
         self.prev       = 0
         self.output     = Output(input)
         self.stopwatch  = datetime.now()
-        self.relax      = (0 - relax)*0.10
+        self.relax      = (0 - relax)*0.25
         self.skip       = set()
         self.forced     = 0
+        self.metrics    = input.metrics
+        self.schedule   = input.schedule
+        self.stupid     = input.conf.stupid
+        self.drift      = []
+        self.totalScheduled = 0
         
         if(self.relax < 0):
-            self.name += "["+str(int(relax))+"]"
+            self.name += "["+str(abs(self.relax))+"]"
         if(input.trace): 
             self.output.console()
         if(input.conf.pushcal): 
@@ -37,7 +42,7 @@ class Algorithm:
         # prioritize tasks with large intervals
         # prioritize tasks with many associated tasks.
         input.tasks.sort(key=lambda task: 
-            (              
+            (
                 (self.weight * self.totalhours(task, input.tasks)) +
                 ((1-self.weight) * (self.totalconflicts(task, input.tasks) / (self.totalTasks)))
                 ), reverse=True
@@ -53,10 +58,10 @@ class Algorithm:
                       A. The last time a task was performed on a given asset
                       B. The start date of the given date range.
                     """
-                    start = task.next(asset, input.schedule.last(asset, task))
-                    start = max(start, input.schedule.dateRange.start)
+                    start = task.next(asset, self.schedule.last(asset, task))
+                    start = max(start, self.schedule.dateRange.start)
                     bundle = task.checkConstraints(list(), asset, input)
-                    if len(bundle) > 1:
+                    if len(bundle) > 1 and task.id not in self.skip:
                         self.bundleSchedule(bundle, asset, input, task, start)
                     elif task.id not in self.skip:
                         self.regularSchedule(asset, task, input, start)
@@ -69,19 +74,15 @@ class Algorithm:
             if t.id in task.prep:
                 total += self.taskcost(t)
                 total += self.totalhours(self, t, tasks)
-                # total += t.manhours
             if t.id in task.prereq:
                 total += self.taskcost(t)
                 total += self.totalhours(self, t, tasks)
-                # total += t.manhours
             if t.id in task.subseq:
                 total += self.taskcost(t)
                 total += self.totalhours(self, t, tasks)
-                # total += t.manhours
             if t.id in task.concur:
                 total += self.taskcost(t)
                 total += self.totalhours(self, t, tasks)
-                # total += t.manhours
         return total
     
     def totalconflicts(self, task, tasks):
@@ -142,22 +143,27 @@ class Algorithm:
         exectime = str(now - self.stopwatch)[:-4]
         forced = "    Forced: " + str(self.forced) if self.forced else ""
         weight = str(self.weight)
-        data = (self.name, input.schedule.dataSource, input.count, self.weight, self.conflicts, forced)
+        data = (self.name, self.schedule.dataSource, input.count, self.weight, self.conflicts, forced)
         output = "%s: %s %s    Weight: %s    Adjustments: %s %s" % data
         print "\n", str.ljust(output, 80), "Execution:", exectime, "\n"
+        self.metrics.Forced = self.forced
         """Write out metrics to a file."""
-        if(input.conf.metrics):
-            self.output.writeMetrics(input, self.conflicts, self.name, self.weight, exectime, now)
+        # if(input.conf.metrics):
+        #     self.output.writeMetrics(input, self.conflicts, self.name, self.weight, exectime, now)
             
     def calendar(self, input):
         """Initiate the Google Calendar."""
         from outputs.Calendar import Calendar        
-        if not input.schedule.cal: 
-            input.schedule.cal = Calendar()
-        input.schedule.cal.Connect(input)
+        if not self.schedule.cal: 
+            self.schedule.cal = Calendar()
+        self.schedule.cal.Connect(input)
     
     def usageViolation(self, date, original, schedule, asset):
         """Record usage violations."""
         if date > original and schedule.used and date not in asset.violation:
             asset.violation.update([date])
             schedule.totalUsage += 1
+    
+    def recordInterval(self, start, orig):
+        self.drift.append(start - orig)
+               

@@ -17,8 +17,9 @@ class PushRightRelaxLeft(Algorithm):
         while(start <= input.schedule.dateRange.end):            
             start = self.shift(asset, task, start, start, original, input.schedule)
             
-            if not task.withinInterval(input.schedule, asset, start):  
+            if not task.withinInterval(input.schedule, asset, start, self.stupid):  
                 task.interval = original
+                self.totalScheduled += 1
                 end = input.schedule.add(asset, task, start)
                 self.console(asset, task, input, start, end)
             else:
@@ -52,11 +53,12 @@ class PushRightRelaxLeft(Algorithm):
                 if(task.interval + int(ceil(task.interval * self.relax)) > 0):                    
                     task.interval += int(ceil(task.interval * self.relax))
                 
-                if task.concurrent or not task.withinInterval(input.schedule, asset, start):
+                if task.concurrent or not task.withinInterval(input.schedule, asset, start, self.stupid):
                     """Concurrent task inherits the interval of its parent task."""
                     # if(task.concurrent): 
                     #     task.interval = primary.interval
                     task.interval = orig
+                    self.totalScheduled += 1
                     """Add to schedule."""
                     end = input.schedule.add(asset, task, start)
                     self.console(asset, task, input, start, end)
@@ -64,8 +66,8 @@ class PushRightRelaxLeft(Algorithm):
                     dates = self.calc(task, start, end)
                     start = dates[0]
                     end = dates[1]
-                    if(task.concurrent and task.id in primary.concur 
-                        and task.interval >= primary.interval): self.skip.add(task.id) 
+                    if(task.concurrent and task.id in primary.concur and 
+                       task.interval >= primary.interval): self.skip.add(task.id) 
                 else:
                     task.interval = orig
                     end = start
@@ -77,7 +79,7 @@ class PushRightRelaxLeft(Algorithm):
         push  = False
         schedule.used = False
         
-        while(schedule.blocked(asset, task, start)):
+        while(schedule.blocked(asset, task, start, self.stupid)):
             if start > floor and not push and floor > asset.start:
                 """Adjust the interval so it doesn't stumble on the interval check."""
                 task.interval = interval + int(ceil(interval * self.relax))
@@ -91,6 +93,7 @@ class PushRightRelaxLeft(Algorithm):
                 task.interval = interval
                 start += timedelta(days=1)
                 self.conflicts += 1
-                # print "push" 
+                # print "push"
+        self.recordInterval(start, orig)
         self.usageViolation(start, orig, schedule, asset)
         return start

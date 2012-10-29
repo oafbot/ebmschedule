@@ -2,25 +2,29 @@ from datetime import timedelta
 from datetime import datetime
 from collections import namedtuple
 from objects.DateRange import DateRange
+# from collections import Counter
 # import thread
 
 class Tests:
     def __init__(self, algorithm):
         self.algorithm = algorithm
-        self.output = self.algorithm.output
-        self.model = self.algorithm.results
-        self.schedule = self.model.schedule
-        self.tasks = self.model.tasks
-        self.assets = self.model.assets        
-        self.total = 0
+        self.metrics   = self.algorithm.metrics
+        self.output    = self.algorithm.output
+        self.model     = self.algorithm.results
+        self.schedule  = self.model.schedule
+        self.tasks     = self.model.tasks
+        self.assets    = self.model.assets        
+        self.total     = 0
         self.stopwatch = datetime.now()
+        
         self.IntervalCheck()
     
     def IntervalCheck(self):                
         """Find and flag interval violations."""
         Index = namedtuple("Index", ["Asset", "Task"])
-        SortedByTask = self.SortByTask(Index)
-        self.IntervalViolations(SortedByTask)
+        SortedByTask = self.SortByTask(Index)        
+        self.IntervalViolations(SortedByTask)        
+        self.console("Summary", [self.violation, self.ground, self.ineff, self.average])
             
     def SortByTask(self, Index):
         """Sort the schedule by Asset and Task."""
@@ -54,11 +58,11 @@ class Tests:
         prev = None
         prev_asset = None
         prev_task = None
-        violation = 0
-        ground = 0
-        ineff  = 0
+        self.violation = 0
+        self.ground = 0
+        self.ineff  = 0
         active = set()
-        grounded = []
+        self.grounded = []
         self.terminated = True
         self.console("Banner", None)
         
@@ -84,78 +88,56 @@ class Tests:
             for date in SortedByTask[i]:
                 if(prev is None or date < asset.start):
                     prev = date                
-                elif(date >= asset.start and task.interval > 0 and date > task.end(prev)):
-                    if date not in active and not task.concurrent:
-                        """Do not count concurrent tasks."""
+                elif(date >= asset.start and date <= self.schedule.dateRange.end and date > task.end(prev) and date not in active):
+                    if(task.interval > 0 and not task.child):
+                        """Do not count concurrent, subsequent, prep and prereq tasks."""
+                        for d in DateRange(date, task.end(date)).range(): active.update([d])
                         difference = (date - prev).days
-                    
-                        if(difference != timedelta(days=task.interval-1).days and
-                           difference != timedelta(days=task.interval).days):
-                            """If the difference is not the same as the interval.""" 
-                            active.update([date])
-                            drift = difference - task.interval
-                            violation += 1
-                                                        
+                                                
+                        if(difference != timedelta(days=task.interval).days):
+                            """If the difference is not the same as the interval."""                                                                                                                
+                            self.violation += 1
+                           
                             if(difference - task.interval > 0):
-                                if(date - timedelta(days=1) not in active or 
-                                   date + timedelta(days=1) not in active): 
-                                   """Count groundings that are non-consecutive and distinct."""
-                                   ground += 1
-                                   # violation += 1
-                                grounded.append(drift)
-                            elif not task.subseq and not task.prereq:
-                                if(date - timedelta(days=1) not in active or 
-                                   date + timedelta(days=1) not in active):
-                                   """Count inefficiencies that are non-consecutive and distinct."""
-                                   ineff += 1
-                                   # violation += 1
-                        
-                            if(abs(drift) > 7):                            
+                                """Count groundings if non-consecutive and distinct."""
+                                self.ground += 1
+                                self.grounded.append(drift)
+                                drift = difference - task.interval
+                            else:
+                                """Count inefficiencies if non-consecutive and distinct."""
+                                self.ineff += 1
+                                drift = difference - task.interval
+                                                           
+                            if(abs(drift) > 7):
+                                """Output to console."""                            
                                 self.console("Task", [task, prev, date, difference, drift])
+                    
                     """Increment previous task date."""
                     prev = task.end(date)
                 else:
-                    prev = date
-        
-        average = sum(grounded)/len(grounded) if len(grounded) > 0 else 0
-        
-        self.console("Summary", [violation, ground, ineff, average])
-              
-        if(self.model.conf.metrics):
-            self.writeMetrics(violation, ground, ineff, average)
-        
-    def writeMetrics(self, violations, groundings, inefficiencies, average_grounded):
-        """Write out metrics to a file."""
-        import os
-        if 'tools' in os.getcwd(): 
-            path = "../metrics/"
-        else: 
-            path = "metrics/"
-        optimal = self.total - violations
-        percent = round((float(optimal) / float(self.total)) * 100, 2)
-        fo = open(path + self.schedule.dataSource + ".txt", "ab+")
-        out =  str.ljust("Groundings: " + str(groundings), 25) + \
-               str.ljust("Inefficiencies: " + str(inefficiencies), 25) + "\n" + \
-               str.ljust("Scheduled: " + str(self.total), 25) + \
-               str.ljust("Violations: " + str(violations), 25) + \
-               str.ljust("Optimal: " + str(optimal) + "  " + str(percent) + "%", 25) + "\n" + \
-               str.ljust("Average ground: " + str(average_grounded) + " days", 25)  + \
-               str.ljust("Usage: " + str(self.schedule.totalUsage), 25 )     
-        fo.write(out)
-        fo.close()
-        fo = open(path + self.schedule.dataSource + ".csv", "ab+")
-        if os.stat(path + self.schedule.dataSource + ".csv")[6]==0:
-            csv = "Algorithm,Data,Weight,Manhours,Groundings,Inefficiencies,Scheduled,Violations,Optimal,Average,Usage\n"
-        else: 
-            csv = ""
-        csv += self.algorithm.name + "," + str(self.model.count) + "," + \
-               str(self.algorithm.weight) + "," + str(self.schedule.totalManhours) + "," + \
-               str(groundings) + "," + str(inefficiencies) + "," + str(self.total) + "," + \
-               str(violations) + "," + str(optimal) + "," + str(average_grounded) + "," + \
-               str(self.schedule.totalUsage) + "\n"  
-        fo.write(csv)
-        fo.close()
-            
+                    prev = date                            
+        self.average = sum(self.grounded)/len(self.grounded) if len(self.grounded) > 0 else 0
+    
+    def setMetrics(self):
+        self.metrics.DataSource      = self.schedule.dataSource
+        self.metrics.Algorithm       = self.algorithm.name
+        self.metrics.Weight          = self.algorithm.weight
+        self.metrics.Data            = self.model.count
+        self.metrics.Manhours        = self.schedule.totalManhours
+        self.metrics.Usage           = self.schedule.totalUsage
+        self.metrics.UsageTotal      = len(self.schedule.usage.dates)
+        self.metrics.UsageCount      = self.schedule.usage.count
+        self.metrics.Groundings      = self.ground
+        self.metrics.Inefficiencies  = self.ineff
+        self.metrics.Scheduled       = self.total
+        self.metrics.Violations      = self.violation
+        self.metrics.Optimal         = self.total - self.violation
+        self.metrics.AverageGround   = self.average
+        self.metrics.ExtendedGround  = sum(n > 7 for n in self.grounded)
+        self.metrics.Available       = self.schedule._assetsInWork
+        self.metrics.end             = self.schedule.dateRange.end
+        self.metrics.start           = self.schedule.dateRange.start
+                
     def console(self, type, args):
         if(self.model.conf.testout):
             if(type=="Banner"):

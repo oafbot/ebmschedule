@@ -17,7 +17,7 @@ If task was not scheduled try pushing forward until ceiling is reached.
 * ***Algorithm*** is the algorithm to use. 0 is PushRight, 1 is PushRight-RelaxLeft.
 * ***Data*** is the initial conditions to load. Ranges from 0 to as many datasets as was generated.
 * ***Weight*** is the weight applied to sorting algorithm. Ranges from 0 to 10 (represents 0.0 to 1.0)
-* ***Relax*** is the percentage of interval to relax left. Ranges from 1 to 9 (represents 10% to 90%)
+* ***Relax*** is the percentage of interval to relax left. Ranges from 1 to 3 (represents 25% to 75%)
 
 ## Tools
 ### crunch.py
@@ -26,7 +26,7 @@ Run main.py N number of times with varying weights and relaxing (if relax left a
 #### Usage: 
 	$ ./crunch.py [-h] [--start START] [--end END] [--algo ALGO]
 #### Example:
-	$ ./crunch.py --algo 1 --start 0 --end 1 
+	$ ./crunch.py --algo 1 --start 0 --end 0 
 
 #### Options:
 *  ***-h, --help*** Show help message.

@@ -2,12 +2,11 @@ from datetime import timedelta
 from math import ceil
 class Task:
     
-    def __init__(self, id, name, unit, threshold, interval, manpowers, 
+    def __init__(self, id, name, workhours, threshold, interval, manpowers, 
                  conflicts=list(), prep=list(), prereq=list(), subseq=list(), concur=list()):
         
         self.id                  = id
         self.name                = name
-        self.unit                = unit
         self.threshold           = threshold
         self.interval            = interval
         self.manpowers           = manpowers
@@ -17,13 +16,17 @@ class Task:
         self.subseq              = set(subseq)
         self.concur              = set(concur)
         self.locked              = False
-        self.hoursPerDay         = 8
+        self.hoursPerDay         = workhours
         self.skills              = []
         self.days                = 0
         self.manhours            = 0
-        self.totalAvailableHours = 0        
+        self.totalAvailableHours = 0 
+        self.child               = False       
         self.required            = False
+        self.preparatory         = False
         self.concurrent          = False
+        self.primary             = False
+        self.subsequent          = False
         self.relax               = timedelta(days=int(ceil(self.interval/4)))
         # self.relax               = timedelta(days=self.interval)
         # self.relax               = timedelta(days=1)
@@ -98,14 +101,19 @@ class Task:
         return _task
     
     def checkConstraints(self, bundle, asset, input):
-        """Check the constrains and bundle tasks together when appropriate."""
-        if self.prereq: self.satisfyRequisite(bundle, asset, input)              # prerequisite
-        if self.prep: bundle = self.bundle(bundle, self.prep, asset, input)      # prepatory
+        """Check the constrains and bundle tasks together when appropriate."""                
+        if self.prereq: bundle = self.satisfyRequisite(bundle, asset, input)
+        """Prerequisite task."""             
+        if self.prep: bundle = self.bundle(bundle, self.prep, asset, input, type="prep")
+        """Preparatorytask."""                                          
         if not bundle or self not in bundle: 
-            bundle.append(self)
-            self.primary = True                  # primary task            
-        if self.concur: bundle = self.concurrence(bundle, asset, input)          # concurrent
-        if self.subseq: bundle = self.bundle(bundle, self.subseq, asset, input)  # subsequent
+            """Primary task."""
+            self.primary = True
+            bundle.append(self)                     
+        if self.concur: bundle = self.concurrence(bundle, asset, input)
+        """Concurrent task."""                    
+        if self.subseq: bundle = self.bundle(bundle, self.subseq, asset, input, type="subseq")
+        """Subsequent task."""            
         return bundle
     
     def satisfyRequisite(self, bundle, asset, input):
@@ -159,11 +167,14 @@ class Task:
             bundle = self.bundle(bundle, self.concur, asset, input)
         return bundle
     
-    def bundle(self, bundle, tasks, asset, input):
+    def bundle(self, bundle, tasks, asset, input, type=None):
         """Bundle related tasks together."""
         for t in tasks:
             for task in input.tasks:
                 if task.id == t:
+                    task.child = True
+                    if type == "subseq": task.subsequent = True
+                    elif type == "prep": task.preparatory = True
                     task.checkConstraints(bundle, asset, input)
                     if bundle and task not in bundle: return bundle.append(task)
         return bundle
@@ -186,7 +197,7 @@ class Task:
             cf.union(task.conflicts)
             name += str(task.id) + "-"
             
-            if task.primary: 
+            if task.primary:
                 prime = task
                 interval = task.interval
                 threshold = task.threshold
@@ -195,23 +206,24 @@ class Task:
         metatask.primary = prime
         return metatask
     
-    def withinInterval(self, schedule, asset, start):
+    def withinInterval(self, schedule, asset, start, stupidcheckOn):
         """Check if a date falls within the interval period."""        
-        from objects.DateRange import DateRange
+        if stupidcheckOn:
+            from objects.DateRange import DateRange
         
-        interval = timedelta(days=self.interval)
-        end = self.end(start)
-        dates = schedule._scheduledTasks[asset.id].keys()
+            interval = timedelta(days=self.interval)
+            end = self.end(start)
+            dates = schedule._scheduledTasks[asset.id].keys()
         
-        before = DateRange(start - (interval - self.relax), start)
-        after  = DateRange(end, end + (interval - self.relax))
+            before = DateRange(start - (interval - self.relax), start)
+            after  = DateRange(end, end + (interval - self.relax))
         
-        for date in dates:
-            """If the task is scheduled for that date."""
-            if self.id in schedule._scheduledTasks[asset.id][date]:
-                """Is the date found in the interval daterange?"""
-                if before.within(date):
-                    return True                    
-                if after.within(date):
-                    return True                                   
+            for date in dates:
+                """If the task is scheduled for that date."""
+                if self.id in schedule._scheduledTasks[asset.id][date]:
+                    """Is the date found in the interval daterange?"""
+                    if before.within(date):
+                        return True                    
+                    if after.within(date):
+                        return True                                   
         return False       

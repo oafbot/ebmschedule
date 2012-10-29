@@ -18,7 +18,7 @@ class PushToLeft(Algorithm):
             original = start
             
             while(start > input.schedule.last(asset, task) and not loopend):
-                if(input.schedule.blocked(asset, task, start)):
+                if(input.schedule.blocked(asset, task, start, self.stupid)):
                     start -= timedelta(days=1)
                     self.conflicts += 1
                 
@@ -30,8 +30,10 @@ class PushToLeft(Algorithm):
                     loopend = True
             
             self.usageViolation(start, original, input.schedule, asset)
+            self.recordInterval(start, original)
             
-            if not task.withinInterval(input.schedule, asset, start):
+            if not task.withinInterval(input.schedule, asset, start, self.stupid):
+                self.totalScheduled += 1
                 end = input.schedule.add(asset, task, start)
                 self.console(asset, task, input, start, end)
             else:
@@ -54,7 +56,7 @@ class PushToLeft(Algorithm):
             original = start
             
             while(start > input.schedule.last(asset, primary) and not loopend): 
-                if(input.schedule.blocked(asset, metatask, start)):
+                if(input.schedule.blocked(asset, metatask, start, self.stupid)):
                     start -= timedelta(days=1)
                     self.conflicts += 1
                     if(start <= input.schedule.last(asset, primary)):
@@ -65,6 +67,7 @@ class PushToLeft(Algorithm):
                     loopend = True
             
             self.usageViolation(start, original, input.schedule, asset)
+            self.recordInterval(start, original)
             
             self.remainder_hours = 0            # The hours carried over from the preceding task
             self.maxhours = primary.hoursPerDay # The work hours in a day
@@ -73,7 +76,8 @@ class PushToLeft(Algorithm):
             for task in bundle:
                 """For each task in the bundle, schedule in order."""
                 self.overhours = False
-                if task.concurrent or not task.withinInterval(input.schedule, asset, start):
+                if task.concurrent or not task.withinInterval(input.schedule, asset, start, self.stupid):
+                    self.totalScheduled += 1
                     end = input.schedule.add(asset, task, start)
                     self.console(asset, task, input, start, end)
                     """Claculate the start and end dates."""
