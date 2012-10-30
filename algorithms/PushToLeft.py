@@ -17,17 +17,14 @@ class PushToLeft(Algorithm):
             input.schedule.used = False
             original = start
             
-            while(start > input.schedule.last(asset, task) and not loopend):
-                if(input.schedule.blocked(asset, task, start, self.stupid)):
-                    start -= timedelta(days=1)
-                    self.conflicts += 1
+            while(not loopend and input.schedule.blocked(asset, task, start, self.stupid)):
+                start -= timedelta(days=1)
+                self.conflicts += 1
                 
-                    if(start <= input.schedule.last(asset, task)):
-                        loopend = True
-                        start = original
-                        self.forced += 1
-                else:
+                if(start <= input.schedule.last(asset, task)):
                     loopend = True
+                    start = original
+                    self.forced += 1
             
             self.usageViolation(start, original, input.schedule, asset)
             self.recordInterval(start, original)
@@ -55,16 +52,13 @@ class PushToLeft(Algorithm):
             input.schedule.used = False
             original = start
             
-            while(start > input.schedule.last(asset, primary) and not loopend): 
-                if(input.schedule.blocked(asset, metatask, start, self.stupid)):
-                    start -= timedelta(days=1)
-                    self.conflicts += 1
-                    if(start <= input.schedule.last(asset, primary)):
-                        loopend = True
-                        start = original
-                        self.forced += 1
-                else:
+            while(not loopend and input.schedule.blocked(asset, metatask, start, self.stupid)): 
+                start -= timedelta(days=1)
+                self.conflicts += 1
+                if(start <= input.schedule.last(asset, primary)):
                     loopend = True
+                    start = original
+                    self.forced += 1
             
             self.usageViolation(start, original, input.schedule, asset)
             self.recordInterval(start, original)
