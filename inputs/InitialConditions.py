@@ -22,9 +22,9 @@ class InitialConditions:
         self.xml = etree.Element("Dataset")
 
         if 'tools' in os.getcwd():
-            self.path = "../inputs/"
+            self.path = "../inputs/xml/"
         else: 
-            self.path = "inputs/"
+            self.path = "inputs/xml/"
 
         if(self.config.fixed):
             self.xml_file_path = self.path + self.name + "-fix.xml"
@@ -33,7 +33,7 @@ class InitialConditions:
             
         if(self.reset):
             if(self.count < 1 or not self.config.fixed):                
-                self.xmlfile = open(self.xml_file_path, 'wb')            
+                self.xmlfile = open(self.xml_file_path, 'wb+')            
                 self.xmlfile.write('<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n')
                 self.xmlfile.close()
             self.xmlfile = open(self.xml_file_path, 'ab+')
