@@ -39,10 +39,13 @@ class Algorithm:
         Divide manhours cost with total available manhours.
         Schedule the complex ( i.e. conflict heavy ) task first.
         """
+        # for task in input.tasks:
+        #     print self.weight * self.totalhours(task, input.tasks)*1.00000, \
+        #           (1-self.weight) * (self.totalconflicts(task, input.tasks)*1.00000 / (self.totalTasks))
         input.tasks.sort(key=lambda task: 
             (
-                (self.weight * self.totalhours(task, input.tasks)) +
-                ((1-self.weight) * (self.totalconflicts(task, input.tasks) / (self.totalTasks)))
+                (self.weight * self.totalhours(task, input.tasks)*1.00000) +
+                ((1-self.weight) * (self.totalconflicts(task, input.tasks)*1.00000 / (self.totalTasks)))
                 ), reverse=True
             )
             
@@ -70,16 +73,16 @@ class Algorithm:
         total = self.taskcost(task)
         for t in tasks:
             if t.id in task.prep:
-                total += self.taskcost(t)
+                # total += self.taskcost(t)
                 total += self.totalhours(t, tasks)
             if t.id in task.prereq:
-                total += self.taskcost(t)
+                # total += self.taskcost(t)
                 total += self.totalhours(t, tasks)
             if t.id in task.subseq:
-                total += self.taskcost(t)
+                # total += self.taskcost(t)
                 total += self.totalhours(t, tasks)
             if t.id in task.concur:
-                total += self.taskcost(t)
+                # total += self.taskcost(t)
                 total += self.totalhours(t, tasks)
         return total
     
@@ -87,16 +90,16 @@ class Algorithm:
         total = len(task.conflicts)
         for t in tasks:
             if t.id in task.prep:
-                total += len(t.conflicts)
+                # total += len(t.conflicts)
                 total += self.totalconflicts(t, tasks)
             if t.id in task.prereq:
-                total += len(t.conflicts)
+                # total += len(t.conflicts)
                 total += self.totalconflicts(t, tasks)
             if t.id in task.subseq:
-                total += len(t.conflicts)
+                # total += len(t.conflicts)
                 total += self.totalconflicts(t, tasks)
             if t.id in task.concur:
-                total += len(t.conflicts)
+                # total += len(t.conflicts)
                 total += self.totalconflicts(t, tasks)
         return total        
     
