@@ -165,5 +165,6 @@ class Algorithm:
             schedule.totalUsage += 1
     
     def recordInterval(self, start, orig):
-        self.drift.append(start - orig)
+        if(start < self.schedule.dateRange.end):
+            self.drift.append(start - orig)
                

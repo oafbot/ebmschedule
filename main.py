@@ -22,7 +22,7 @@ if __name__ == "__main__":
     """Run metrics."""
     metrics.run(algorithm)
     
-    """Test Scheduling Output."""
+    """Test scheduling output."""
     if algorithm.results.conf.testing:
         test = Tests(algorithm)
         
