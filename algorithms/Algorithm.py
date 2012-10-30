@@ -39,8 +39,6 @@ class Algorithm:
         Divide manhours cost with total available manhours.
         Schedule the complex ( i.e. conflict heavy ) task first.
         """
-        # prioritize tasks with large intervals
-        # prioritize tasks with many associated tasks.
         input.tasks.sort(key=lambda task: 
             (
                 (self.weight * self.totalhours(task, input.tasks)) +
@@ -73,16 +71,16 @@ class Algorithm:
         for t in tasks:
             if t.id in task.prep:
                 total += self.taskcost(t)
-                total += self.totalhours(self, t, tasks)
+                total += self.totalhours(t, tasks)
             if t.id in task.prereq:
                 total += self.taskcost(t)
-                total += self.totalhours(self, t, tasks)
+                total += self.totalhours(t, tasks)
             if t.id in task.subseq:
                 total += self.taskcost(t)
-                total += self.totalhours(self, t, tasks)
+                total += self.totalhours(t, tasks)
             if t.id in task.concur:
                 total += self.taskcost(t)
-                total += self.totalhours(self, t, tasks)
+                total += self.totalhours(t, tasks)
         return total
     
     def totalconflicts(self, task, tasks):
@@ -90,16 +88,16 @@ class Algorithm:
         for t in tasks:
             if t.id in task.prep:
                 total += len(t.conflicts)
-                total += self.totalconflicts(self, t, tasks)
+                total += self.totalconflicts(t, tasks)
             if t.id in task.prereq:
                 total += len(t.conflicts)
-                total += self.totalconflicts(self, t, tasks)
+                total += self.totalconflicts(t, tasks)
             if t.id in task.subseq:
                 total += len(t.conflicts)
-                total += self.totalconflicts(self, t, tasks)
+                total += self.totalconflicts(t, tasks)
             if t.id in task.concur:
                 total += len(t.conflicts)
-                total += self.totalconflicts(self, t, tasks)
+                total += self.totalconflicts(t, tasks)
         return total        
     
     def taskcost(self, task):
