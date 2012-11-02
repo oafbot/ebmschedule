@@ -30,31 +30,29 @@ class Config:
         self.hours    = 8
         self.duration = "Y"   # Y : Year, M : Month, C : Custom
         
-        self.trace    = True
+        self.trace    = False
         self.fixed    = True  # start on a fixed day
         
         self.pushcal  = False # Push schedule to Googe Calendar
-        self.metrics  = False # Write metrics to output file
-        self.testing  = True
+        self.metrics  = True  # Write metrics to output file
+        
+        self.testing  = False # Conduct testing
+        self.testout  = False # Output detailed results
+        
+        self.stupid   = False # Stupidity checking
 
         # ======================================
         # = BE CAREFUL ADJUSTING THE FOLLOWING =
         # ======================================
-        """XML rewriting and limit."""
-        self.reset    = False # reset the initial conditions, alter externally
-        self.cap      = 1     # cap for the xml gerneration,  alter externally
-                        
-        if(not self.fixed):
-            self.reset = True 
-                
+        """XML rewriting and limit. Alter values externally."""
+        self.reset = True if not self.fixed else False  # reset the initial conditions.
+        self.cap   = 1                                  # cap for the xml gerneration.
+                                        
         """Set maximum number of assets grounded."""
-        if(self.bigdata):
-            self.max = 14
-        else:
-            self.max = 2
+        self.max = 5 if self.bigdata else 3
         
         """Set start and end dates."""
-        self.now   = time.gmtime()
+        self.now = time.gmtime()
         
         if(self.fixed):
             """Scheduling start date if fixed."""

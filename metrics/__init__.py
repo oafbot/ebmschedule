@@ -30,11 +30,12 @@ class Metrics:
         self.tasks     = self.model.tasks
         self.assets    = self.model.assets        
         self.stopwatch = datetime.now()
-
+        
         self.DataSource = self.schedule.dataSource
         self.Algorithm  = self.algorithm.name
         self.Weight     = self.algorithm.weight
         self.Data       = self.model.count
+        self.Sort       = self.algorithm.sorting
         self.Manhours   = self.schedule.totalManhours        
         self.Scheduled  = self.algorithm.totalScheduled
         self.Available  = self.schedule._assetsInWork
@@ -104,13 +105,14 @@ class Metrics:
             header = ""
             for n in range(0, self.NumberOfAssets+1):
                 header += "," + str(self.NumberOfAssets - n) + " Avail."
-            csv = "Algorithm,Data,Weight,Manhours,Groundings,Inefficiencies,Scheduled," + \
+            csv = "Algorithm,Data,Weight,Sort,Manhours,Groundings,Inefficiencies,Scheduled," + \
                   "Violations,Optimal,Average,Usage,Total Usage,Extended Grounding" + \
                   header + ",Forced" + "\n"
         else: 
             csv = ""
         csv += self.Algorithm       + "," + str(self.Data)           + "," + \
-               str(self.Weight)     + "," + str(self.Manhours)       + "," + \
+               str(self.Weight)     + "," + str(self.Sort)           + "," + \
+               str(self.Manhours)   + "," + \
                str(self.Groundings) + "," + str(self.Inefficiencies) + "," + \
                str(self.Scheduled)  + "," + str(self.Violations)     + "," + \
                str(self.Optimal)    + "," + str(self.AverageGround)  + "," + \

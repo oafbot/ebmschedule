@@ -3,8 +3,8 @@ from Algorithm import Algorithm
 
 class PushToRight(Algorithm):
     
-    def __init__(self, input, weight, name="PushRight"):        
-        Algorithm.__init__(self, input, weight, 0, name)
+    def __init__(self, input, weight, sort='on', name="PushRight"):        
+        Algorithm.__init__(self, input, weight, 0, sort, name)
                        
     def regularSchedule(self, asset, task, input, start):
         """
