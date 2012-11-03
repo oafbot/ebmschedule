@@ -12,6 +12,7 @@ class Metrics:
         self.UsageTotal      = 0
         self.UsageCount      = 0
         self.Groundings      = 0
+        self.GroundedSum     = 0
         self.Inefficiencies  = 0
         self.Scheduled       = 0
         self.Violations      = 0
@@ -64,14 +65,15 @@ class Metrics:
                 under.append(drift.days)
             else:
                 optimal.append(drift.days)
-        
+
         self.Groundings = len(over)
+        self.GroundedSum = sum(over)
         self.Inefficiencies = len(under)
         self.Optimal = len(optimal)
         self.Violations = len(self.algorithm.drift)-len(optimal)
         self.ExtendedGround = sum(n > 7 for n in over)
-        self.AverageGround = sum(over)/len(over) if len(over) > 0 else 0
-            
+        self.AverageGround = sum(over)*1.0/len(over) if len(over) > 0 else 0
+
     def availability(self):
         from collections import Counter
         counts = []
@@ -82,8 +84,8 @@ class Metrics:
         availables = ""
         for i in range(0, self.NumberOfAssets+1):
             availables += "," + str(counter[i]) if i in counter else ",0"
-        return availables    
-    
+        return availables
+
     def console(self):
         print str.ljust("Scheduled:", 10), str.ljust(str(self.Scheduled), 10), \
               str.ljust("Optimal:", 10), str.ljust(str(self.Optimal), 10), \
@@ -91,9 +93,10 @@ class Metrics:
               str.ljust("Grounding:", 10), str.ljust(str(self.Groundings), 10), \
               str.ljust("Inefficiency:", 10), str.ljust(str(self.Inefficiencies), 10) + "\n" + \
               str.ljust("Manhours:", 10), str.ljust(str(self.Manhours), 10), \
-              str.ljust("Average:", 10), str.ljust(str(self.AverageGround) + " days", 10), \
+              str.ljust("Average:", 10), str.ljust("{0:.1f}".format(self.AverageGround) + " days", 10), \
               str.ljust("Usage:", 10), str.ljust(str(self.Usage), 10), \
-              str.ljust("Extended:", 10), str.ljust(str(self.ExtendedGround), 10) + "\n"
+              str.ljust("Extended:", 10), str.ljust(str(self.ExtendedGround), 10), \
+              str.ljust("Sort:", 5), str.ljust(self.Sort, 5) + "\n"
     
     def writeout(self):
         """Write out metrics to a file."""
@@ -105,17 +108,17 @@ class Metrics:
             header = ""
             for n in range(0, self.NumberOfAssets+1):
                 header += "," + str(self.NumberOfAssets - n) + " Avail."
-            csv = "Algorithm,Data,Weight,Sort,Manhours,Groundings,Inefficiencies,Scheduled," + \
-                  "Violations,Optimal,Average,Usage,Total Usage,Extended Grounding" + \
+            csv = "Algorithm,Data,Weight,Sort,Manhours,Ground Days,Groundings,Inefficiencies,Scheduled," + \
+                  "Violations,Optimal,Average,Usage,Usage Days,Extended Grnd" + \
                   header + ",Forced" + "\n"
         else: 
             csv = ""
         csv += self.Algorithm       + "," + str(self.Data)           + "," + \
                str(self.Weight)     + "," + str(self.Sort)           + "," + \
-               str(self.Manhours)   + "," + \
+               str(self.Manhours)   + "," + str(self.GroundedSum)    + "," + \
                str(self.Groundings) + "," + str(self.Inefficiencies) + "," + \
                str(self.Scheduled)  + "," + str(self.Violations)     + "," + \
-               str(self.Optimal)    + "," + str(self.AverageGround)  + "," + \
+               str(self.Optimal)    + "," + "{0:.2f}".format(self.AverageGround) + "," + \
                str(self.Usage)      + "," + str(self.UsageTotal)     + "," + \
                str(self.ExtendedGround) + self.availability() + "," + str(self.Forced) + "\n"
         fo.write(csv)

@@ -11,19 +11,19 @@ if __name__ == "__main__":
     relax   = sys.argv[4] if len(sys.argv)>4 else  3
     sort    = sys.argv[5] if len(sys.argv)>5 else '+'
     batch   = sys.argv[6] if len(sys.argv)>6 else  0
-    
+
     """"Initialize metrics."""
     metrics = metrics.Metrics()
 
     """Construct the model."""
     model = inputs.Inputs(counter, metrics, algo, batch).model
-    
+
     """Feed the model to the algorithm."""
     algorithm = algorithms.Algos(model, weight, relax, sort).algorithm
-    
+
     """Run metrics."""
     metrics.run(algorithm)
-    
+
     """Test scheduling output."""
     if algorithm.results.conf.testing:
         test = Tests(algorithm)

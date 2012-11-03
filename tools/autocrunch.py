@@ -11,7 +11,7 @@ if __name__ == "__main__":
     timer = datetime.now()
     
     """Handle command line args."""
-    batch = "--batch " + sys.argv[1] if len(sys.argv)>1 else "--batch 99"
+    batch = "--batch " + sys.argv[1] if len(sys.argv)>1 else "--batch 0"
             
     start = "--start 0"
     end   = "--end 9"

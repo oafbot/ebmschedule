@@ -18,7 +18,7 @@ metrics = metrics.Metrics()
 # ===========================================
 config.bigdata = True
 config.cap = 10
-config.batch = 100
+config.batch = 1
 
 for batch in range(0, config.batch):
     print "\nWriting initial conditions dataset No.", batch
