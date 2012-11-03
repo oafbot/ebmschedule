@@ -6,8 +6,8 @@ from objects.Task import Task
 from objects.DateRange import DateRange
 
 class Model:
-    
-    def __init__(self, count, metrics, config=Config()):                   
+
+    def __init__(self, count, metrics, config=Config(), batch=0):
         self.conf    = config
         self.name    = "Simple-Model"        
         self.trace   = self.conf.trace
@@ -15,6 +15,7 @@ class Model:
         self.start   = self.conf.start
         self.end     = self.conf.end
         self.hours   = self.conf.hours
+        self.batch   = batch
         self.count   = count
         self.metrics = metrics
                                
@@ -181,6 +182,6 @@ class Model:
         self.tasks = tasks.values()
         self.skills = skills.values()
       
-        conditions = InitialConditions(self.name, self.count, self.conf)
+        conditions = InitialConditions(self.name, self.count, self.conf, self.batch)
         self.schedule = conditions.set(assets, tasks, schedule)
         self.metrics.NumberOfAssets = len(assets)

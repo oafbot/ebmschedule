@@ -18,11 +18,13 @@ metrics = metrics.Metrics()
 # ===========================================
 config.bigdata = True
 config.cap = 10
+config.batch = 100
 
-
-if(config.bigdata): 
-    from inputs.BigModel import BigModel   
-    model = BigModel(0, metrics, config)
-else:
-    from inputs.Model import Model  
-    model = Model(0, metrics, config)
+for batch in range(0, config.batch):
+    print "\nWriting initial conditions dataset No.", batch
+    if(config.bigdata): 
+        from inputs.BigModel import BigModel   
+        model = BigModel(0, metrics, config, batch)
+    else:
+        from inputs.Model import Model  
+        model = Model(0, metrics, config, batch)

@@ -13,26 +13,28 @@ from objects.Task import Task
 from objects.DateRange import DateRange
 
 class InitialConditions:
-    def __init__(self, name, count=0, config=Config()):
+    def __init__(self, name, count=0, config=Config(), batch=0):
         self.name = name
         self.config = config
         self.reset = self.config.reset
         self.cap = self.config.cap
         self.count = count
+        self.batch = batch
         self.xml = etree.Element("Dataset")
-
+        
         if 'tools' in os.getcwd():
             self.path = "../inputs/xml/"
         else: 
             self.path = "inputs/xml/"
 
         if(self.config.fixed):
-            self.xml_file_path = self.path + self.name + "-fix.xml"
+            # num = str(self.batch) if self.batch > 0 else "\b"
+            self.xml_file_path = self.path + self.name + "-fix-" + str(self.batch) + ".xml"
         else:
             self.xml_file_path = self.path + self.name + ".xml"
             
         if(self.reset):
-            if(self.count < 1 or not self.config.fixed):                
+            if(self.count < 1 or not self.config.fixed):    
                 self.xmlfile = open(self.xml_file_path, 'wb+')            
                 self.xmlfile.write('<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n')
                 self.xmlfile.close()
@@ -76,7 +78,7 @@ class InitialConditions:
         # print (start + timedelta(seconds=random_second))
         # return (start + timedelta(seconds=random_second))       
         random_day = randrange(delta.days)
-        print self.count, start + timedelta(days=random_day, hours=8)
+        print self.batch, self.count, start + timedelta(days=random_day, hours=8)
         return (start + timedelta(days=random_day, hours=8))
             
     def read(self, asset, task):

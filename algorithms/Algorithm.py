@@ -5,11 +5,10 @@ from outputs.Output import Output
 class Algorithm:
     """Parent class for algorithms."""
 
-    def __init__(self, input, weight, relax, sort="on", name="Algorithm"):
+    def __init__(self, input, weight, relax, sort="+", name="Algorithm"):
         self.name       = name
         self.weight     = weight*0.10
         self.relax      = (0 - relax)*0.25
-        self.sorting    = sort
         self.totalTasks = len(input.tasks)
         self.conflicts  = 0
         self.prev       = 0
@@ -29,9 +28,13 @@ class Algorithm:
             self.output.console()
         if(input.conf.pushcal): 
             self.calendar(input)
-        if self.sorting == 'on':
+        if sort == '+':
+            self.sorting = 'On'
             self.sort(input, True)
-        elif self.sorting == 'reverse':
+        elif sort == '-':
+            self.sorting = 'Off'
+        elif sort == '!':
+            self.sorting = 'Rev'
             self.sort(input, False)
         self.main(input)
 

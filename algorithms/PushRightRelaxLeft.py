@@ -4,7 +4,7 @@ from math import ceil
 
 class PushRightRelaxLeft(Algorithm):
 
-    def __init__(self, input, weight, relax, sort='on', name="PushRight-RelaxLeft"):
+    def __init__(self, input, weight, relax, sort='+', name="PushRight-RelaxLeft"):
         Algorithm.__init__(self, input, weight, relax, sort, name)
 
     def regularSchedule(self, asset, task, input, start):
