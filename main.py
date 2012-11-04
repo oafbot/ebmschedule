@@ -10,13 +10,15 @@ if __name__ == "__main__":
     weight  = sys.argv[3] if len(sys.argv)>3 else  5
     relax   = sys.argv[4] if len(sys.argv)>4 else  3
     sort    = sys.argv[5] if len(sys.argv)>5 else '+'
-    batch   = sys.argv[6] if len(sys.argv)>6 else  0
-
+    plat    = sys.argv[6] if len(sys.argv)>6 else  1
+    trace   = sys.argv[7] if len(sys.argv)>7 else  1
+    batch   = sys.argv[8] if len(sys.argv)>8 else  0    
+    
     """"Initialize metrics."""
     metrics = metrics.Metrics()
 
     """Construct the model."""
-    model = inputs.Inputs(counter, metrics, algo, batch).model
+    model = inputs.Inputs(counter, metrics, algo, plat, trace, batch).model
 
     """Feed the model to the algorithm."""
     algorithm = algorithms.Algos(model, weight, relax, sort).algorithm

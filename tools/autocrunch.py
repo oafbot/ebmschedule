@@ -11,8 +11,9 @@ if __name__ == "__main__":
     timer = datetime.now()
     
     """Handle command line args."""
-    batch = "--batch " + sys.argv[1] if len(sys.argv)>1 else "--batch 0"
-            
+    plat  = "--plat "  + sys.argv[1] if len(sys.argv)>1 else "--plat 1"
+    batch = "--batch " + sys.argv[2] if len(sys.argv)>2 else "--batch 0"
+                
     start = "--start 0"
     end   = "--end 9"
     algos = ["--algo 0", "--algo 1"]
@@ -20,7 +21,7 @@ if __name__ == "__main__":
      
     for sort in sorts:
         for algo in algos:
-            command = "./crunch.py %s %s %s %s %s" % (algo, start, end, sort, batch)
+            command = "./crunch.py %s %s %s %s %s %s" % (algo, start, end, sort, batch, plat)
             subprocess.call(shlex.split(command))
 
     print "Executed in", str(datetime.now()-timer)[:-4] + "\a\n"

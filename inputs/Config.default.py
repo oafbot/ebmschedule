@@ -26,13 +26,16 @@ class Config:
         # =============================
         self.bigdata  = True
         self.algo     = 0     # [0: PushRight], [1: PushRight-RelaxLeft], [2: PushLeft]
+        self.platform = 1
 
         self.hours    = 8
         self.duration = "Y"   # Y : Year, M : Month, C : Custom
         
         self.trace    = False
-        self.fixed    = True  # start on a fixed day
+        self.schedout = True # output scheduling to console
         
+        self.fixed    = True  # start on a fixed day
+                
         self.pushcal  = False # Push schedule to Googe Calendar
         self.metrics  = True  # Write metrics to output file
         

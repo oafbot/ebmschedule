@@ -7,7 +7,7 @@ from objects.DateRange import DateRange
 
 class Model:
 
-    def __init__(self, count, metrics, config=Config(), batch=0):
+    def __init__(self, count, metrics, config, batch=0):
         self.conf    = config
         self.name    = "Simple-Model"        
         self.trace   = self.conf.trace

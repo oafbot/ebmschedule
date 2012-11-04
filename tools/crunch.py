@@ -15,6 +15,7 @@ if __name__ == "__main__":
     parser.add_argument('--algo',  type=int, help='The algorithm to use. 0 is PushRight, 1 is PushRightRelaxLeft')
     parser.add_argument('--sort',  type=str, help='Turn sorting on, off, or reverse')
     parser.add_argument('--batch', type=int, help='Batch process X number of initial conditions.')
+    parser.add_argument('--plat',  type=int, help='The platform to run the algorithm on.')
     
     args = vars(parser.parse_args())
 
@@ -23,6 +24,7 @@ if __name__ == "__main__":
     end   = args['end'  ] if args['end'  ] is not None else 0
     sort  = args['sort' ] if args['sort' ] is not None else 'on'
     batch = args['batch'] if args['batch'] is not None else 0
+    plat  = args['plat' ] if args['plat' ] is not None else 1
     lax   = 5 if algo == 1 else 2
     
     # weights = [0, 5, 10] if algo != 2 else [0]
@@ -49,6 +51,6 @@ if __name__ == "__main__":
                     """Vary the relaxing 25 percent to (lax-1)*25 percent."""
                     count += 1
                     print "Running", count, "out of", runs
-                    subprocess.call(["../main.py", str(algo), str(data), str(weight), str(relax), sorting, str(proc)])
+                    subprocess.call(["../main.py", str(algo), str(data), str(weight), str(relax), sorting, str(plat), str(proc)])
 
     print "Executed", runs, "runs in", str(datetime.now()-timer)[:-4] + "\a\n"

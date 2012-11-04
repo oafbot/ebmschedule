@@ -18,14 +18,15 @@ class InitialConditions:
         self.config = config
         self.reset = self.config.reset
         self.cap = self.config.cap
+        self.platform = self.config.platform
         self.count = count
         self.batch = batch
         self.xml = etree.Element("Dataset")
         
         if 'tools' in os.getcwd():
-            self.path = "../inputs/xml/"
+            self.path = "../inputs/xml/" + str(self.platform) + "/"
         else: 
-            self.path = "inputs/xml/"
+            self.path = "inputs/xml/" + str(self.platform) + "/"
 
         if(self.config.fixed):
             # num = str(self.batch) if self.batch > 0 else "\b"
