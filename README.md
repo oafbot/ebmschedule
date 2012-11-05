@@ -1,5 +1,10 @@
 EBM Scheduler
 =============
+## Purpose
+Optimization algorithms to solve the general problem of Optimal Maintenance Scheduling for 
+Aircraft or other types of vehicles when there are limited resources available to deliver such 
+maintenance to a fleet of aircraft or other kind of bundle of vehicles. 
+
 ## Algorithms
 #### PushToRight:
 If there are conflicts on the scheduled day, try to schedule by pushing one day forward.
