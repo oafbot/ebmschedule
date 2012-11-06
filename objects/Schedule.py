@@ -17,6 +17,8 @@ class Schedule:
         self.hoursPerDay     = hours
         self.forced          = []        
         self.cal             = None
+        # self.metrics         = metrics
+        self.metrics = {}
         
     def force(self, asset, task, dateRange):
         """Force an asset to be scheduled for specified task to be performed."""
@@ -163,6 +165,10 @@ class Schedule:
             """Tally manhours."""
             if date <= self.dateRange.end and date >= self.dateRange.start:
                 self.totalManhours += task.manhours
+                
+                if (asset.id,task.id) not in self.metrics:                    
+                    self.metrics.update({(asset.id,task.id):0})
+                self.metrics[(asset.id,task.id)] += task.manhours
         
         """Call Google Calendar scheduler."""
         from inputs.Config import Config
