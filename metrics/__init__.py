@@ -82,7 +82,7 @@ class Metrics:
                 counts.append(len(self.Available[date]))
         counter = Counter(counts)
         availables = ""
-        for i in range(0, self.NumberOfAssets+1):
+        for i in reversed(range(0, self.NumberOfAssets+1)):
             availables += "," + str(counter[i]) if i in counter else ",0"
         return availables
 
@@ -106,11 +106,11 @@ class Metrics:
         fo = open(path + self.DataSource + ".csv", "ab+")
         if os.stat(path + self.DataSource + ".csv")[6]==0:
             header = ""
-            for n in range(0, self.NumberOfAssets+1):
+            for n in reversed(range(0, self.NumberOfAssets+1)):
                 header += "," + str(self.NumberOfAssets - n) + " Avail."
             csv = "Algorithm,Data,Weight,Sort,Manhours,Ground Days,Groundings,Inefficiencies,Scheduled," + \
                   "Violations,Optimal,Average,Usage,Usage Days,Extended Grnd" + \
-                  header + ",Forced" + "\n"
+                  header + "\n"
         else: 
             csv = ""
         csv += self.Algorithm       + "," + str(self.Data)           + "," + \
@@ -120,6 +120,6 @@ class Metrics:
                str(self.Scheduled)  + "," + str(self.Violations)     + "," + \
                str(self.Optimal)    + "," + "{0:.2f}".format(self.AverageGround) + "," + \
                str(self.Usage)      + "," + str(self.UsageTotal)     + "," + \
-               str(self.ExtendedGround) + self.availability() + "," + str(self.Forced) + "\n"
+               str(self.ExtendedGround) + self.availability() + "\n"
         fo.write(csv)
         fo.close()

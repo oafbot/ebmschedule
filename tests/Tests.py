@@ -45,7 +45,8 @@ class Tests:
                             SortedByTask[Index(Asset=asset.id, Task=task.id)] = []
                         
                 for t in self.schedule._schedule[asset.id]:
-                    if(t.dateRange.start == date and not t.child):
+                    # if(t.dateRange.start == date and not t.child):
+                    if(t.dateRange.start == date):
                         if date not in SortedByTask[Index(Asset=asset.id, Task=t.id)]:
                             """If date is start date of task and not in the sorted list."""
                             SortedByTask[Index(Asset=asset.id, Task=t.id)].append(date)
@@ -117,7 +118,7 @@ class Tests:
                     prev = task.end(date)
                 else:
                     prev = date
-        self.average = sum(self.grounded)/len(self.grounded) if len(self.grounded) > 0 else 0
+        self.average = sum(self.grounded)*1.0/len(self.grounded) if len(self.grounded) > 0 else 0
                     
     
     def console(self, type, args):

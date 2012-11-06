@@ -54,9 +54,7 @@ class PushRightRelaxLeft(Algorithm):
                     task.interval += int(ceil(task.interval * self.relax))
 
                 if task.concurrent or not task.withinInterval(input.schedule, asset, start, self.stupid):
-                    """Concurrent task inherits the interval of its parent task."""
-                    # if(task.concurrent): 
-                    #     task.interval = primary.interval
+                    """Concurrent tasks always inherit the interval of its parent task."""
                     task.interval = orig
                     self.totalScheduled += 1
                     """Add to schedule."""
@@ -73,16 +71,18 @@ class PushRightRelaxLeft(Algorithm):
                     end = start
 
             start = primary.next(asset, end)
-
-    def shift(self, asset, task, start, orig, interval, schedule):
-        relaxing = timedelta(days=int(ceil(interval * self.relax)))  
-        floor = start + relaxing if self.relax > -1.0 else start + relaxing + timedelta(days=2)
+        
+    def shift(self, asset, task, start, orig, interval, schedule): 
+        relax = start + timedelta(days=int(ceil(interval * self.relax)))
+        # last  = self.last(asset, task)
+        # print relax, last
+        floor = relax if relax > start - timedelta(days=interval) else relax + timedelta(days=2)       
+        # print floor
         push  = False
         schedule.used = False
-        last = self.schedule.last(asset, task) if not None else asset.start
-
+        
         while(schedule.blocked(asset, task, start, self.stupid)):
-            if start > floor and not push and floor > asset.start:
+            if start - timedelta(days=1) > floor and not push:
                 """Adjust the interval so it doesn't stumble on the interval check."""
                 task.interval = interval + int(ceil(interval * self.relax))
                 start -= timedelta(days=1)

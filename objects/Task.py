@@ -99,7 +99,7 @@ class Task:
         _task.locked = True
         return _task
 
-    def checkConstraints(self, bundle, asset, input):
+    def checkConstraints(self, bundle, asset, input, prime=False):
         """Check the constrains and bundle tasks together when appropriate."""
         if self.prereq: bundle = self.satisfyRequisite(bundle, asset, input)
         """Prerequisite task."""
@@ -107,7 +107,7 @@ class Task:
         """Preparatorytask."""
         if not bundle or self not in bundle: 
             """Primary task."""
-            self.primary = True
+            self.primary = True if prime else False
             bundle.append(self)
         if self.concur: bundle = self.concurrence(bundle, asset, input)
         """Concurrent task."""
@@ -155,10 +155,11 @@ class Task:
                 if t.id == c:
                     t.concurrent = True
                     concurlist.append(t)
-        """Check if tasks are already in the Bundle."""
+        
         for concurrent in concurlist:
-            if concurrent in bundle: tasks_set = True
-            else: tasks_set = False
+            """Check if tasks are already in the Bundle."""
+            tasks_set = True if concurrent in bundle else False
+        
         for concurrent in concurlist:
             """If all tasks are in the bundle return the bundle."""
             if tasks_set and self in bundle:
@@ -172,10 +173,11 @@ class Task:
             for task in input.tasks:
                 if task.id == t:
                     task.child = True
-                    if type == "subseq": task.subsequent = True
-                    elif type == "prep": task.preparatory = True
-                    task.checkConstraints(bundle, asset, input)
-                    if bundle and task not in bundle: return bundle.append(task)
+                    task.primary = False
+                    task.subsequent = True if type == "subseq" else False 
+                    task.preparatory = True if type == "prep"  else False
+                    bundle = task.checkConstraints(bundle, asset, input)
+                    # if bundle and task not in bundle: return bundle.append(task)
         return bundle
 
     def unbundle(self, bundle):

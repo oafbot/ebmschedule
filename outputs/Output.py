@@ -36,7 +36,6 @@ class Output:
                 if task.id is not 0:
                     print "Task:            ", task.name
                     print "ID:              ", task.id
-                    print "Unit:            ", task.unit
                     print "Threshold:       ", task.threshold
                     print "Interval:        ", task.interval
                     print "Days:            ", task.days
@@ -119,6 +118,7 @@ class Output:
             if self.input.bigdata:
                 if algorithm.prev != asset.name: print ""
                 print str.ljust(asset.name, 8), str.ljust(task.name, 96), \
+                str.ljust(str(task.interval), 8), \
                 str.ljust(str(start)[:-9], 10), "--", \
                 str.ljust(str(end)[:-9], 10)
                 # str.ljust(str(task.score), 8), \

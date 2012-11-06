@@ -23,7 +23,7 @@ class Algorithm:
         self.totalScheduled = 0
 
         if(self.relax < 0):
-            self.name += "["+str(abs(self.relax))+"]"
+            self.name += "["+"{0:.2f}".format(abs(self.relax))+"]"
         if(input.trace): 
             self.output.console()
         if(input.conf.pushcal): 
@@ -63,7 +63,7 @@ class Algorithm:
                     """
                     start = task.next(asset, self.schedule.last(asset, task))
                     start = max(start, self.schedule.dateRange.start)
-                    bundle = task.checkConstraints(list(), asset, input)
+                    bundle = task.checkConstraints(list(), asset, input, True)
                     if len(bundle) > 1 and task.id not in self.skip:
                         self.bundleSchedule(bundle, asset, input, task, start)
                     elif task.id not in self.skip:
@@ -161,3 +161,8 @@ class Algorithm:
         if(start < self.schedule.dateRange.end):
             self.drift.append(start - orig)
 
+    def last(self, asset, task): 
+        if task.id == 0: 
+            return self.schedule.last(asset, task.primary)
+        else: 
+            return self.schedule.last(asset, task)
