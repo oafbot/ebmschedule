@@ -17,8 +17,6 @@ class Schedule:
         self.hoursPerDay     = hours
         self.forced          = []        
         self.cal             = None
-        # self.metrics         = metrics
-        self.metrics = {}
         
     def force(self, asset, task, dateRange):
         """Force an asset to be scheduled for specified task to be performed."""
@@ -52,13 +50,13 @@ class Schedule:
             
             if (date.date() in self._assetsInWork.keys() and len(
                set(self._assetsInWork[date.date()]).difference([asset.id])) >= self.maxAssetsInWork):
-                    # print "Asset"
                     return True
             
             if (date.date(), asset.id) in self.usage.dates:
                 usage = self.usage.dates[(date.date(), asset.id)]
                 if usage > self.hoursPerDay:
-                    # print "Usage"
+                    self.used_date = date.date()
+                    self.used_asset = asset.id
                     self.used = True
                     return True
             else:
@@ -84,15 +82,16 @@ class Schedule:
                     if (task.id != 0 and date in self._skillsInWork.keys() and
                        skill.id in self._skillsInWork[date].keys() and
                        self._skillsInWork[date][skill.id] + hours > available):
-                            # print "Skills"
-                            if usage > 0: self.used = True
+                            if usage > 0: 
+                                self.used_date = date.date()
+                                self.used_asset = asset.id
+                                self.used = True
                             return True
             
             if (asset.id in self._conflictTasks.keys() and
                 date in self._conflictTasks[asset.id].keys()):
                     """Check if there are conflicts."""
                     if task.id in self._conflictTasks[asset.id][date]:
-                        # print "conflict"
                         return True
                     """Catch outside case where task is a Meta-task."""                    
                     if task.id == 0:                        
@@ -101,16 +100,13 @@ class Schedule:
                             meta.remove('')
                         for meta_id in meta:
                             if int(meta_id) in self._conflictTasks[asset.id][date]: 
-                                # print "conflict bundle"
                                 return True
             
             if task.id != 0 and task.withinInterval(self, asset, date, stupidity):
                 """If not a metatask check if task falls within the interval."""
-                # print "interval"
                 return True
             elif task.id == 0 and task.primary.withinInterval(self, asset, date, stupidity):
                 """If a metatask, check if the primary task falls within the interval."""
-                # print "interval bundle"
                 return True
                                                            
         return False

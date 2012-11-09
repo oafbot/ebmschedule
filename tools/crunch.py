@@ -16,6 +16,7 @@ if __name__ == "__main__":
     parser.add_argument('--sort',  type=str, help='Turn sorting on, off, or reverse')
     parser.add_argument('--batch', type=int, help='Batch process X number of initial conditions.')
     parser.add_argument('--plat',  type=int, help='The platform to run the algorithm on.')
+    parser.add_argument('--trace', action="store_true", default=False, help='Trace data on console.')
     
     args = vars(parser.parse_args())
 
@@ -24,12 +25,12 @@ if __name__ == "__main__":
     end   = args['end'  ] if args['end'  ] is not None else 0
     sort  = args['sort' ] if args['sort' ] is not None else 'on'
     batch = args['batch'] if args['batch'] is not None else 0
-    plat  = args['plat' ] if args['plat' ] is not None else 1
-    trace = args['trace'] if args['trace'] is not None else 1
+    plat  = args['plat' ] if args['plat' ] is not None else 1    
+    trace = 1 if args['trace'] is True else 0
     lax   = 5 if algo == 1 else 2
     
     # weights = [0, 5, 10] if algo != 2 else [0]
-    weights = [0, 2, 4, 6, 8, 10] if algo != 2 else [0]
+    weights = [0, 2, 4, 6, 8, 10] if sort != "off" else [0]
     count = 0
     runs  = len(range(0, batch+1)) * len(range(start, end+1)) * len(weights) * len(range(1, lax))
     timer = datetime.now()
@@ -51,7 +52,8 @@ if __name__ == "__main__":
                 for relax in range(1, lax):
                     """Vary the relaxing 25 percent to (lax-1)*25 percent."""
                     count += 1
-                    print "Running", count, "out of", runs
+                    status = "Running " + str(count) + " out of " + str(runs) + " "
+                    print status + "-" * (110-len(status))
                     subprocess.call(["../main.py", str(algo), str(data), str(weight), str(relax), 
                                     sorting, str(plat), str(trace), str(proc)])
 

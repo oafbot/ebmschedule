@@ -74,15 +74,13 @@ class PushRightRelaxLeft(Algorithm):
         
     def shift(self, asset, task, start, orig, interval, schedule): 
         relax = orig + timedelta(days=int(ceil(interval * self.relax)))
-        last  = orig - timedelta(days=interval)
-        
+        last  = orig - timedelta(days=interval)        
         floor = relax if relax > last else relax + timedelta(days=1)
-        # print "start:", schedule.dateRange.start
+        
         if floor < schedule.dateRange.start:
             floor = schedule.dateRange.start
-        # print "relax:",relax,"last:", last
-        # print "floor:",floor
-        push  = False
+
+        push = False
         schedule.used = False
         
         while(schedule.blocked(asset, task, start, self.stupid)):
@@ -100,6 +98,6 @@ class PushRightRelaxLeft(Algorithm):
                 start += timedelta(days=1)
                 self.conflicts += 1
                 # print "push"
-        self.recordInterval(start, orig)
         self.usageViolation(start, orig, schedule, asset)
+        self.recordInterval(start, orig)
         return start

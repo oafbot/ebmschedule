@@ -17,10 +17,10 @@ class Tests:
         self.total     = 0
         self.stopwatch = datetime.now()
         """Check intervals."""
-        # self.IntervalCheck()
+        self.IntervalCheck()
         
-        for index in self.schedule.metrics:
-            print str(index)+":", str(self.schedule.metrics[index])+","
+        # for index in self.schedule.metrics:
+        #     print str(index)+":", str(self.schedule.metrics[index])+","
             
     
     def IntervalCheck(self):

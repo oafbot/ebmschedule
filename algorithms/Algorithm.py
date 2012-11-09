@@ -49,7 +49,7 @@ class Algorithm:
             task.score = (self.weight * self.totalhours(task, input.tasks)) + ((1.0-self.weight)*
                          (self.totalconflicts(task, input.tasks)*1.0 / self.totalTasks))
         input.tasks.sort(key=lambda task:task.score, reverse=order)
-
+            
     def main(self, input):
         """Schedule tasks for each asset."""
         for task in input.tasks:
@@ -152,17 +152,13 @@ class Algorithm:
 
     def usageViolation(self, date, original, schedule, asset):
         """Record usage violations."""
-        if date > original and schedule.used and date not in asset.violation:
-            asset.violation.update([date])
+        if date > original and original.date() < schedule.used_date and schedule.used and original not in asset.violation:
+            asset.violation.update([original])
             schedule.totalUsage += 1
+            # print "                ", schedule.used_asset, schedule.used_date
+            # print "USAGE VIOLATION:", asset.id, original.date(), date.date()
 
     def recordInterval(self, start, orig):
         """Record the days that """
         if(start < self.schedule.dateRange.end):
             self.drift.append(start - orig)
-
-    def last(self, asset, task): 
-        if task.id == 0: 
-            return self.schedule.last(asset, task.primary)
-        else: 
-            return self.schedule.last(asset, task)
