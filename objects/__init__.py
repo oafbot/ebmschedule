@@ -2,7 +2,8 @@ class Asset:
     def __init__(self, id, name, start):
         self.id    = id
         self.name  = name
-        self.start = start        
+        self.start = start
+        self.score = 0        
         self.violation = set() # usage violation
     
     def __contains__(self, assets): 

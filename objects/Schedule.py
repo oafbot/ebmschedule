@@ -4,18 +4,21 @@ class Schedule:
         from objects import Usage
         self.dataSource      = dataSource
         self.dateRange       = dateRange
+        self.hoursPerDay     = hours
         self.maxAssetsInWork = maxAssetsInWork        
         self._schedule       = {}	# assets >> tasks
         self._assetsInWork   = {}   # date   >> assets
         self._skillsInWork   = {}   # date   >> skills
         self._scheduledTasks = {}   # assets >> date >> tasks
         self._conflictTasks  = {}   # assets >> date >> conflicts
+        self.metrics         = {}
+        self.forced          = []
         self.usage           = Usage()
         self.used            = False
+        self.used_date       = None
+        self.used_asset      = None
         self.totalUsage      = 0
-        self.totalManhours   = 0
-        self.hoursPerDay     = hours
-        self.forced          = []        
+        self.totalManhours   = 0        
         self.cal             = None
         
     def force(self, asset, task, dateRange):

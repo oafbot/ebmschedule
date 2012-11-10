@@ -14,13 +14,13 @@ class PushRightRelaxLeft(Algorithm):
         Keep Shifting one day forward as long as a schedule conflict exists.
         """
         original = task.interval
-        while(start <= input.schedule.dateRange.end):
-            start = self.shift(asset, task, start, start, original, input.schedule)
+        while(start <= self.endDate):
+            start = self.shift(asset, task, start, start, original)
 
-            if not task.withinInterval(input.schedule, asset, start, self.stupid):
+            if not task.withinInterval(self.schedule, asset, start, self.stupid):
                 task.interval = original
                 self.totalScheduled += 1
-                end = input.schedule.add(asset, task, start)
+                end = self.schedule.add(asset, task, start)
                 self.console(asset, task, input, start, end)
             else:
                 task.interval = original
@@ -38,8 +38,8 @@ class PushRightRelaxLeft(Algorithm):
         metatask = primary.bundleAsTask(bundle, asset)
         original = primary.interval
 
-        while(start <= input.schedule.dateRange.end):
-            start = self.shift(asset, metatask, start, start, original, input.schedule)
+        while(start <= self.endDate):
+            start = self.shift(asset, metatask, start, start, original)
 
             self.remainder_hours = 0            # The hours carried over from the preceding task
             self.maxhours = primary.hoursPerDay # The work hours in a day
@@ -53,12 +53,12 @@ class PushRightRelaxLeft(Algorithm):
                 if(task.interval + int(ceil(task.interval * self.relax)) > 0):
                     task.interval += int(ceil(task.interval * self.relax))
 
-                if task.concurrent or not task.withinInterval(input.schedule, asset, start, self.stupid):
+                if task.concurrent or not task.withinInterval(self.schedule, asset, start, self.stupid):
                     """Concurrent tasks always inherit the interval of its parent task."""
                     task.interval = orig
                     self.totalScheduled += 1
                     """Add to schedule."""
-                    end = input.schedule.add(asset, task, start)
+                    end = self.schedule.add(asset, task, start)
                     self.console(asset, task, input, start, end)
                     """Claculate the start and end dates."""
                     dates = self.calc(task, start, end)
@@ -72,24 +72,22 @@ class PushRightRelaxLeft(Algorithm):
 
             start = primary.next(asset, end)
         
-    def shift(self, asset, task, start, orig, interval, schedule): 
+    def shift(self, asset, task, start, orig, interval): 
+        """If the optimal day for scheduling is blocked, try to schedule prior, if not later."""
         relax = orig + timedelta(days=int(ceil(interval * self.relax)))
         last  = orig - timedelta(days=interval)        
         floor = relax if relax > last else relax + timedelta(days=1)
+        push  = False
         
-        if floor < schedule.dateRange.start:
-            floor = schedule.dateRange.start
-
-        push = False
-        schedule.used = False
+        if floor < self.startDate:
+            floor = self.startDate
         
-        while(schedule.blocked(asset, task, start, self.stupid)):
+        while(self.schedule.blocked(asset, task, start, self.stupid)):
             if start - timedelta(days=1) > floor and not push:
                 """Adjust the interval so it doesn't stumble on the interval check."""
                 task.interval = interval + int(ceil(interval * self.relax))
                 start -= timedelta(days=1)
                 self.conflicts += 1
-                # print "shove" 
             else:
                 if start < orig:
                     start = orig
@@ -97,7 +95,7 @@ class PushRightRelaxLeft(Algorithm):
                 task.interval = interval
                 start += timedelta(days=1)
                 self.conflicts += 1
-                # print "push"
-        self.usageViolation(start, orig, schedule, asset)
+                
+        self.usageViolation(start, orig, asset)
         self.recordInterval(start, orig)
         return start

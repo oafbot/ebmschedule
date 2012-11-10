@@ -9,18 +9,20 @@ class Algorithm:
         self.name       = name
         self.weight     = weight*0.10
         self.relax      = (0 - relax)*0.25
-        self.totalTasks = len(input.tasks)
-        self.conflicts  = 0
-        self.prev       = 0
-        self.output     = Output(input)
-        self.stopwatch  = datetime.now()
-        self.skip       = set()
-        self.forced     = 0
         self.metrics    = input.metrics
         self.schedule   = input.schedule
+        self.output     = Output(input)
         self.stupid     = input.conf.stupid
-        self.drift      = []
+        self.startDate  = self.schedule.dateRange.start
+        self.endDate    = self.schedule.dateRange.end
+        self.totalTasks = len(input.tasks)
         self.totalScheduled = 0
+        self.conflicts  = 0
+        self.prev       = 0
+        self.forced     = 0
+        self.drift      = []
+        self.skip       = set()
+        self.stopwatch  = datetime.now()
 
         if(self.relax < 0):
             self.name += "["+"{0:.2f}".format(abs(self.relax))+"]"
@@ -43,13 +45,21 @@ class Algorithm:
         Prioritize the tasks that require higher percentage of resources.
         How many of the skills for the task are available.
         Divide manhours cost with total available manhours.
-        Schedule the complex ( i.e. conflict heavy ) task first.
+        Schedule the complex conflict heavy task first.
         """
         for task in input.tasks:
             task.score = (self.weight * self.totalhours(task, input.tasks)) + ((1.0-self.weight)*
                          (self.totalconflicts(task, input.tasks)*1.0 / self.totalTasks))
         input.tasks.sort(key=lambda task:task.score, reverse=order)
-            
+
+        for asset in input.assets:
+            """Prioritize the assets that have usage constraints in the more imminent future."""
+            for index in usage:
+                if asset.id in index:
+                    d = (index.Date - (self.startDate.date()-timedelta(days=1))).days
+                    asset.score += (0.9**int(d))*(1)
+        input.assets.sort(key=lambda asset:asset.score, reverse=True)
+                    
     def main(self, input):
         """Schedule tasks for each asset."""
         for task in input.tasks:
@@ -62,7 +72,7 @@ class Algorithm:
                       B. The start date of the given date range.
                     """
                     start = task.next(asset, self.schedule.last(asset, task))
-                    start = max(start, self.schedule.dateRange.start)
+                    start = max(start, self.startDate)
                     bundle = task.checkConstraints(list(), asset, input, True)
                     if len(bundle) > 1 and task.id not in self.skip:
                         self.bundleSchedule(bundle, asset, input, task, start)
@@ -111,7 +121,7 @@ class Algorithm:
         """If the task takes takes longer than the workday, carry over."""
         if self.longest <= self.maxhours:
             hours = self.longest
-            if hours + self.remainder_hours >= self.maxhours: 
+            if hours + self.remainder_hours >= self.maxhours:
                 self.overhours = True
         else: hours = self.longest % self.maxhours
         """Determine the hours remaining on a task that need to be carried over."""
@@ -150,15 +160,19 @@ class Algorithm:
             self.schedule.cal = Calendar()
         self.schedule.cal.Connect(input)
 
-    def usageViolation(self, date, original, schedule, asset):
+    def usageViolation(self, date, original, asset):
         """Record usage violations."""
-        if date > original and original.date() < schedule.used_date and schedule.used and original not in asset.violation:
-            asset.violation.update([original])
-            schedule.totalUsage += 1
-            # print "                ", schedule.used_asset, schedule.used_date
-            # print "USAGE VIOLATION:", asset.id, original.date(), date.date()
+        if(date > original and original not in asset.violation and self.schedule.used):
+            if(self.schedule.used_date is not None and original.date() < self.schedule.used_date):
+                asset.violation.update([original])
+                self.schedule.totalUsage += 1
+                # print "                ", schedule.used_asset, schedule.used_date
+                # print "USAGE VIOLATION:", asset.id, original.date(), date.date()
+        self.schedule.used = False
+        self.schedule.used_date  = None
+        self.schedule.used_asset = None
 
     def recordInterval(self, start, orig):
-        """Record the days that """
-        if(start < self.schedule.dateRange.end):
+        """Record the drift in days from the optimal scheduling day."""
+        if(start < self.endDate):
             self.drift.append(start - orig)

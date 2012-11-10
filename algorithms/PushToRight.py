@@ -12,22 +12,21 @@ class PushToRight(Algorithm):
         While the start date is within the date range,
         Keep Shifting one day forward as long as a schedule conflict exists.
         """
-        while(start <= input.schedule.dateRange.end):
-            input.schedule.used = False
+        while(start <= self.endDate):
             origin = start
                         
-            while(input.schedule.blocked(asset, task, start, self.stupid)):
+            while(self.schedule.blocked(asset, task, start, self.stupid)):
                 """Shift to the right one day when blocked."""
                 start += timedelta(days=1)
                 self.conflicts += 1
             
-            self.usageViolation(start, origin, input.schedule, asset)
+            self.usageViolation(start, origin, asset)
             self.recordInterval(start, origin)
             
-            if not task.withinInterval(input.schedule, asset, start, self.stupid): 
+            if not task.withinInterval(self.schedule, asset, start, self.stupid): 
                 """Add to schedule."""
                 self.totalScheduled += 1
-                end = input.schedule.add(asset, task, start)
+                end = self.schedule.add(asset, task, start)
                 self.console(asset, task, input, start, end)
             else:
                 end = start
@@ -43,16 +42,15 @@ class PushToRight(Algorithm):
         """
         metatask = primary.bundleAsTask(bundle, asset)
         
-        while(start <= input.schedule.dateRange.end):                        
-            input.schedule.used = False
+        while(start <= self.schedule.dateRange.end):
             origin = start
                         
-            while(input.schedule.blocked(asset, metatask, start, self.stupid)):
+            while(self.schedule.blocked(asset, metatask, start, self.stupid)):
                 """Shift to the right one day when blocked."""
                 start += timedelta(days=1)
                 self.conflicts += 1
             
-            self.usageViolation(start, origin, input.schedule, asset)
+            self.usageViolation(start, origin, asset)
             self.recordInterval(start, origin)
                         
             self.remainder_hours = 0             # The hours carried over from the preceding task
@@ -62,12 +60,12 @@ class PushToRight(Algorithm):
             for task in bundle:
                 """For each task in the bundle, schedule in order."""
                 self.overhours  = False
-                if task.concurrent or not task.withinInterval(input.schedule, asset, start, self.stupid):        
+                if task.concurrent or not task.withinInterval(self.schedule, asset, start, self.stupid):        
                     """Concurrent task inherits the interval of its parent task."""
                     if task.concurrent: task.interval = primary.interval                        
                     """Add to schedule."""
                     self.totalScheduled += 1
-                    end = input.schedule.add(asset, task, start)
+                    end = self.schedule.add(asset, task, start)
                     self.console(asset, task, input, start, end)                   
                     """Claculate the start and end dates."""
                     dates = self.calc(task, start, end)
