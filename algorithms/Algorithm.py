@@ -54,11 +54,15 @@ class Algorithm:
 
         for asset in input.assets:
             """Prioritize the assets that have usage constraints in the more imminent future."""
-            for index in usage:
+            for index in self.schedule.usage.dates:
                 if asset.id in index:
                     d = (index.Date - (self.startDate.date()-timedelta(days=1))).days
                     asset.score += (0.9**int(d))*(1)
-        input.assets.sort(key=lambda asset:asset.score, reverse=True)
+            print asset.score, asset.id
+        # input.assets.sort(key=lambda asset:asset.score, reverse=True)
+        
+        for score in input.assets:
+            print score.score, score.id
                     
     def main(self, input):
         """Schedule tasks for each asset."""
@@ -169,10 +173,12 @@ class Algorithm:
                 # print "                ", schedule.used_asset, schedule.used_date
                 # print "USAGE VIOLATION:", asset.id, original.date(), date.date()
         self.schedule.used = False
-        self.schedule.used_date  = None
+        self.schedule.used_date = None
         self.schedule.used_asset = None
 
     def recordInterval(self, start, orig):
         """Record the drift in days from the optimal scheduling day."""
         if(start < self.endDate):
+            # if start - orig > timedelta(days=100):
+            #     print "Hello"
             self.drift.append(start - orig)

@@ -42,7 +42,7 @@ class PushToRight(Algorithm):
         """
         metatask = primary.bundleAsTask(bundle, asset)
         
-        while(start <= self.schedule.dateRange.end):
+        while(start <= self.endDate):
             origin = start
                         
             while(self.schedule.blocked(asset, metatask, start, self.stupid)):

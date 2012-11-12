@@ -74,16 +74,19 @@ class PushRightRelaxLeft(Algorithm):
         
     def shift(self, asset, task, start, orig, interval): 
         """If the optimal day for scheduling is blocked, try to schedule prior, if not later."""
-        relax = orig + timedelta(days=int(ceil(interval * self.relax)))
-        last  = orig - timedelta(days=interval)        
-        floor = relax if relax > last else relax + timedelta(days=1)
+        relax = orig + timedelta(days=int(ceil(interval * self.relax))) + timedelta(days=1)
+        last  = orig - timedelta(days=interval) + timedelta(days=1)       
+        floor = relax if relax > last else last + timedelta(days=1)
         push  = False
         
         if floor < self.startDate:
             floor = self.startDate
         
+        # print "relax:",relax,"last:", last
+        # print "floor:",floor
+        
         while(self.schedule.blocked(asset, task, start, self.stupid)):
-            if start - timedelta(days=1) > floor and not push:
+            if start > floor and not push:
                 """Adjust the interval so it doesn't stumble on the interval check."""
                 task.interval = interval + int(ceil(interval * self.relax))
                 start -= timedelta(days=1)
