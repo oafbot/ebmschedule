@@ -104,7 +104,10 @@ class Schedule:
                         for meta_id in task.tasksInMeta():            
                             if int(meta_id) in self._conflictTasks[asset.id][date]: 
                                 # print "conflicts: bundle", meta_id,
-                                if meta_id == '252205': print asset.name, date.date(), "conflict" 
+                                from datetime import datetime
+                                if meta_id == '252205': print asset.name, date.date(), "conflict"
+                                # if asset.name == '158095' and date.date() == datetime(2013, 2, 6).date(): print self._conflictTasks[asset.id][date]
+                                        
                                 return True
 
             if task.id != 0 and task.withinInterval(self, asset, date, stupidity):

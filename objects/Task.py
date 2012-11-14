@@ -190,23 +190,35 @@ class Task:
         cf = set()
         name = ""
         threshold = 0
-        interval = 0
+        interval  = 0
+        
         for task in bundle:
-            for manpower in task.manpowers:
-                mp += task.manpowers
-
+            mp.extend(task.manpowers)
             cf.union(task.conflicts)
             name += str(task.id) + "-"
-
+                        
             if task.primary:
                 prime = task
                 interval = task.interval
                 threshold = task.threshold
 
-        metatask = Task(0, name, 1, threshold, interval, mp, cf)
+        metatask = Task(0, name, self.hoursPerDay, threshold, interval, mp, cf)
         metatask.primary = prime
+        metatask.days = self.bundleDays(bundle)
+        # print "days:", metatask.days
         return metatask
-    
+
+    def bundleDays(self, bundle):
+        """Return the number of days a bundle of tasks takes to perform."""
+        bundle_hours = []
+        for task in bundle:
+            longest = 0
+            for manpower in task.manpowers:
+                """Find the the most costly task."""
+                if manpower.hours > longest: longest = manpower.hours
+            bundle_hours.append(longest)
+        return int(ceil(sum(bundle_hours) / self.hoursPerDay))
+  
     def tasksInMeta(self):
         """Return an array of tasks associated with a meta task."""
         meta = self.name.split("-")
