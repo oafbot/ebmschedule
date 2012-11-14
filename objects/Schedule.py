@@ -61,7 +61,7 @@ class Schedule:
                     self.used_date = date.date()
                     self.used_asset = asset.id
                     self.used = True
-                    # print "usage: workhours"
+                    # print asset.name, date.date(), "usage: workhours"
                     return True
             else:
                 usage = 0
@@ -90,7 +90,7 @@ class Schedule:
                                 self.used_date = date.date()
                                 self.used_asset = asset.id
                                 self.used = True
-                                # print "usage: skills"
+                                # print asset.name, date.date(), "usage: skills"
                             return True
             
             if (asset.id in self._conflictTasks.keys() and
@@ -101,34 +101,19 @@ class Schedule:
                         return True
                     """Catch outside case where task is a Meta-task."""                    
                     if task.id == 0:                        
-                        meta = task.name.split("-")
-                        while '' in meta:
-                            meta.remove('')
-                        for meta_id in meta:
-                            # if meta_id == '252205':
-                            #     print asset.name, date.date(), self._scheduledTasks[asset.id][date]                                
-                            #     if int(meta_id) in self._conflictTasks[asset.id][date]:
-                            #         print "conflict"
-                            #     else:
-                            #         print "scheduled", date.date()
-                            
+                        for meta_id in task.tasksInMeta():            
                             if int(meta_id) in self._conflictTasks[asset.id][date]: 
-                                # print "conflicts: bundle", meta_id, 
+                                # print "conflicts: bundle", meta_id,
+                                if meta_id == '252205': print asset.name, date.date(), "conflict" 
                                 return True
-                                                                
-                        # meta_id = None
-                                
-            
+
             if task.id != 0 and task.withinInterval(self, asset, date, stupidity):
                 """If not a metatask check if task falls within the interval."""
                 return True
             elif task.id == 0 and task.primary.withinInterval(self, asset, date, stupidity):
                 """If a metatask, check if the primary task falls within the interval."""
                 return True
-        
-        # if meta_id is not None and meta_id == '252205':
-        #     print "scheduled", date.date()
-                                                           
+                                
         return False
     
     def last(self, asset, task):
@@ -144,9 +129,11 @@ class Schedule:
         if asset.id not in self._schedule:
             self._schedule[asset.id] = []
         self._schedule[asset.id].append(task)
-        
+                
         for date in task.dateRange.range():
             # date = date.date()
+            if task.id == 252205:
+                print asset.name, date.date(), "scheduled"
                         
             """Assign asset to the date."""
             if date.date() not in self._assetsInWork.keys():

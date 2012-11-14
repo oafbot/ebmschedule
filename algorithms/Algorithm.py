@@ -58,11 +58,11 @@ class Algorithm:
                 if asset.id in index:
                     d = (index.Date - (self.startDate.date()-timedelta(days=1))).days
                     asset.score += (0.9**int(d))*(1)
-            print asset.score, asset.id
-        # input.assets.sort(key=lambda asset:asset.score, reverse=True)
+            # print asset.score, asset.id
+        input.assets.sort(key=lambda asset:asset.score, reverse=True)
         
-        for score in input.assets:
-            print score.score, score.id
+        # for score in input.assets:
+        #     print score.score, score.id
                     
     def main(self, input):
         """Schedule tasks for each asset."""
@@ -86,6 +86,7 @@ class Algorithm:
         self.results = input
 
     def totalhours(self, task, tasks):
+        """Determine the total skill hours cost of a task and it's children."""
         total = self.taskcost(task)
         for t in tasks:
             if t.id in task.prep:
@@ -99,6 +100,7 @@ class Algorithm:
         return total
 
     def totalconflicts(self, task, tasks):
+        """Determine the total conflict cost of a task and it's children."""
         total = len(task.conflicts)
         for t in tasks:
             if t.id in task.prep:
@@ -166,10 +168,15 @@ class Algorithm:
 
     def usageViolation(self, date, original, asset):
         """Record usage violations."""
+        # if(date <= self.startDate + timedelta(days=14)):
+        #     print "Hello", date
         if(date > original and original not in asset.violation and self.schedule.used):
             if(self.schedule.used_date is not None and original.date() < self.schedule.used_date):
                 asset.violation.update([original])
                 self.schedule.totalUsage += 1
+                # print "Hello", date, self.startDate + timedelta(days=14)
+                if(date <= self.startDate + timedelta(days=90)):                
+                    self.metrics.Imminent += 1
                 # print "                ", schedule.used_asset, schedule.used_date
                 # print "USAGE VIOLATION:", asset.id, original.date(), date.date()
         self.schedule.used = False

@@ -206,7 +206,14 @@ class Task:
         metatask = Task(0, name, 1, threshold, interval, mp, cf)
         metatask.primary = prime
         return metatask
-
+    
+    def tasksInMeta(self):
+        """Return an array of tasks associated with a meta task."""
+        meta = self.name.split("-")
+        while '' in meta:
+            meta.remove('')
+        return meta
+        
     def withinInterval(self, schedule, asset, start, stupidcheckOn):
         """Check if a date falls within the interval period."""
         if stupidcheckOn:

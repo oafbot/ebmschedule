@@ -10,6 +10,7 @@ class Metrics:
         self.Manhours        = 0
         self.Usage           = 0
         self.UsageTotal      = 0
+        self.Imminent        = 0
         self.UsageCount      = 0
         self.Groundings      = 0
         self.GroundedSum     = 0
@@ -109,7 +110,7 @@ class Metrics:
             for n in reversed(range(0, self.NumberOfAssets+1)):
                 header += "," + str(self.NumberOfAssets - n) + " Avail."
             csv = "Algorithm,Data,Weight,Sort,Manhours,Ground Days,Groundings,Inefficiencies,Scheduled," + \
-                  "Violations,Optimal,Average,Usage,Usage Days,Extended Grnd" + \
+                  "Violations,Optimal,Average,Usage Viol.,Imminent Usg.,Planned Usg.,Extended Grnd" + \
                   header + "\n"
         else: 
             csv = ""
@@ -119,7 +120,8 @@ class Metrics:
                str(self.Groundings) + "," + str(self.Inefficiencies) + "," + \
                str(self.Scheduled)  + "," + str(self.Violations)     + "," + \
                str(self.Optimal)    + "," + "{0:.2f}".format(self.AverageGround) + "," + \
-               str(self.Usage)      + "," + str(self.UsageTotal)     + "," + \
-               str(self.ExtendedGround) + self.availability() + "\n"
+               str(self.Usage)      + "," + str(self.Imminent) + "," + \
+               str(self.UsageTotal) + "," + str(self.ExtendedGround) + \
+               self.availability() + "\n"
         fo.write(csv)
         fo.close()
