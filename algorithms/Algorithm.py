@@ -21,6 +21,7 @@ class Algorithm:
         self.prev       = 0
         self.forced     = 0
         self.drift      = []
+        self.groundings = set()
         self.skip       = set()
         self.stopwatch  = datetime.now()
 
@@ -58,11 +59,7 @@ class Algorithm:
                 if asset.id in index:
                     d = (index.Date - (self.startDate.date()-timedelta(days=1))).days
                     asset.score += (0.9**int(d))*(1)
-            # print asset.score, asset.id
         input.assets.sort(key=lambda asset:asset.score, reverse=True)
-        
-        # for score in input.assets:
-        #     print score.score, score.id
                     
     def main(self, input):
         """Schedule tasks for each asset."""
@@ -168,24 +165,21 @@ class Algorithm:
 
     def usageViolation(self, date, original, asset):
         """Record usage violations."""
-        # if(date <= self.startDate + timedelta(days=14)):
-        #     print "Hello", date
         if(date > original and original not in asset.violation and self.schedule.used):
             if(self.schedule.used_date is not None and original.date() < self.schedule.used_date):
                 asset.violation.update([original])
                 self.schedule.totalUsage += 1
-                # print "Hello", date, self.startDate + timedelta(days=14)
+                
                 if(date <= self.startDate + timedelta(days=90)):                
                     self.metrics.Imminent += 1
-                # print "                ", schedule.used_asset, schedule.used_date
-                # print "USAGE VIOLATION:", asset.id, original.date(), date.date()
+                    # print "                ", self.schedule.used_asset, self.schedule.used_date
+                    # print "USAGE VIOLATION:", asset.id, original.date(), date.date()
+        
         self.schedule.used = False
         self.schedule.used_date = None
         self.schedule.used_asset = None
 
-    def recordInterval(self, start, orig):
+    def recordInterval(self, date, orig):
         """Record the drift in days from the optimal scheduling day."""
         if(start < self.endDate):
-            # if start - orig > timedelta(days=100):
-            #     print "Hello"
-            self.drift.append(start - orig)
+            self.drift.append(date - orig)

@@ -61,7 +61,6 @@ class Schedule:
                     self.used_date = date.date()
                     self.used_asset = asset.id
                     self.used = True
-                    # print asset.name, date.date(), "usage: workhours"
                     return True
             else:
                 usage = 0
@@ -90,24 +89,17 @@ class Schedule:
                                 self.used_date = date.date()
                                 self.used_asset = asset.id
                                 self.used = True
-                                # print asset.name, date.date(), "usage: skills"
                             return True
             
             if (asset.id in self._conflictTasks.keys() and
                 date in self._conflictTasks[asset.id].keys()):
                     """Check if there are conflicts."""
                     if task.id in self._conflictTasks[asset.id][date]:
-                        # print "conflicts: primary"
                         return True
                     """Catch outside case where task is a Meta-task."""                    
                     if task.id == 0:                        
                         for meta_id in task.tasksInMeta():            
                             if int(meta_id) in self._conflictTasks[asset.id][date]: 
-                                # print "conflicts: bundle", meta_id,
-                                from datetime import datetime
-                                if meta_id == '252205': print asset.name, date.date(), "conflict"
-                                # if asset.name == '158095' and date.date() == datetime(2013, 2, 6).date(): print self._conflictTasks[asset.id][date]
-                                        
                                 return True
 
             if task.id != 0 and task.withinInterval(self, asset, date, stupidity):
@@ -133,11 +125,7 @@ class Schedule:
             self._schedule[asset.id] = []
         self._schedule[asset.id].append(task)
                 
-        for date in task.dateRange.range():
-            # date = date.date()
-            if task.id == 252205:
-                print asset.name, date.date(), "scheduled"
-                        
+        for date in task.dateRange.range():                        
             """Assign asset to the date."""
             if date.date() not in self._assetsInWork.keys():
                 self._assetsInWork[date.date()] = [asset.id]

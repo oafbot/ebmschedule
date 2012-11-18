@@ -81,12 +81,6 @@ class PushRightRelaxLeft(Algorithm):
         
         if floor < self.startDate:
             floor = self.startDate
-        
-        # print "relax:",relax,"last:", last
-        # print "floor:",floor
-        if task.id == 0:                        
-            if '252205' in task.tasksInMeta():
-                print "---------------------------", task.primary.id
                     
         while(self.schedule.blocked(asset, task, start, self.stupid)):
             if start > floor and not push:
