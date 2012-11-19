@@ -24,7 +24,10 @@ class Metrics:
         self.NumberOfAssets  = 0
         self.Forced          = 0
         self.Available       = {}
-    
+
+        self.costas = {}
+        self.anothermetric = 0
+        
     def set(self, algorithm):                
         self.algorithm = algorithm
         self.output    = self.algorithm.output
@@ -75,7 +78,19 @@ class Metrics:
         self.Violations = len(self.algorithm.drift)-len(optimal)
         self.ExtendedGround = sum(n > 7 for n in over)
         self.AverageGround = sum(over)*1.0/len(over) if len(over) > 0 else 0
-
+        
+        total = 0
+        for asset in self.costas:
+            for ground in self.costas[asset]:
+                total += self.costas[asset][ground]
+        
+        for ground in self.algorithm.groundings:
+            self.ActualGround += self.algorithm.groundings[ground]
+        
+        print total
+        print self.ActualGround
+        print self.anothermetric
+        
     def availability(self):
         from collections import Counter
         counts = []
@@ -110,7 +125,7 @@ class Metrics:
             header = ""
             for n in reversed(range(0, self.NumberOfAssets+1)):
                 header += "," + str(self.NumberOfAssets - n) + " Avail."
-            csv = "Algorithm,Data,Weight,Sort,Manhours,Ground (discrete),Ground (raw),Groundings,Inefficiencies,Scheduled," + \
+            csv = "Algorithm,Data,Weight,Sort,Manhours,Grounded Days,Ground Raw Count,Grounding Events,Inefficiencies,Scheduled," + \
                   "Violations,Optimal,Average,Usage Viol.,Imminent Usg.,Planned Usg.,Extended Grnd" + \
                   header + "\n"
         else: 

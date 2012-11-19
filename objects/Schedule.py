@@ -99,9 +99,7 @@ class Schedule:
                     """Catch outside case where task is a Meta-task."""                    
                     if task.id == 0:                        
                         for meta_id in task.tasksInMeta():            
-                            if int(meta_id) in self._conflictTasks[asset.id][date]: 
-                                if task.name == "307696-307768-144286-220960-307976-308048-" and asset.id == 165051:
-                                    print "conflict", date, int(meta_id)
+                            if int(meta_id) in self._conflictTasks[asset.id][date]:
                                 return True
 
             if task.id != 0 and task.withinInterval(self, asset, date, stupidity):
@@ -129,9 +127,7 @@ class Schedule:
                         
         for date in task.dateRange.range():                        
             """Assign asset to the date."""
-            if task.id == 144286 and asset.id == 165051:
-                print "scheduled", date
-            
+
             if date.date() not in self._assetsInWork.keys():
                 self._assetsInWork[date.date()] = [asset.id]
             elif asset.id not in self._assetsInWork[date.date()]:

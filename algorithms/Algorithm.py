@@ -21,7 +21,7 @@ class Algorithm:
         self.prev       = 0
         self.forced     = 0
         self.drift      = []
-        self.groundings = set()
+        self.groundings = {}
         self.skip       = set()
         self.stopwatch  = datetime.now()
 
@@ -171,7 +171,7 @@ class Algorithm:
                 asset.violation.update([self.schedule.used_date])
                 self.schedule.totalUsage += 1
                 
-                if(date <= self.startDate + timedelta(days=90)):                
+                if(date <= self.startDate + timedelta(days=14)):                
                     self.metrics.Imminent += 1
                     # print "                ", self.schedule.used_asset, self.schedule.used_date
                     # print "USAGE VIOLATION:", asset.id, original.date(), date.date()        
@@ -185,11 +185,19 @@ class Algorithm:
         
         if(date < self.endDate):
             self.drift.append(date - orig)
-            # print "orig:", orig, "date:", date
-            if(date > orig and (asset.id, date) not in self.groundings):
-                for ground in DateRange(orig + timedelta(days=1), date).range():
-                    # print ground
-                    self.groundings.update((asset.id, ground))
-                    self.metrics.ActualGround += 1
+
             if(date > orig):
-                print date - orig, asset.id, task.id, task.name 
+                for ground in DateRange(orig + timedelta(days=1), date).range():
+                    if((asset.id, ground) not in self.groundings):
+                        self.groundings.update({(asset.id, ground):1})
+                        # self.metrics.ActualGround += 1
+                        self.metrics.anothermetric += 1
+            
+            if(date > orig):
+                if(asset.id not in self.metrics.costas):
+                    self.metrics.costas[asset.id] = {}
+
+                for ground in DateRange(orig + timedelta(days=1), date).range():
+                    if(ground not in self.metrics.costas[asset.id]):
+                        self.metrics.costas[asset.id].update({ground:1})
+                                        
