@@ -12,8 +12,9 @@ class Metrics:
         self.UsageTotal      = 0
         self.Imminent        = 0
         self.UsageCount      = 0
-        self.Groundings      = 0
-        self.GroundedSum     = 0
+        self.ActualGround    = 0 # discrete count
+        self.Groundings      = 0 # raw count
+        self.GroundedSum     = 0 # raw count
         self.Inefficiencies  = 0
         self.Scheduled       = 0
         self.Violations      = 0
@@ -109,19 +110,28 @@ class Metrics:
             header = ""
             for n in reversed(range(0, self.NumberOfAssets+1)):
                 header += "," + str(self.NumberOfAssets - n) + " Avail."
-            csv = "Algorithm,Data,Weight,Sort,Manhours,Ground Days,Groundings,Inefficiencies,Scheduled," + \
+            csv = "Algorithm,Data,Weight,Sort,Manhours,Ground (discrete),Ground (raw),Groundings,Inefficiencies,Scheduled," + \
                   "Violations,Optimal,Average,Usage Viol.,Imminent Usg.,Planned Usg.,Extended Grnd" + \
                   header + "\n"
         else: 
             csv = ""
-        csv += self.Algorithm       + "," + str(self.Data)           + "," + \
-               str(self.Weight)     + "," + str(self.Sort)           + "," + \
-               str(self.Manhours)   + "," + str(self.GroundedSum)    + "," + \
-               str(self.Groundings) + "," + str(self.Inefficiencies) + "," + \
-               str(self.Scheduled)  + "," + str(self.Violations)     + "," + \
-               str(self.Optimal)    + "," + "{0:.2f}".format(self.AverageGround) + "," + \
-               str(self.Usage)      + "," + str(self.Imminent) + "," + \
-               str(self.UsageTotal) + "," + str(self.ExtendedGround) + \
-               self.availability() + "\n"
+        csv += self.Algorithm                       + "," + \
+               str(self.Data)                       + "," + \
+               str(self.Weight)                     + "," + \
+               str(self.Sort)                       + "," + \
+               str(self.Manhours)                   + "," + \
+               str(self.ActualGround)               + "," + \
+               str(self.GroundedSum)                + "," + \
+               str(self.Groundings)                 + "," + \
+               str(self.Inefficiencies)             + "," + \
+               str(self.Scheduled)                  + "," + \
+               str(self.Violations)                 + "," + \
+               str(self.Optimal)                    + "," + \
+               "{0:.2f}".format(self.AverageGround) + "," + \
+               str(self.Usage)                      + "," + \
+               str(self.Imminent)                   + "," + \
+               str(self.UsageTotal)                 + "," + \
+               str(self.ExtendedGround)             + \
+               self.availability()                  + "\n"
         fo.write(csv)
         fo.close()

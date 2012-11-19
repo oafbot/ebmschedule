@@ -59,7 +59,7 @@ class Algorithm:
                 if asset.id in index:
                     d = (index.Date - (self.startDate.date()-timedelta(days=1))).days
                     asset.score += (0.9**int(d))*(1)
-        input.assets.sort(key=lambda asset:asset.score, reverse=True)
+        input.assets.sort(key=lambda asset:asset.score, reverse=order)
                     
     def main(self, input):
         """Schedule tasks for each asset."""
@@ -165,21 +165,29 @@ class Algorithm:
 
     def usageViolation(self, date, original, asset):
         """Record usage violations."""
-        if(date > original and original not in asset.violation and self.schedule.used):
-            if(self.schedule.used_date is not None and original.date() < self.schedule.used_date):
-                asset.violation.update([original])
+        if(date > original and self.schedule.used and self.schedule.used_date is not None):
+            if(self.schedule.used_date not in asset.violation 
+                and original.date() < self.schedule.used_date):
+                asset.violation.update([self.schedule.used_date])
                 self.schedule.totalUsage += 1
                 
                 if(date <= self.startDate + timedelta(days=90)):                
                     self.metrics.Imminent += 1
                     # print "                ", self.schedule.used_asset, self.schedule.used_date
-                    # print "USAGE VIOLATION:", asset.id, original.date(), date.date()
-        
+                    # print "USAGE VIOLATION:", asset.id, original.date(), date.date()        
         self.schedule.used = False
         self.schedule.used_date = None
         self.schedule.used_asset = None
 
-    def recordInterval(self, date, orig):
+    def recordInterval(self, date, orig, asset):
         """Record the drift in days from the optimal scheduling day."""
-        if(start < self.endDate):
+        from objects.DateRange import DateRange
+        
+        if(date < self.endDate):
             self.drift.append(date - orig)
+            # print "orig:", orig, "date:", date
+            if(date > orig and (asset.id, date) not in self.groundings):
+                for ground in DateRange(orig + timedelta(days=1), date).range():
+                    # print ground
+                    self.groundings.update((asset.id, ground))
+                    self.metrics.ActualGround += 1

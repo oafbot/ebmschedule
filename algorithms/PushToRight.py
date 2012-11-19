@@ -21,7 +21,7 @@ class PushToRight(Algorithm):
                 self.conflicts += 1
             
             self.usageViolation(start, origin, asset)
-            self.recordInterval(start, origin)
+            self.recordInterval(start, origin, asset)
             
             if not task.withinInterval(self.schedule, asset, start, self.stupid): 
                 """Add to schedule."""
@@ -51,7 +51,7 @@ class PushToRight(Algorithm):
                 self.conflicts += 1
             
             self.usageViolation(start, origin, asset)
-            self.recordInterval(start, origin)
+            self.recordInterval(start, origin, asset)
                         
             self.remainder_hours = 0             # The hours carried over from the preceding task
             self.maxhours = primary.hoursPerDay  # The work hours in a day
@@ -70,7 +70,7 @@ class PushToRight(Algorithm):
                     """Claculate the start and end dates."""
                     dates = self.calc(task, start, end)
                     start = dates[0]
-                    end = dates[1]
+                    end   = dates[1]
                     if(task.concurrent and task.id in primary.concur 
                         and task.interval >= primary.interval): self.skip.add(task.id)
                 else:

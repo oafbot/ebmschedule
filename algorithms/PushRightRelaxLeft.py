@@ -80,7 +80,7 @@ class PushRightRelaxLeft(Algorithm):
         push  = False
         
         if floor < self.startDate:
-            floor = self.startDate
+            floor = self.startDate + timedelta(days=1)
                     
         while(self.schedule.blocked(asset, task, start, self.stupid)):
             if start > floor and not push:
@@ -97,5 +97,5 @@ class PushRightRelaxLeft(Algorithm):
                 self.conflicts += 1
                 
         self.usageViolation(start, orig, asset)
-        self.recordInterval(start, orig)
+        self.recordInterval(start, orig, asset)
         return start
