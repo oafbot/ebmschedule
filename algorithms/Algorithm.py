@@ -191,3 +191,5 @@ class Algorithm:
                     # print ground
                     self.groundings.update((asset.id, ground))
                     self.metrics.ActualGround += 1
+            if(date > orig):
+                print date - orig, asset.id, task.id, task.name 
