@@ -179,19 +179,20 @@ class Algorithm:
         self.schedule.used_date = None
         self.schedule.used_asset = None
 
-    def recordInterval(self, date, orig, asset):
+    def recordInterval(self, date, orig, asset, task):
         """Record the drift in days from the optimal scheduling day."""
         from objects.DateRange import DateRange
         
         if(date < self.endDate):
             self.drift.append(date - orig)
-
+            
             if(date > orig):
+                # print date - orig, task.name
                 for ground in DateRange(orig + timedelta(days=1), date).range():
                     if((asset.id, ground) not in self.groundings):
                         self.groundings.update({(asset.id, ground):1})
+                        # self.groundings.append((asset.id, ground))
                         # self.metrics.ActualGround += 1
-                        self.metrics.anothermetric += 1
             
             if(date > orig):
                 if(asset.id not in self.metrics.costas):

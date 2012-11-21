@@ -100,6 +100,11 @@ class Schedule:
                     if task.id == 0:                        
                         for meta_id in task.tasksInMeta():            
                             if int(meta_id) in self._conflictTasks[asset.id][date]:
+                                # if(task.name=="307709-307695-144735-307989-307975-"):
+                                #     print "conflict", meta_id, date.date()
+                                from datetime import datetime 
+                                if asset.id==165322 and date.date()==datetime(2013,10,12).date() and int(meta_id)==144735:
+                                    print self._scheduledTasks[asset.id][date]
                                 return True
 
             if task.id != 0 and task.withinInterval(self, asset, date, stupidity):
@@ -127,7 +132,10 @@ class Schedule:
                         
         for date in task.dateRange.range():                        
             """Assign asset to the date."""
-
+            # if task.id==144735 and asset.id==165322:
+            #     print "scheduled:", date
+                
+                
             if date.date() not in self._assetsInWork.keys():
                 self._assetsInWork[date.date()] = [asset.id]
             elif asset.id not in self._assetsInWork[date.date()]:
@@ -149,7 +157,9 @@ class Schedule:
                 self._scheduledTasks[asset.id][date] = [task.id]
             else:
                 self._scheduledTasks[asset.id][date].append(task.id)
-            
+                if asset.id==165322 and date.date()==datetime(2013,10,12).date() and task.id==144735:
+                    print self._scheduledTasks[asset.id][date]
+                            
             if asset.id not in self._conflictTasks.keys():
                 """Assign conflict to list of conflicts.""" 
                 self._conflictTasks[asset.id] = { date: task.conflicts }

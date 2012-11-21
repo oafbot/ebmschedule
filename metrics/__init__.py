@@ -26,7 +26,6 @@ class Metrics:
         self.Available       = {}
 
         self.costas = {}
-        self.anothermetric = 0
         
     def set(self, algorithm):                
         self.algorithm = algorithm
@@ -84,12 +83,12 @@ class Metrics:
             for ground in self.costas[asset]:
                 total += self.costas[asset][ground]
         
-        for ground in self.algorithm.groundings:
+        for ground in sorted(self.algorithm.groundings):
+            # print ground
             self.ActualGround += self.algorithm.groundings[ground]
         
         print total
         print self.ActualGround
-        print self.anothermetric
         
     def availability(self):
         from collections import Counter
