@@ -205,7 +205,6 @@ class Task:
         metatask = Task(0, name, self.hoursPerDay, threshold, interval, mp, cf)
         metatask.primary = prime
         metatask.days = self.bundleDays(bundle)
-        print "days:", metatask.days, "interval", interval
         return metatask
 
     def bundleDays(self, bundle):

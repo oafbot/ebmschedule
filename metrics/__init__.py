@@ -24,8 +24,6 @@ class Metrics:
         self.NumberOfAssets  = 0
         self.Forced          = 0
         self.Available       = {}
-
-        self.costas = {}
         
     def set(self, algorithm):                
         self.algorithm = algorithm
@@ -78,17 +76,8 @@ class Metrics:
         self.ExtendedGround = sum(n > 7 for n in over)
         self.AverageGround = sum(over)*1.0/len(over) if len(over) > 0 else 0
         
-        total = 0
-        for asset in self.costas:
-            for ground in self.costas[asset]:
-                total += self.costas[asset][ground]
-        
         for ground in sorted(self.algorithm.groundings):
-            # print ground
             self.ActualGround += self.algorithm.groundings[ground]
-        
-        print total
-        print self.ActualGround
         
     def availability(self):
         from collections import Counter

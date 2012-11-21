@@ -38,8 +38,7 @@ class Schedule:
         from datetime import timedelta
         
         _task = task.schedule(date) #Create scheduled task (prevent threading issues)
-        # self.usageflag = False
-        # meta_id = None
+
         for date in _task.dateRange.range():
             """
             difference: If Asset Foo is already in set, 
@@ -100,11 +99,6 @@ class Schedule:
                     if task.id == 0:                        
                         for meta_id in task.tasksInMeta():            
                             if int(meta_id) in self._conflictTasks[asset.id][date]:
-                                # if(task.name=="307709-307695-144735-307989-307975-"):
-                                #     print "conflict", meta_id, date.date()
-                                from datetime import datetime 
-                                if asset.id==165322 and date.date()==datetime(2013,10,12).date() and int(meta_id)==144735:
-                                    print self._scheduledTasks[asset.id][date]
                                 return True
 
             if task.id != 0 and task.withinInterval(self, asset, date, stupidity):
@@ -131,11 +125,7 @@ class Schedule:
         self._schedule[asset.id].append(task)
                         
         for date in task.dateRange.range():                        
-            """Assign asset to the date."""
-            # if task.id==144735 and asset.id==165322:
-            #     print "scheduled:", date
-                
-                
+            """Assign asset to the date."""               
             if date.date() not in self._assetsInWork.keys():
                 self._assetsInWork[date.date()] = [asset.id]
             elif asset.id not in self._assetsInWork[date.date()]:
@@ -157,8 +147,6 @@ class Schedule:
                 self._scheduledTasks[asset.id][date] = [task.id]
             else:
                 self._scheduledTasks[asset.id][date].append(task.id)
-                if asset.id==165322 and date.date()==datetime(2013,10,12).date() and task.id==144735:
-                    print self._scheduledTasks[asset.id][date]
                             
             if asset.id not in self._conflictTasks.keys():
                 """Assign conflict to list of conflicts.""" 

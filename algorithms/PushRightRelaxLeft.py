@@ -97,5 +97,5 @@ class PushRightRelaxLeft(Algorithm):
                 self.conflicts += 1
                 
         self.usageViolation(start, orig, asset)
-        self.recordInterval(start, orig, asset, task)
+        self.recordInterval(start, orig, asset)
         return start

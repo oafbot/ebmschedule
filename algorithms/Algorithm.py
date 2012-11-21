@@ -173,13 +173,12 @@ class Algorithm:
                 
                 if(date <= self.startDate + timedelta(days=14)):                
                     self.metrics.Imminent += 1
-                    # print "                ", self.schedule.used_asset, self.schedule.used_date
-                    # print "USAGE VIOLATION:", asset.id, original.date(), date.date()        
+
         self.schedule.used = False
         self.schedule.used_date = None
         self.schedule.used_asset = None
 
-    def recordInterval(self, date, orig, asset, task):
+    def recordInterval(self, date, orig, asset):
         """Record the drift in days from the optimal scheduling day."""
         from objects.DateRange import DateRange
         
@@ -187,18 +186,8 @@ class Algorithm:
             self.drift.append(date - orig)
             
             if(date > orig):
-                # print date - orig, task.name
                 for ground in DateRange(orig + timedelta(days=1), date).range():
                     if((asset.id, ground) not in self.groundings):
                         self.groundings.update({(asset.id, ground):1})
                         # self.groundings.append((asset.id, ground))
                         # self.metrics.ActualGround += 1
-            
-            if(date > orig):
-                if(asset.id not in self.metrics.costas):
-                    self.metrics.costas[asset.id] = {}
-
-                for ground in DateRange(orig + timedelta(days=1), date).range():
-                    if(ground not in self.metrics.costas[asset.id]):
-                        self.metrics.costas[asset.id].update({ground:1})
-                                        
