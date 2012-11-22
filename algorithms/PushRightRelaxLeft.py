@@ -41,9 +41,9 @@ class PushRightRelaxLeft(Algorithm):
         while(start <= self.endDate):
             start = self.shift(asset, metatask, start, start, original)
 
-            self.remainder_hours = 0            # The hours carried over from the preceding task
+            self.remainder = 0            # The hours carried over from the preceding task
             self.maxhours = primary.hoursPerDay # The work hours in a day
-            self.longest = 0                    # The task that takes the longest to perform
+            # self.longest = 0                    # The task that takes the longest to perform
 
             for task in bundle:
                 """For each task in the bundle, schedule in order."""
@@ -69,7 +69,6 @@ class PushRightRelaxLeft(Algorithm):
                 else:
                     task.interval = orig
                     end = start
-
             start = primary.next(asset, end)
         
     def shift(self, asset, task, start, orig, interval): 

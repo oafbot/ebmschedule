@@ -118,28 +118,46 @@ class Algorithm:
         return cost
 
     def calc(self, task, start, end):
-        """Find the the most costly task."""
+        """Calculate the start and end dates."""
+        longest = 0
+        """Inherit the duration of a task from its most time-intensive procedure."""
         for manpower in task.manpowers:
-            if manpower.hours > self.longest: self.longest = manpower.hours
-        """If the task takes takes longer than the workday, carry over."""
-        if self.longest <= self.maxhours:
-            hours = self.longest
-            if hours + self.remainder_hours >= self.maxhours:
-                self.overhours = True
-        else: hours = self.longest % self.maxhours
-        """Determine the hours remaining on a task that need to be carried over."""
-        if hours + self.remainder_hours == self.maxhours:
-            self.remainder_hours = 0
-        elif hours + self.remainder_hours > self.maxhours:
-            self.remainder_hours = (self.remainder_hours + hours) - self.maxhours
+            if manpower.hours > longest: longest = manpower.hours        
+        hours = self.remainder + longest
+                
+        if hours >= self.maxhours:
+            """If the tasks take longer than the workday, determine end date and remainder hours."""
+            end = start + timedelta(days=int(hours / self.maxhours))
+            self.remainder = hours % self.maxhours
         else:
-            self.remainder_hours += hours
-        """Set the start date. Push to next day if overtime."""
-        if self.overhours:
-            start = end + timedelta(days=1)
-        else: 
-            start = end
+            self.remainder = hours
+        """Set start to end of the task for the next task."""
+        start = end
         return [start, end]
+        
+        # self.longest = 0
+        # """Find the the most costly task."""
+        # for manpower in task.manpowers:
+        #     if manpower.hours > self.longest: self.longest = manpower.hours
+        # """If the task takes takes longer than the workday, carry over."""
+        # if self.longest <= self.maxhours:
+        #     hours = self.longest
+        #     if hours + self.remainder >= self.maxhours:
+        #         self.overhours = True
+        # else: hours = self.longest % self.maxhours
+        # """Determine the hours remaining on a task that need to be carried over."""
+        # if hours + self.remainder == self.maxhours:
+        #     self.remainder = 0
+        # elif hours + self.remainder > self.maxhours:
+        #     self.remainder = (self.remainder + hours) - self.maxhours
+        # else:
+        #     self.remainder += hours
+        # """Set the start date. Push to next day if overtime."""
+        # if self.overhours:
+        #     start = end + timedelta(days=1)
+        # else: 
+        #     start = end
+        # return [start, end]
 
     def console(self, asset, task, input, start, end):
         """Print out the scheduling output to the console."""

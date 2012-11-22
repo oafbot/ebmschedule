@@ -186,25 +186,33 @@ class Task:
 
     def bundleAsTask(self, bundle, asset):
         """Convert a bundle into a meta-task for running schedule calculations."""
-        mp = []
-        cf = set()
-        name = ""
-        threshold = 0
-        interval  = 0
+        from Bundle import Bundle
+        # mp = []
+        # cf = set()
+        # name = ""
+        # threshold = 0
+        # interval  = 0
+        # 
+        # for task in bundle:
+        #     mp.extend(task.manpowers)
+        #     cf.union(task.conflicts)
+        #     name += str(task.id) + "-"
+        #                 
+        #     if task.primary:
+        #         prime = task
+        #         interval = task.interval
+        #         threshold = task.threshold
+        # 
+        # metatask = Task(0, name, self.hoursPerDay, threshold, interval, mp, cf)
+        # metatask.primary = prime
+        # metatask.days = self.bundleDays(bundle)
         
-        for task in bundle:
-            mp.extend(task.manpowers)
-            cf.union(task.conflicts)
-            name += str(task.id) + "-"
-                        
-            if task.primary:
-                prime = task
-                interval = task.interval
-                threshold = task.threshold
-
-        metatask = Task(0, name, self.hoursPerDay, threshold, interval, mp, cf)
-        metatask.primary = prime
-        metatask.days = self.bundleDays(bundle)
+        # print "days:", metatask.days
+        
+        metatask = Bundle(bundle)
+        # print bun.tasks
+        # print bun.conflicts
+        
         return metatask
 
     def bundleDays(self, bundle):

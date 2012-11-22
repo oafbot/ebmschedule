@@ -38,17 +38,8 @@ class Schedule:
         from datetime import timedelta
         
         _task = task.schedule(date) #Create scheduled task (prevent threading issues)
-
+        
         for date in _task.dateRange.range():
-            """
-            difference: If Asset Foo is already in set, 
-            then take it out before running this logic. i.e. If already scheduled, 
-            one can schedule additional tasks for that asset on that day.
-            
-            LHS is the number of assets *already* scheduled, so if >= maxAssets cannot 
-            schedule any additional assets
-            """
-            # date = date.date()
             
             if (date.date() in self._assetsInWork.keys() and len(
                set(self._assetsInWork[date.date()]).difference([asset.id])) >= self.maxAssetsInWork):
@@ -64,42 +55,24 @@ class Schedule:
             else:
                 usage = 0
 
-            for skill in task.skills:                    
-                """Check if the required skills are available."""
-                for d in range(0, task.days):
-                    date += timedelta(days=d)
-                    
-                    if(task.days <= 1):
-                        """If the task can be completed in a day."""
-                        hours = skill.hours
-                    elif(d == task.days-1):
-                        """If it is the last day of a multi-day task."""
-                        hours = skill.hours % skill.hoursPerDay
-                    else:
-                        """Otherwise schedule for full workday."""
-                        hours = skill.hoursPerDay
-                    
-                    available = skill.availableHours - (usage * skill.available)    
-                    
-                    if (task.id != 0 and date in self._skillsInWork.keys() and
-                       skill.id in self._skillsInWork[date].keys() and
-                       self._skillsInWork[date][skill.id] + hours > available):
-                            if usage > 0: 
-                                self.used_date = date.date()
-                                self.used_asset = asset.id
-                                self.used = True
-                            return True
-            
-            if (asset.id in self._conflictTasks.keys() and
-                date in self._conflictTasks[asset.id].keys()):
+            # self.skillsBlocked()
+                        
+                        
+            """Check conflicts."""
+            if asset.id in self._conflictTasks.keys():                                       
+                if task.id == 0:
+                    """Catch outside case where task is a Meta-task."""                       
+                    for delta in range(0, task.days):
+                        offset = date + timedelta(days=delta)
+                        if offset in self._conflictTasks[asset.id].keys():
+                            for subtask in task.TasksMap[delta]:
+                                if subtask in self._conflictTasks[asset.id][offset]:
+                                    return True                    
+                elif(date in self._conflictTasks[asset.id].keys() and 
+                    task.id in self._conflictTasks[asset.id][date]):
                     """Check if there are conflicts."""
-                    if task.id in self._conflictTasks[asset.id][date]:
-                        return True
-                    """Catch outside case where task is a Meta-task."""                    
-                    if task.id == 0:                        
-                        for meta_id in task.tasksInMeta():            
-                            if int(meta_id) in self._conflictTasks[asset.id][date]:
-                                return True
+                    return True
+
 
             if task.id != 0 and task.withinInterval(self, asset, date, stupidity):
                 """If not a metatask check if task falls within the interval."""
