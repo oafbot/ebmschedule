@@ -53,9 +53,8 @@ class PushToRight(Algorithm):
             self.usageViolation(start, origin, asset)
             self.recordInterval(start, origin, asset)
                         
-            self.remainder_hours = 0             # The hours carried over from the preceding task
+            self.remainder = 0                   # The hours carried over from the preceding task
             self.maxhours = primary.hoursPerDay  # The work hours in a day
-            self.longest = 0                     # The task that takes the longest to perform
                                     
             for task in bundle:
                 """For each task in the bundle, schedule in order."""

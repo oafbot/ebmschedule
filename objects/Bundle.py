@@ -2,18 +2,20 @@ from Task import Task
 from math import ceil
 
 class Bundle(Task):
+    """A meta-Task class that is a wrapper for bundled tasks."""
+    
     def __init__(self, tasks):
         Task.__init__(self, 0, "", 0, 0, 0, [])
         self.tasks = tasks
         self.TasksMap = {}
+        self.SkillsMap = {}
         self.ConflictsMap = {}
-        self.ManpowersMap = {}        
         self.contents = []
-        
+                
         self.initialize(tasks)
-        self.distribute(tasks)
         self.calculateDays(tasks)
-        print self.days
+        self.distribute(tasks)
+        
 
     def initialize(self, tasks):
         for task in tasks:
@@ -24,7 +26,10 @@ class Bundle(Task):
                 self.workday = self.hoursPerDay = task.hoursPerDay
             self.name += str(task.id) + "-"
             self.contents.append(task.id)
+            self.manpowers.extend(task.manpowers) 
         self.name = self.name[:-1]
+        for manpower in self.manpowers:
+            self.manhours += manpower.hours
     
     def calculateDays(self, bundle):
         """Return the number of days a bundle of tasks takes to perform."""
@@ -44,21 +49,58 @@ class Bundle(Task):
             meta.remove('')
         return meta
     
+    def calculateSkillHours(self, task):
+        remainder = 0
+        start = 0
+        end = 0
+        
+        for day in range(0, self.days):
+            """Allocate days to the Skills array."""
+            if day not in self.SkillsMap:
+                self.SkillsMap.update({day:[]})
+            
+        for skill in task.skills:
+            """Calculate the days and the remainder."""
+            if skill.hours < self.workday:
+                remainder = skill.hours
+            else:
+                end = int(skill.hours / self.workday)
+                remainder = skill.hours % self.workday
+            """If the remainder is zero, don't apply to next day."""
+            days = range(start, end+1) if remainder > 0 else range(start, end)
+
+            for day in days:
+                """Copy skill, adjust hours and store in array."""
+                _skill = skill.copy()
+                _skill.hours = remainder if remainder > 0 else self.workday
+                self.SkillsMap[day].append(_skill)
+            start = end
+        
     def distribute(self, tasks):
         """Distribute conflicts and manpower hours to the corresponding days."""        
         remainder = 0
         start = 0
         end = 0                
-        for task in tasks:
+        for task in tasks:           
             hours = self.longest(task)
             hours = remainder + hours                        
             if hours >= self.workday:
                 end += int(hours / self.workday)
                 remainder = hours % self.workday
             else:
-                remainder = hours                                
-            start, end = self.allocate(remainder, start, end, task)
-    
+                remainder = hours
+            
+            skills = self.calculateSkillHours(task)                                
+            start, end = self.assign(remainder, start, end, task, skills)
+
+        # for day in self.TasksMap:
+        #     print day, self.TasksMap[day]
+        # for d in self.SkillsMap:
+        #     print d, ":"
+        #     for skill in self.SkillsMap[d]:
+        #         print skill.id, skill.hours
+        #     print ""
+        
     def longest(self, task):
         """Find the the most time-costly aspect of a task and return its duration."""
         longest = 0
@@ -66,15 +108,17 @@ class Bundle(Task):
             if manpower.hours > longest: longest = manpower.hours
         return longest
  
-    def allocate(self, remainder, start, end, task):
+    def assign(self, remainder, start, end, task, skills):
         """Allocate constraints to the corresponding days."""
-        days = range(start, end+1) if remainder > 0 else range(start, end) 
+        days = range(start, end+1) if remainder > 0 else range(start, end)
         
         for day in days:
-            if day not in self.conflicts:
-                self.TasksMap.update({day:[task.id]})
+            if day not in self.ConflictsMap:
                 self.ConflictsMap.update({day:task.conflicts})
             else:
-                self.TasksMap[day].append(task.id)
-                self.ConflictsMap[day].union(task.conflicts)       
+                self.ConflictsMap[day].union(task.conflicts)
+            if day not in self.TasksMap:
+                self.TasksMap.update({day:[task.id]})
+            else:
+                self.TasksMap[day].append(task.id)            
         return [end, end]

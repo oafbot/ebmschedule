@@ -207,31 +207,9 @@ class Task:
         # metatask.primary = prime
         # metatask.days = self.bundleDays(bundle)
         
-        # print "days:", metatask.days
-        
+        # print "days:", metatask.days        
         metatask = Bundle(bundle)
-        # print bun.tasks
-        # print bun.conflicts
-        
         return metatask
-
-    def bundleDays(self, bundle):
-        """Return the number of days a bundle of tasks takes to perform."""
-        bundle_hours = []
-        for task in bundle:
-            longest = 0
-            for manpower in task.manpowers:
-                """Find the the most costly task."""
-                if manpower.hours > longest: longest = manpower.hours
-            bundle_hours.append(longest)
-        return int(ceil(sum(bundle_hours) / self.hoursPerDay))
-  
-    def tasksInMeta(self):
-        """Return an array of tasks associated with a meta task."""
-        meta = self.name.split("-")
-        while '' in meta:
-            meta.remove('')
-        return meta
         
     def withinInterval(self, schedule, asset, start, stupidcheckOn):
         """Check if a date falls within the interval period."""
