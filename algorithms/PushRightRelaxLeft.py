@@ -60,11 +60,10 @@ class PushRightRelaxLeft(Algorithm):
                     end = self.schedule.add(asset, task, start)
                     self.console(asset, task, input, start, end)
                     """Claculate the start and end dates."""
-                    dates = self.calc(task, start, end)
-                    start = dates[0]
-                    end = dates[1]
-                    if(task.concurrent and task.id in primary.concur and 
-                       task.interval >= primary.interval): self.skip.add(task.id) 
+                    start, end = self.calc(task, start, end)
+                    """Skip individual scheduling for some concurrent tasks."""
+                    if task.concurrent and task.id in primary.concur:                         
+                        if task.interval >= primary.interval: self.skip.add(task.id) 
                 else:
                     task.interval = orig
                     end = start

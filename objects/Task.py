@@ -134,6 +134,7 @@ class Task:
         return bundle
 
     def requisiteSatisfied(self, input, asset, task, date=None):
+        """Checks if a prerequisite has been performed within a designated timeframe."""
         if(date==None):
             date = input.schedule.dateRange.start
         last = input.schedule.last(asset, task)
@@ -186,30 +187,8 @@ class Task:
 
     def bundleAsTask(self, bundle, asset):
         """Convert a bundle into a meta-task for running schedule calculations."""
-        from Bundle import Bundle
-        # mp = []
-        # cf = set()
-        # name = ""
-        # threshold = 0
-        # interval  = 0
-        # 
-        # for task in bundle:
-        #     mp.extend(task.manpowers)
-        #     cf.union(task.conflicts)
-        #     name += str(task.id) + "-"
-        #                 
-        #     if task.primary:
-        #         prime = task
-        #         interval = task.interval
-        #         threshold = task.threshold
-        # 
-        # metatask = Task(0, name, self.hoursPerDay, threshold, interval, mp, cf)
-        # metatask.primary = prime
-        # metatask.days = self.bundleDays(bundle)
-        
-        # print "days:", metatask.days        
-        metatask = Bundle(bundle)
-        return metatask
+        from Bundle import Bundle  
+        return Bundle(bundle)
         
     def withinInterval(self, schedule, asset, start, stupidcheckOn):
         """Check if a date falls within the interval period."""

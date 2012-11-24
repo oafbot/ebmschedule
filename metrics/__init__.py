@@ -95,7 +95,7 @@ class Metrics:
         print str.ljust("Scheduled:", 10), str.ljust(str(self.Scheduled), 10), \
               str.ljust("Optimal:", 10), str.ljust(str(self.Optimal), 10), \
               str.ljust("Violation:", 10), str.ljust(str(self.Violations), 10), \
-              str.ljust("Grounding:", 10), str.ljust(str(self.Groundings), 10), \
+              str.ljust("Grounding:", 10), str.ljust(str(self.GroundedSum), 10), \
               str.ljust("Inefficiency:", 10), str.ljust(str(self.Inefficiencies), 10) + "\n" + \
               str.ljust("Manhours:", 10), str.ljust(str(self.Manhours), 10), \
               str.ljust("Average:", 10), str.ljust("{0:.1f}".format(self.AverageGround) + " days", 10), \

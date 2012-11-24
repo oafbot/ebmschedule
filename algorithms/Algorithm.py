@@ -15,8 +15,6 @@ class Algorithm:
         self.stupid     = input.conf.stupid
         self.startDate  = self.schedule.dateRange.start
         self.endDate    = self.schedule.dateRange.end
-        self.totalTasks = len(input.tasks)
-        self.totalScheduled = 0
         self.conflicts  = 0
         self.prev       = 0
         self.forced     = 0
@@ -24,6 +22,8 @@ class Algorithm:
         self.groundings = {}
         self.skip       = set()
         self.stopwatch  = datetime.now()
+        self.totalTasks = len(input.tasks)
+        self.totalScheduled = 0
 
         if(self.relax < 0):
             self.name += "["+"{0:.2f}".format(abs(self.relax))+"]"
@@ -134,30 +134,6 @@ class Algorithm:
         """Set start to end of the task for the next task."""
         start = end
         return [start, end]
-        
-        # self.longest = 0
-        # """Find the the most costly task."""
-        # for manpower in task.manpowers:
-        #     if manpower.hours > self.longest: self.longest = manpower.hours
-        # """If the task takes takes longer than the workday, carry over."""
-        # if self.longest <= self.maxhours:
-        #     hours = self.longest
-        #     if hours + self.remainder >= self.maxhours:
-        #         self.overhours = True
-        # else: hours = self.longest % self.maxhours
-        # """Determine the hours remaining on a task that need to be carried over."""
-        # if hours + self.remainder == self.maxhours:
-        #     self.remainder = 0
-        # elif hours + self.remainder > self.maxhours:
-        #     self.remainder = (self.remainder + hours) - self.maxhours
-        # else:
-        #     self.remainder += hours
-        # """Set the start date. Push to next day if overtime."""
-        # if self.overhours:
-        #     start = end + timedelta(days=1)
-        # else: 
-        #     start = end
-        # return [start, end]
 
     def console(self, asset, task, input, start, end):
         """Print out the scheduling output to the console."""
@@ -183,10 +159,12 @@ class Algorithm:
 
     def usageViolation(self, date, original, asset):
         """Record usage violations."""
-        if(date > original and self.schedule.used and self.schedule.used_date is not None):
-            if(self.schedule.used_date not in asset.violation 
-                and original.date() < self.schedule.used_date):
-                asset.violation.update([self.schedule.used_date])
+        used_date = self.schedule.used_date
+        
+        if(date > original and self.schedule.used and used_date is not None):
+            if(used_date not in asset.violation and original.date() < used_date):
+                
+                asset.violation.update([used_date])
                 self.schedule.totalUsage += 1
                 
                 if(date <= self.startDate + timedelta(days=14)):                

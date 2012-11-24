@@ -32,108 +32,114 @@ class Schedule:
         _task = task.schedule(date) #Create scheduled task
         self._addToSchedule(asset, _task)
         return _task.dateRange.end
-    
-    def blocked(self, asset, task, date, stupidity):
-        """Return False if task can be scheduled on that day."""
-        from datetime import timedelta
-        
-        _task = task.schedule(date) #Create scheduled task (prevent threading issues)
-        
-        for delta, date in enumerate(_task.dateRange.range()):
-            """Check the number of assets being worked on."""
-            if (date.date() in self._assetsInWork.keys() and len(
-               set(self._assetsInWork[date.date()]).difference([asset.id])) >= self.maxAssetsInWork):
-               """Note on difference: If Asset Foo is already in set, then take it out before running this logic."""
-                    return True
-            
-            """Check on Usage requirements."""
-            if (date.date(), asset.id) in self.usage.dates:
-                """Assign usage to the amount required on that day."""
-                usage = self.usage.dates[(date.date(), asset.id)]
-                if usage > self.hoursPerDay:
-                    """If usage hours are greater than a workday. Return"""
-                    self.used_date = date.date()
-                    self.used_asset = asset.id
-                    self.used = True
-                    return True
-            else:
-                usage = 0
-            
-            """Check skills hours availability and usage."""
-            if task.id != 0:
-                for skill in task.skills:                    
-                    """Check if the required skills are available."""
-                    if(task.days <= 1):
-                        """If the task can be completed in a day."""
-                        hours = skill.hours
-                    elif(delta == task.days-1):
-                        """If it is the last day of a multi-day task."""
-                        hours = skill.hours % skill.hoursPerDay
-                    else:
-                        """Otherwise schedule for full workday."""
-                        hours = skill.hoursPerDay
-                
-                    """Calculate the available hours for the skill."""
-                    available = skill.availableHours - (usage * skill.available)    
 
-                    if(date in self._skillsInWork.keys() and skill.id in self._skillsInWork[date].keys()):
-                        if self._skillsInWork[date][skill.id] + hours > available:
-                            """If the sum of scheduled and current skill hours exceed available hours."""
-                            if usage > 0: 
-                                self.used_date = date.date()
-                                self.used_asset = asset.id
-                                self.used = True
-                            return True
-            else:
-                for skill in task.SkillsMap[delta]:
-                    """Check if the required skills are available."""
-                    if(task.days <= 1):
-                        """If the task can be completed in a day."""
-                        hours = skill.hours
-                    elif(delta == task.days-1):
-                        """If it is the last day of a multi-day task."""
-                        hours = skill.hours % skill.hoursPerDay
-                    else:
-                        """Otherwise schedule for full workday."""
-                        hours = skill.hoursPerDay
-                
-                        """Calculate the available hours for the skill."""
-                        available = skill.availableHours - (usage * skill.available)    
-            
-                        if(date in self._skillsInWork.keys() and skill.id in self._skillsInWork[date].keys()):
-                            if self._skillsInWork[date][skill.id] + hours > available:
-                                if usage > 0: 
-                                    self.used_date = date.date()
-                                    self.used_asset = asset.id
-                                    self.used = True
-                                return True
-                        
-            """Check conflicts."""
-            if asset.id in self._conflictTasks.keys() and date in self._conflictTasks[asset.id].keys():                                       
-                if task.id == 0:
-                    """Check if there are conflicts in a bundle for that day."""
-                    for subtask in task.TasksMap[delta]:
-                        if subtask in self._conflictTasks[asset.id][date]:
-                            return True
-                elif task.id in self._conflictTasks[asset.id][date]:                    
-                    return True
-            
-            """Check for overlapping and overscheduling."""
-            if task.id != 0 and task.withinInterval(self, asset, date, stupidity):
-                """If not a metatask check if task falls within the interval."""
-                return True
-            elif task.id == 0 and task.primary.withinInterval(self, asset, date, stupidity):
-                """If a metatask, check if the primary task falls within the interval."""
-                return True
-                                
-        return False
-    
     def last(self, asset, task):
         """Last time task was performed on the asset. Return end date."""
         if asset.id in self._schedule.keys():
             for _task in self._schedule[asset.id]:
                 if _task.id == task.id:
                     return _task.dateRange.end
+    
+    def blocked(self, asset, task, date, stupidity):
+        """Return False if task can be scheduled on that day."""
+        from datetime import timedelta
+        """Create scheduled task to prevent threading issues."""
+        _task = task.schedule(date)
+        
+        for delta, date in enumerate(_task.dateRange.range()):
+            """Check the number of assets being worked on."""
+            if self.checkAssets(date, asset):
+                return True
+            """Check usage requirements."""
+            if self.checkUsage(date, asset):
+                return True
+            """Check skills hours availability and usage."""
+            if self.checkSkills(date, delta, asset, task):
+                return True
+            """Check conflicts."""
+            if self.checkConflicts(date, delta, asset, task):
+                return True
+            """Check for overlapping and overscheduling.""" 
+            if self.checkOverlaps(date, asset, task, stupidity):
+                return True
+        return False
+                    
+    def checkAssets(self, date, asset):
+        """Check the number of assets being worked on."""                       
+        if date.date() in self._assetsInWork.keys():
+            """If asset is already in set, take it out before running logic."""
+            worked = set(self._assetsInWork[date.date()]).difference([asset.id])                
+            if len(worked) >= self.maxAssetsInWork:
+                return True
+        return False
+    
+    def getUsage(self, date, asset):
+        """Return usage amount required for that day."""
+        if (date.date(), asset.id) in self.usage.dates:
+            return self.usage.dates[(date.date(), asset.id)]
+        return 0
+    
+    def checkUsage(self, date, asset):
+        """Check on Usage requirements."""
+        if self.getUsage(date, asset) > self.hoursPerDay:
+            """If usage hours are greater than a workday, the day is blocked."""
+            self.setUsageFlag(date, asset)
+            return True
+        return False
+    
+    def checkConflicts(self, date, delta, asset, task):
+        """Check conflicts."""
+        if asset.id in self._conflictTasks.keys() and date in self._conflictTasks[asset.id].keys():                                       
+            if task.id == 0:
+                """Check if there are conflicts in a bundle for that day."""
+                for subtask in task.TasksMap[delta]:
+                    if subtask in self._conflictTasks[asset.id][date]:
+                        return True
+            elif task.id in self._conflictTasks[asset.id][date]:                    
+                return True
+        return False
+
+    def checkOverlaps(self, date, asset, task, stupidity):
+        """Check for overlapping and overscheduling."""
+        if task.id != 0 and task.withinInterval(self, asset, date, stupidity):
+            """If not a metatask check if task falls within the interval."""
+            return True
+        elif task.id == 0 and task.primary.withinInterval(self, asset, date, stupidity):
+            """If a metatask, check if the primary task falls within the interval."""
+            return True
+        return False
+
+    def checkSkills(self, date, delta, asset, task):
+        """Check skills hours availability and usage."""
+        usage = self.getUsage(date, asset)
+        skills = task.skills if task.id != 0 else task.SkillsMap[delta]
+
+        for skill in skills:
+            """Check if the required skills are available."""
+            if(task.days <= 1):
+                """If the task can be completed in a day."""
+                hours = skill.hours
+            elif(delta == task.days-1):
+                """If it is the last day of a multi-day task."""
+                hours = skill.hours % skill.hoursPerDay
+            else:
+                """Otherwise schedule for full workday."""
+                hours = skill.hoursPerDay
+            """Calculate the available hours for the skill."""
+            available = skill.availableHours - (usage * skill.available)    
+
+            if(date in self._skillsInWork.keys() and skill.id in self._skillsInWork[date].keys()):
+                """If the sum of scheduled and current skill hours exceed available hours."""
+                if self._skillsInWork[date][skill.id] + hours > available:
+                    if usage > 0: self.setUsageFlag(date, asset)
+                    return True
+        return False
+
+    def setUsageFlag(self, date, asset):
+        """Set usage flags."""
+        self.used_date = date.date()
+        self.used_asset = asset.id
+        self.used = True
                     
     def _addToSchedule(self, asset, task, forced = False):
         """Add a task to an asset in the schedule."""

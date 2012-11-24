@@ -2,7 +2,7 @@ from Task import Task
 from math import ceil
 
 class Bundle(Task):
-    """A meta-Task class that is a wrapper for bundled tasks."""
+    """A metatask class that is a wrapper for bundled tasks."""
     
     def __init__(self, tasks):
         Task.__init__(self, 0, "", 0, 0, 0, [])
