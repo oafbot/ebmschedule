@@ -116,10 +116,10 @@ class Schedule:
 
         for skill in skills:
             """Check if the required skills are available."""
-            if(task.days <= 1):
+            if task.days <= 1:
                 """If the task can be completed in a day."""
                 hours = skill.hours
-            elif(delta == task.days-1):
+            elif delta == task.days-1:
                 """If it is the last day of a multi-day task."""
                 hours = skill.hours % skill.hoursPerDay
             else:
@@ -128,7 +128,7 @@ class Schedule:
             """Calculate the available hours for the skill."""
             available = skill.availableHours - (usage * skill.available)    
 
-            if(date in self._skillsInWork.keys() and skill.id in self._skillsInWork[date].keys()):
+            if date in self._skillsInWork.keys() and skill.id in self._skillsInWork[date].keys():
                 """If the sum of scheduled and current skill hours exceed available hours."""
                 if self._skillsInWork[date][skill.id] + hours > available:
                     if usage > 0: self.setUsageFlag(date, asset)

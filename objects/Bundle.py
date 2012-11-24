@@ -92,14 +92,6 @@ class Bundle(Task):
             
             skills = self.calculateSkillHours(task)                                
             start, end = self.assign(remainder, start, end, task, skills)
-
-        # for day in self.TasksMap:
-        #     print day, self.TasksMap[day]
-        # for d in self.SkillsMap:
-        #     print d, ":"
-        #     for skill in self.SkillsMap[d]:
-        #         print skill.id, skill.hours
-        #     print ""
         
     def longest(self, task):
         """Find the the most time-costly aspect of a task and return its duration."""

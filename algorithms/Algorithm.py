@@ -163,13 +163,12 @@ class Algorithm:
         
         if(date > original and self.schedule.used and used_date is not None):
             if(used_date not in asset.violation and original.date() < used_date):
-                
                 asset.violation.update([used_date])
                 self.schedule.totalUsage += 1
-                
-                if(date <= self.startDate + timedelta(days=14)):                
+                if(date <= self.startDate + timedelta(days=14)):
+                    """Keep a record of imminent usage."""              
                     self.metrics.Imminent += 1
-
+        """Reset usage flags."""
         self.schedule.used = False
         self.schedule.used_date = None
         self.schedule.used_asset = None
