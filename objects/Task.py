@@ -1,5 +1,6 @@
 from datetime import timedelta
 from math import ceil
+
 class Task:
 
     def __init__(self, id, name, workhours, threshold, interval, manpowers, 
@@ -184,11 +185,6 @@ class Task:
     def unbundle(self, bundle):
         bundle = bundle.reverse().remove(self)
         return bundle.reverse()
-
-    def bundleAsTask(self, bundle, asset):
-        """Convert a bundle into a meta-task for running schedule calculations."""
-        from Bundle import Bundle  
-        return Bundle(bundle)
         
     def withinInterval(self, schedule, asset, start, stupidcheckOn):
         """Check if a date falls within the interval period."""

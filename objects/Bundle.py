@@ -15,7 +15,6 @@ class Bundle(Task):
         self.initialize(tasks)
         self.calculateDays(tasks)
         self.distribute(tasks)
-        
 
     def initialize(self, tasks):
         for task in tasks:

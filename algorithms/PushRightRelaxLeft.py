@@ -1,6 +1,7 @@
+from math import ceil
 from datetime import timedelta
 from Algorithm import Algorithm
-from math import ceil
+from objects.Bundle import Bundle
 
 class PushRightRelaxLeft(Algorithm):
 
@@ -35,7 +36,7 @@ class PushRightRelaxLeft(Algorithm):
         Check against the length of the entire bundle of tasks.
         Schedule individual tasks in consecutive order once an empty slot is found.
         """
-        metatask = primary.bundleAsTask(bundle, asset)
+        metatask = Bundle(bundle)
         original = primary.interval
 
         while(start <= self.endDate):
