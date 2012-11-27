@@ -116,27 +116,26 @@ class Schedule:
         return False
 
     def checkSkills(self, date, delta, asset, task):
-        """Check skills hours availability and usage."""
+        """Check skills hours availability and usage."""        
         usage = self.getUsage(date, asset)
         skills = task.skills if task.id != 0 else task.pooledSkills(delta)
-        
         # for skill in skills:
         #     print asset.id, task.id, skill.name, skill.hours
         # print ""
         
         for skill in skills:
             """Check if the required skills are available."""
-            if task.days <= 1:
-                """If the task can be completed in a day."""
+            if task.days <= 1 or task.id == 0:
+                """If the task can be completed in a day, or is part of bundle."""
                 hours = skill.hours
             elif delta == task.days-1:
                 """If it is the last day of a multi-day task."""
                 hours = skill.hours % skill.hoursPerDay
             else:
                 """Otherwise schedule for full workday."""
-                hours = skill.hoursPerDay
+                hours = skill.hours / task.days
             """Calculate the available hours for the skill."""
-            available = skill.availableHours - (usage * skill.available)    
+            available = skill.availableHours - (usage * skill.available)
 
             if date in self._skillsInWork.keys() and skill.id in self._skillsInWork[date].keys():
                 """If the sum of scheduled and current skill hours exceed available hours."""
