@@ -132,8 +132,7 @@ class Algorithm:
         else:
             self.remainder = hours
         """Set start to end of the task for the next task."""
-        start = end
-        return [start, end]
+        return [end, end]
 
     def console(self, asset, task, input, start, end):
         """Print out the scheduling output to the console."""

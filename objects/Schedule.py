@@ -49,19 +49,25 @@ class Schedule:
         for delta, date in enumerate(_task.dateRange.range()):
             """Check the number of assets being worked on."""
             if self.checkAssets(date, asset):
+                # print "Assets"
                 return True
             """Check usage requirements."""
             if self.checkUsage(date, asset):
+                # print "Usage:    ", date.date(), asset.id
                 return True
             """Check skills hours availability and usage."""
             if self.checkSkills(date, delta, asset, task):
+                # print "Skills:   ", date.date(), asset.id, task.id if task.id != 0 else task.name
                 return True
             """Check conflicts."""
             if self.checkConflicts(date, delta, asset, task):
+                # print "Conflicts:", date.date(), asset.id, task.id if task.id != 0 else task.name
                 return True
             """Check for overlapping and overscheduling.""" 
             if self.checkOverlaps(date, asset, task, stupidity):
+                # print "Overlap"
                 return True
+        # print "scheduled:", date.date(), task.name if task.id == 0 else task.id
         return False
                     
     def checkAssets(self, date, asset):
@@ -112,8 +118,12 @@ class Schedule:
     def checkSkills(self, date, delta, asset, task):
         """Check skills hours availability and usage."""
         usage = self.getUsage(date, asset)
-        skills = task.skills if task.id != 0 else task.SkillsMap[delta]
-
+        skills = task.skills if task.id != 0 else task.pooledSkills(delta)
+        
+        # for skill in skills:
+        #     print asset.id, task.id, skill.name, skill.hours
+        # print ""
+        
         for skill in skills:
             """Check if the required skills are available."""
             if task.days <= 1:
@@ -150,6 +160,8 @@ class Schedule:
                         
         for date in task.dateRange.range():                        
             """Assign asset to the date."""               
+            # print date.date(), asset.id, task.id if task.id !=0 else task.name
+            
             if date.date() not in self._assetsInWork.keys():
                 self._assetsInWork[date.date()] = [asset.id]
             elif asset.id not in self._assetsInWork[date.date()]:
