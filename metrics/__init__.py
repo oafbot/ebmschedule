@@ -92,16 +92,21 @@ class Metrics:
         return availables
 
     def console(self):
-        print str.ljust("Scheduled:", 10), str.ljust(str(self.Scheduled), 10), \
-              str.ljust("Optimal:", 10), str.ljust(str(self.Optimal), 10), \
-              str.ljust("Violation:", 10), str.ljust(str(self.Violations), 10), \
-              str.ljust("Grounding:", 10), str.ljust(str(self.GroundedSum), 10), \
-              str.ljust("Inefficiency:", 10), str.ljust(str(self.Inefficiencies), 10) + "\n" + \
-              str.ljust("Manhours:", 10), str.ljust(str(self.Manhours), 10), \
-              str.ljust("Average:", 10), str.ljust("{0:.1f}".format(self.AverageGround) + " days", 10), \
-              str.ljust("Usage:", 10), str.ljust(str(self.Usage), 10), \
-              str.ljust("Extended:", 10), str.ljust(str(self.ExtendedGround), 10), \
+        print str.ljust("Manhours:", 10), str.ljust(str(self.Manhours), 10), \
+              str.ljust("Grounding:", 10), str.ljust(str(self.ActualGround), 5), \
+              str.ljust("Usage:", 5), str.ljust(str(self.Usage), 5), \
               str.ljust("Sort:", 5), str.ljust(self.Sort, 5) + "\n"
+        
+        # print str.ljust("Scheduled:", 10), str.ljust(str(self.Scheduled), 10), \
+        #       str.ljust("Optimal:", 10), str.ljust(str(self.Optimal), 10), \
+        #       str.ljust("Violation:", 10), str.ljust(str(self.Violations), 10), \
+        #       str.ljust("Grounding:", 10), str.ljust(str(self.ActualGround), 10), \
+        #       str.ljust("Inefficiency:", 10), str.ljust(str(self.Inefficiencies), 10) + "\n" + \
+        #       str.ljust("Manhours:", 10), str.ljust(str(self.Manhours), 10), \
+        #       str.ljust("Average:", 10), str.ljust("{0:.1f}".format(self.AverageGround) + " days", 10), \
+        #       str.ljust("Usage:", 10), str.ljust(str(self.Usage), 10), \
+        #       str.ljust("Extended:", 10), str.ljust(str(self.ExtendedGround), 10), \
+        #       str.ljust("Sort:", 5), str.ljust(self.Sort, 5) + "\n"
     
     def writeout(self):
         """Write out metrics to a file."""

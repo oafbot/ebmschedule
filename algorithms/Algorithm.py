@@ -49,6 +49,8 @@ class Algorithm:
         Schedule the complex conflict heavy task first.
         """
         for task in input.tasks:
+            # print self.weight * self.totalhours(task, input.tasks)*100, (1.0-self.weight)* (self.totalconflicts(task, input.tasks)*1.0 / self.totalTasks)*100 
+            
             task.score = (self.weight * self.totalhours(task, input.tasks)) + ((1.0-self.weight)*
                          (self.totalconflicts(task, input.tasks)*1.0 / self.totalTasks))
         input.tasks.sort(key=lambda task:task.score, reverse=order)
@@ -60,6 +62,8 @@ class Algorithm:
                     d = (index.Date - (self.startDate.date()-timedelta(days=1))).days
                     asset.score += (0.9**int(d))*(1)
         input.assets.sort(key=lambda asset:asset.score, reverse=order)
+        
+        # for task in input.tasks: print task.score, task.name 
                     
     def main(self, input):
         """Schedule tasks for each asset."""
@@ -161,23 +165,24 @@ class Algorithm:
         used_date = self.schedule.used_date
         
         if(date > original and self.schedule.used and used_date is not None):
-            if(used_date not in asset.violation and original.date() < used_date):
+            if(original.date() <= used_date and used_date not in asset.violation):
                 asset.violation.update([used_date])
                 self.schedule.totalUsage += 1
-                if(date <= self.startDate + timedelta(days=14)):
-                    """Keep a record of imminent usage."""              
+                """Keep a record of imminent usage."""
+                if(date <= self.startDate + timedelta(days=14)):              
                     self.metrics.Imminent += 1
         """Reset usage flags."""
         self.schedule.used = False
         self.schedule.used_date = None
         self.schedule.used_asset = None
 
-    def recordInterval(self, date, orig, asset):
+    def recordInterval(self, date, orig, asset, task):
         """Record the drift in days from the optimal scheduling day."""
         from objects.DateRange import DateRange
         
         if(date < self.endDate):
             self.drift.append(date - orig)
+            # if date - orig > timedelta(days=0): print date - orig, date.date(), asset.id, task.id if task.id != 0 else task.name
             
             if(date > orig):
                 for ground in DateRange(orig + timedelta(days=1), date).range():

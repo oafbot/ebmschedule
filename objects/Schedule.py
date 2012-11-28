@@ -48,8 +48,8 @@ class Schedule:
         
         for delta, date in enumerate(_task.dateRange.range()):
             """Check the number of assets being worked on."""
-            if self.checkAssets(date, asset):
-                # print "Assets"
+            if self.checkAssets(date, asset): 
+                print "Assets"
                 return True
             """Check usage requirements."""
             if self.checkUsage(date, asset):
@@ -64,8 +64,8 @@ class Schedule:
                 # print "Conflicts:", date.date(), asset.id, task.id if task.id != 0 else task.name
                 return True
             """Check for overlapping and overscheduling.""" 
-            if self.checkOverlaps(date, asset, task, stupidity):
-                # print "Overlap"
+            if self.checkOverlaps(date, asset, task, stupidity): 
+                print "Overlap"
                 return True
         # print "scheduled:", date.date(), task.name if task.id == 0 else task.id
         return False
@@ -119,24 +119,32 @@ class Schedule:
         """Check skills hours availability and usage."""        
         usage = self.getUsage(date, asset)
         skills = task.skills if task.id != 0 else task.pooledSkills(delta)
+        lastday = task.days-1
         # for skill in skills:
-        #     print asset.id, task.id, skill.name, skill.hours
-        # print ""
-        
+        #     print asset.id, task.id, skill.name, skill.hours       
         for skill in skills:
             """Check if the required skills are available."""
-            if task.days <= 1 or task.id == 0:
+            # print skill.hours, task.id if task.id != 0 else task.name
+            if task.days > 1 and task.id != 0:
+                if skill.hours > skill.availableHours:
+                    if delta == lastday:
+                        """If it is the last day of a multi-day task."""
+                        hours = skill.hours % skill.availableHours
+                    else:
+                        """Otherwise schedule for full workday."""
+                        hours = skill.hours / task.days
+                elif delta < lastday:
+                    hours = skill.hours
+                else:
+                    hours = 0
+            else:
                 """If the task can be completed in a day, or is part of bundle."""
                 hours = skill.hours
-            elif delta == task.days-1:
-                """If it is the last day of a multi-day task."""
-                hours = skill.hours % skill.hoursPerDay
-            else:
-                """Otherwise schedule for full workday."""
-                hours = skill.hours / task.days
+            # print delta, hours
+            # print "" 
             """Calculate the available hours for the skill."""
             available = skill.availableHours - (usage * skill.available)
-
+        
             if date in self._skillsInWork.keys() and skill.id in self._skillsInWork[date].keys():
                 """If the sum of scheduled and current skill hours exceed available hours."""
                 if self._skillsInWork[date][skill.id] + hours > available:
@@ -146,6 +154,7 @@ class Schedule:
 
     def setUsageFlag(self, date, asset):
         """Set usage flags."""
+        # self.used[asset.id].update([date.date()])
         self.used_date = date.date()
         self.used_asset = asset.id
         self.used = True
