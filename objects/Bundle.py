@@ -71,12 +71,12 @@ class Bundle(Task):
             
         for skill in task.skills:
             """Calculate the days and the remainder."""
-            if skill.hours <= self.workday:
+            if skill.hours <= skill.availableHours:
                 end = 0
                 remainder = skill.hours
             else:
-                end = int(skill.hours / self.workday)
-                remainder = skill.hours % self.workday
+                end = int(skill.hours / skill.availableHours)
+                remainder = skill.hours % skill.availableHours
             """If the remainder is zero, don't apply to next day."""
             days = range(start, end+1) if remainder > 0 else range(start, end)
             
@@ -85,7 +85,7 @@ class Bundle(Task):
             for day in days:
                 """Copy skill, adjust hours and store in array."""
                 _skill = skill.copy()
-                _skill.hours = self.workday if end > 0 and day < end else remainder
+                _skill.hours = skill.availableHours if end > 0 and day < end else remainder
                 
                 # self.SkillsMap[day].append(_skill)
                 

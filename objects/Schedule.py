@@ -124,7 +124,6 @@ class Schedule:
         #     print asset.id, task.id, skill.name, skill.hours       
         for skill in skills:
             """Check if the required skills are available."""
-            # print skill.hours, task.id if task.id != 0 else task.name
             if task.days > 1 and task.id != 0:
                 if skill.hours > skill.availableHours:
                     if delta == lastday:
@@ -140,8 +139,7 @@ class Schedule:
             else:
                 """If the task can be completed in a day, or is part of bundle."""
                 hours = skill.hours
-            # print delta, hours
-            # print "" 
+            print hours
             """Calculate the available hours for the skill."""
             available = skill.availableHours - (usage * skill.available)
         
