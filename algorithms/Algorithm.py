@@ -50,7 +50,6 @@ class Algorithm:
         """
         for task in input.tasks:
             # print self.weight * self.totalhours(task, input.tasks)*100, (1.0-self.weight)* (self.totalconflicts(task, input.tasks)*1.0 / self.totalTasks)*100 
-            
             task.score = (self.weight * self.totalhours(task, input.tasks)) + ((1.0-self.weight)*
                          (self.totalconflicts(task, input.tasks)*1.0 / self.totalTasks))
         input.tasks.sort(key=lambda task:task.score, reverse=order)
@@ -63,7 +62,10 @@ class Algorithm:
                     asset.score += (0.9**int(d))*(1)
         input.assets.sort(key=lambda asset:asset.score, reverse=order)
         
-        # for task in input.tasks: print task.score, task.name 
+        # for task in input.tasks: 
+        #     # print task.score, task.name
+        #     print self.totalconflicts(task, input.tasks) 
+        #     print task.conflicts
                     
     def main(self, input):
         """Schedule tasks for each asset."""

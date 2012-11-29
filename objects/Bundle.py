@@ -11,9 +11,10 @@ class Bundle(Task):
         self.SkillsMap = {}
         self.SkillsPool = {}
         self.contents = []
-                
-        self.calculateDays(tasks)
+        
         self.initialize(tasks)
+        self.calculateDays(tasks)
+        self.allocate()
         self.distribute(tasks)
                 
         # print self.name
@@ -44,13 +45,6 @@ class Bundle(Task):
         for manpower in self.manpowers:
             self.manhours += manpower.hours
     
-        for day in range(0, self.days):
-            """Allocate days to the Skills array."""
-            if day not in self.SkillsMap:
-                self.SkillsMap.update({day:[]})
-            if day not in self.SkillsPool:
-                self.SkillsPool.update({day:{}})
-    
     def calculateDays(self, bundle):
         """Return the number of days a bundle of tasks takes to perform."""
         hours = []
@@ -59,44 +53,23 @@ class Bundle(Task):
             hours.append(longest)
         self.days = int(ceil(sum(hours) / self.hoursPerDay))
     
+    def longest(self, task):
+        """Find the the most time-costly aspect of a task and return its duration."""
+        longest = 0
+        for manpower in task.manpowers:                
+            if manpower.hours > longest: longest = manpower.hours
+        return longest
         
-    def calculateSkillHours(self, task):
-        remainder = 0
-        start = 0
-        end = 0
-        
-        for day in range(0, self.days):
-            """Allocate days to the Skills array."""
+    def allocate(self):
+        """Allocate days to the mapping arrays."""
+        for day in range(0, self.days):            
             if day not in self.SkillsMap:
                 self.SkillsMap.update({day:[]})
             if day not in self.SkillsPool:
                 self.SkillsPool.update({day:{}})
+            if day not in self.TasksMap:
+                self.TasksMap.update({day:[]})
             
-        for skill in task.skills:
-            """Calculate the days and the remainder."""
-            if skill.hours <= skill.availableHours:
-                end = 0
-                remainder = skill.hours
-            else:
-                end = int(skill.hours / skill.availableHours)
-                remainder = skill.hours % skill.availableHours
-            """If the remainder is zero, don't apply to next day."""
-            days = range(start, end+1) if remainder > 0 else range(start, end)
-            
-            # print end, ":", skill.hours, remainder
-            
-            for day in days:
-                """Copy skill, adjust hours and store in array."""
-                _skill = skill.copy()
-                _skill.hours = skill.availableHours if end > 0 and day < end else remainder
-                
-                # self.SkillsMap[day].append(_skill)
-                
-                if _skill.id in self.SkillsPool[day]:
-                    self.SkillsPool[day][_skill.id].hours += _skill.hours
-                else:
-                    self.SkillsPool[day].update({_skill.id:_skill})
-    
     def pooledSkills(self, day):
         """Return the pooled skill hours for designated day."""
         pooled = []
@@ -109,46 +82,42 @@ class Bundle(Task):
         """Distribute conflicts and manpower hours to the corresponding days."""        
         remainder = 0
         start = 0
-        end = 0                
+        end = 0
         for task in tasks:           
-            hours = self.longest(task)
-            hours = remainder + hours
+            hours = remainder + self.longest(task)
             if hours >= self.workday:
                 end += int(hours / self.workday)
                 remainder = hours % self.workday
             else:
                 remainder = hours
-
-            # self.calculateSkillHours(task)
-            start, end = self.assign(remainder, start, end, task)
-
-    def longest(self, task):
-        """Find the the most time-costly aspect of a task and return its duration."""
-        longest = 0
-        for manpower in task.manpowers:                
-            if manpower.hours > longest: longest = manpower.hours
-        return longest
-
-    def assign(self, remainder, start, end, task):
-        """Allocate constraints to the corresponding days."""
-        days = range(start, end+1) if remainder > 0 else range(start, end)
-
-        for day in days:
-            if day not in self.TasksMap:
-                self.TasksMap.update({day:[task.id]})
+            start, end = self.mapTasks(remainder, start, end, task)
+        
+            
+    def mapSkills(self, start, day, task):
+        """Assign skill hours to appropriate days."""        
+        for skill in task.skills:
+            end = start
+            if skill.hours < skill.availableHours:
+                remainder = skill.hours if day == start else 0
             else:
-                self.TasksMap[day].append(task.id)
+                end += int(skill.hours / skill.availableHours)
+                remainder = skill.hours % skill.availableHours
             
-            for skill in task.skills:
-                if skill.hours <= skill.availableHours:
-                    """Copy skill, adjust hours and store in array."""
-                    _skill = skill.copy()
-                    if _skill.id in self.SkillsPool[day]:
-                        self.SkillsPool[day][_skill.id].hours += _skill.hours
-                    else:
-                        self.SkillsPool[day].update({_skill.id:_skill})
-                else:
-                    end = int(skill.hours / skill.availableHours)
-                    remainder = skill.hours % skill.availableHours
+            """Copy skill, adjust hours and store in array."""            
+            hours = skill.availableHours if end > 0 and day < end else remainder
             
+            # print day, skill.hours, remainder, hours
+            
+            if skill.id in self.SkillsPool[day]:
+                self.SkillsPool[day][skill.id].hours += hours
+            else:
+                _skill = skill.copy()
+                self.SkillsPool[day].update({_skill.id:_skill})
+        
+    def mapTasks(self, remainder, start, end, task):
+        """Assign constraints to the corresponding days."""
+        days = range(start, end+1) if remainder > 0 else range(start, end)
+        for day in days:
+            self.TasksMap[day].append(task.id)
+            self.mapSkills(start, day, task)
         return [end, end]

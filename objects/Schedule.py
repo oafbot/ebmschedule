@@ -97,7 +97,7 @@ class Schedule:
         """Check conflicts."""
         if asset.id in self._conflictTasks.keys() and date in self._conflictTasks[asset.id].keys():                                       
             if task.id == 0:
-                """Check if there are conflicts in a bundle for that day."""
+                """Check if there are conflicts in a bundle for that day.""" 
                 for subtask in task.TasksMap[delta]:
                     if subtask in self._conflictTasks[asset.id][date]:
                         return True
@@ -118,31 +118,29 @@ class Schedule:
     def checkSkills(self, date, delta, asset, task):
         """Check skills hours availability and usage."""        
         usage = self.getUsage(date, asset)
-        skills = task.skills if task.id != 0 else task.pooledSkills(delta)
+        skills = task.skills  if task.id != 0 else task.pooledSkills(delta)
         lastday = task.days-1
-        # for skill in skills:
-        #     print asset.id, task.id, skill.name, skill.hours       
+        for skill in skills: 
+            print delta, asset.id, task.id if task.id != 0 else task.name, skill.name, skill.hours, skill.availableHours
+        print ""       
         for skill in skills:
-            """Check if the required skills are available."""
-            if task.days > 1 and task.id != 0:
+            if task.days > 1:
                 if skill.hours > skill.availableHours:
+                    """If the pooled hours are more than available in a workday."""
                     if delta == lastday:
-                        """If it is the last day of a multi-day task."""
                         hours = skill.hours % skill.availableHours
-                    else:
-                        """Otherwise schedule for full workday."""
-                        hours = skill.hours / task.days
+                    else: 
+                        skill.hours / task.days
                 elif delta < lastday:
                     hours = skill.hours
                 else:
                     hours = 0
             else:
-                """If the task can be completed in a day, or is part of bundle."""
                 hours = skill.hours
-            print hours
+
             """Calculate the available hours for the skill."""
             available = skill.availableHours - (usage * skill.available)
-        
+            
             if date in self._skillsInWork.keys() and skill.id in self._skillsInWork[date].keys():
                 """If the sum of scheduled and current skill hours exceed available hours."""
                 if self._skillsInWork[date][skill.id] + hours > available:
