@@ -120,9 +120,9 @@ class Schedule:
         usage = self.getUsage(date, asset)
         skills = task.skills  if task.id != 0 else task.pooledSkills(delta)
         lastday = task.days-1
-        for skill in skills: 
-            print delta, asset.id, task.id if task.id != 0 else task.name, skill.name, skill.hours, skill.availableHours
-        print ""       
+        # for skill in skills: 
+        #     print delta, asset.id, task.id if task.id != 0 else task.name, skill.name, skill.hours, skill.availableHours
+        # print ""       
         for skill in skills:
             if task.days > 1:
                 if skill.hours > skill.availableHours:
@@ -130,7 +130,7 @@ class Schedule:
                     if delta == lastday:
                         hours = skill.hours % skill.availableHours
                     else: 
-                        skill.hours / task.days
+                        hours = skill.hours / task.days
                 elif delta < lastday:
                     hours = skill.hours
                 else:

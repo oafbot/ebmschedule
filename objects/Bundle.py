@@ -16,7 +16,6 @@ class Bundle(Task):
         self.calculateDays(tasks)
         self.allocate()
         self.distribute(tasks)
-                
         # print self.name
         # for day in self.SkillsMap:
         #    for skill in self.SkillsMap[day]:
@@ -96,23 +95,31 @@ class Bundle(Task):
     def mapSkills(self, start, day, task):
         """Assign skill hours to appropriate days."""        
         for skill in task.skills:
-            end = start
-            if skill.hours < skill.availableHours:
-                remainder = skill.hours if day == start else 0
-            else:
-                end += int(skill.hours / skill.availableHours)
-                remainder = skill.hours % skill.availableHours
-            
-            """Copy skill, adjust hours and store in array."""            
-            hours = skill.availableHours if end > 0 and day < end else remainder
-            
-            # print day, skill.hours, remainder, hours
-            
-            if skill.id in self.SkillsPool[day]:
-                self.SkillsPool[day][skill.id].hours += hours
-            else:
-                _skill = skill.copy()
-                self.SkillsPool[day].update({_skill.id:_skill})
+            # resources = 0
+            # for manpower in task.manpowers:
+            #     if manpower.skill.id == skill.id:
+            #         resources += 1
+            for manpower in task.manpowers:
+                if manpower.skill.id == skill.id:
+                    workhours = manpower.hours
+                    # resources = skill.hours / workhours
+                    # print skill.hours, workhours, resources
+                    end = start
+                    if workhours < self.workday:
+                        remainder = workhours if day == start else 0
+                    else:
+                        end += int(workhours / self.workday)
+                        remainder = workhours % self.workday
+                """Copy skill, adjust hours and store in array."""            
+                hours = self.workday if end > start and day < end else remainder
+
+                if skill.id in self.SkillsPool[day]:
+                    self.SkillsPool[day][skill.id].hours += hours
+                else:
+                    _skill = skill.copy()
+                    self.SkillsPool[day].update({_skill.id:_skill})
+                
+                # print day, task.id, skill.id, hours, self.SkillsPool[day][skill.id].hours
         
     def mapTasks(self, remainder, start, end, task):
         """Assign constraints to the corresponding days."""
