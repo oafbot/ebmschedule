@@ -10,11 +10,10 @@ class Bundle(Task):
         self.TasksMap = {}
         self.SkillsMap = {}
         self.SkillsPool = {}
-        self.ConflictsMap = {}
         self.contents = []
                 
-        self.initialize(tasks)
         self.calculateDays(tasks)
+        self.initialize(tasks)
         self.distribute(tasks)
                 
         # print self.name
@@ -45,14 +44,18 @@ class Bundle(Task):
         for manpower in self.manpowers:
             self.manhours += manpower.hours
     
+        for day in range(0, self.days):
+            """Allocate days to the Skills array."""
+            if day not in self.SkillsMap:
+                self.SkillsMap.update({day:[]})
+            if day not in self.SkillsPool:
+                self.SkillsPool.update({day:{}})
+    
     def calculateDays(self, bundle):
         """Return the number of days a bundle of tasks takes to perform."""
         hours = []
         for task in bundle:
-            longest = 0
-            for manpower in task.manpowers:
-                """Find the the most costly task."""
-                if manpower.hours > longest: longest = manpower.hours
+            longest = self.longest(task)
             hours.append(longest)
         self.days = int(ceil(sum(hours) / self.hoursPerDay))
     
@@ -116,7 +119,7 @@ class Bundle(Task):
             else:
                 remainder = hours
 
-            self.calculateSkillHours(task)
+            # self.calculateSkillHours(task)
             start, end = self.assign(remainder, start, end, task)
 
     def longest(self, task):
@@ -131,12 +134,21 @@ class Bundle(Task):
         days = range(start, end+1) if remainder > 0 else range(start, end)
 
         for day in days:
-            # if day not in self.ConflictsMap:
-            #     self.ConflictsMap.update({day:task.conflicts})
-            # else:
-            #     self.ConflictsMap[day].union(task.conflicts)
             if day not in self.TasksMap:
                 self.TasksMap.update({day:[task.id]})
             else:
-                self.TasksMap[day].append(task.id)            
+                self.TasksMap[day].append(task.id)
+            
+            for skill in task.skills:
+                if skill.hours <= skill.availableHours:
+                    """Copy skill, adjust hours and store in array."""
+                    _skill = skill.copy()
+                    if _skill.id in self.SkillsPool[day]:
+                        self.SkillsPool[day][_skill.id].hours += _skill.hours
+                    else:
+                        self.SkillsPool[day].update({_skill.id:_skill})
+                else:
+                    end = int(skill.hours / skill.availableHours)
+                    remainder = skill.hours % skill.availableHours
+            
         return [end, end]
