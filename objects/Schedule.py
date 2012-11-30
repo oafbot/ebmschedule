@@ -14,6 +14,7 @@ class Schedule:
         self.metrics         = {}
         self.forced          = []
         self.usage           = Usage()
+        # self.used            = {}
         self.used            = False
         self.used_date       = None
         self.used_asset      = None
@@ -92,6 +93,16 @@ class Schedule:
             self.setUsageFlag(date, asset)
             return True
         return False
+
+    def setUsageFlag(self, date, asset):
+        """Set usage flags."""
+        # if asset.id not in self.used:
+        #     self.used.update({asset.id:[]})
+        # if date.date() not in self.used[asset.id]:
+        #     self.used[asset.id].append(date.date())
+        self.used_date = date.date()
+        self.used_asset = asset.id
+        self.used = True
     
     def checkConflicts(self, date, delta, asset, task):
         """Check conflicts."""
@@ -147,13 +158,6 @@ class Schedule:
                     if usage > 0: self.setUsageFlag(date, asset)
                     return True
         return False
-
-    def setUsageFlag(self, date, asset):
-        """Set usage flags."""
-        # self.used[asset.id].update([date.date()])
-        self.used_date = date.date()
-        self.used_asset = asset.id
-        self.used = True
                     
     def _addToSchedule(self, asset, task, forced = False):
         """Add a task to an asset in the schedule."""

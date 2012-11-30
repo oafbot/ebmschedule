@@ -95,15 +95,9 @@ class Bundle(Task):
     def mapSkills(self, start, day, task):
         """Assign skill hours to appropriate days."""        
         for skill in task.skills:
-            # resources = 0
-            # for manpower in task.manpowers:
-            #     if manpower.skill.id == skill.id:
-            #         resources += 1
             for manpower in task.manpowers:
                 if manpower.skill.id == skill.id:
                     workhours = manpower.hours
-                    # resources = skill.hours / workhours
-                    # print skill.hours, workhours, resources
                     end = start
                     if workhours < self.workday:
                         remainder = workhours if day == start else 0
@@ -114,7 +108,16 @@ class Bundle(Task):
                 hours = self.workday if end > start and day < end else remainder
 
                 if skill.id in self.SkillsPool[day]:
-                    self.SkillsPool[day][skill.id].hours += hours
+                    if self.SkillsPool[day][skill.id].hours + hours <= skill.availableHours:
+                        self.SkillsPool[day][skill.id].hours += hours
+                    else:
+                        self.SkillsPool[day][skill.id].hours = skill.availableHours
+                        if day+1 not in self.SkillsPool:
+                            self.SkillsPool.update({day:{}})
+                        if skill.id not in self.SkillsPool[day+1]:
+                            _skill = skill.copy()
+                            self.SkillsPool[day+1].update({_skill.id:_skill})
+                        self.SkillsPool[day+1][skill.id].hours += hours % skill.availableHours
                 else:
                     _skill = skill.copy()
                     self.SkillsPool[day].update({_skill.id:_skill})

@@ -171,14 +171,14 @@ class Algorithm:
                 asset.violation.update([used_date])
                 self.schedule.totalUsage += 1
                 """Keep a record of imminent usage."""
-                if(date <= self.startDate + timedelta(days=14)):              
+                if(date <= self.startDate + timedelta(days=90)):              
                     self.metrics.Imminent += 1
         """Reset usage flags."""
         self.schedule.used = False
         self.schedule.used_date = None
         self.schedule.used_asset = None
 
-    def recordInterval(self, date, orig, asset, task):
+    def recordInterval(self, date, orig, asset):
         """Record the drift in days from the optimal scheduling day."""
         from objects.DateRange import DateRange
         

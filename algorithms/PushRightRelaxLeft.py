@@ -96,5 +96,5 @@ class PushRightRelaxLeft(Algorithm):
                 # print "push"
                 
         self.usageViolation(start, orig, asset)
-        self.recordInterval(start, orig, asset, task)
+        self.recordInterval(start, orig, asset)
         return start
