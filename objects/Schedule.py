@@ -14,7 +14,6 @@ class Schedule:
         self.metrics         = {}
         self.forced          = []
         self.usage           = Usage()
-        # self.used            = {}
         self.used            = False
         self.used_date       = None
         self.used_asset      = None
@@ -49,25 +48,21 @@ class Schedule:
         
         for delta, date in enumerate(_task.dateRange.range()):
             """Check the number of assets being worked on."""
-            if self.checkAssets(date, asset): 
-                print "Assets"
-                return True
+            if self.checkAssets(date, asset): return True
             """Check usage requirements."""
-            if self.checkUsage(date, asset):
-                # print "Usage:    ", date.date(), asset.id
-                return True
+            if self.checkUsage(date, asset): 
+                # print "Usage:    ", date.date(), asset.id, task.id if task.id != 0 else task.name
+                return True                
             """Check skills hours availability and usage."""
-            if self.checkSkills(date, delta, asset, task):
+            if self.checkSkills(date, delta, asset, task): 
                 # print "Skills:   ", date.date(), asset.id, task.id if task.id != 0 else task.name
                 return True
             """Check conflicts."""
-            if self.checkConflicts(date, delta, asset, task):
+            if self.checkConflicts(date, delta, asset, task): 
                 # print "Conflicts:", date.date(), asset.id, task.id if task.id != 0 else task.name
                 return True
             """Check for overlapping and overscheduling.""" 
-            if self.checkOverlaps(date, asset, task, stupidity): 
-                print "Overlap"
-                return True
+            if self.checkOverlaps(date, asset, task, stupidity): return True
         # print "scheduled:", date.date(), task.name if task.id == 0 else task.id
         return False
                     
@@ -96,10 +91,6 @@ class Schedule:
 
     def setUsageFlag(self, date, asset):
         """Set usage flags."""
-        # if asset.id not in self.used:
-        #     self.used.update({asset.id:[]})
-        # if date.date() not in self.used[asset.id]:
-        #     self.used[asset.id].append(date.date())
         self.used_date = date.date()
         self.used_asset = asset.id
         self.used = True

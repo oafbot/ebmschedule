@@ -44,7 +44,8 @@ class PushRightRelaxLeft(Algorithm):
 
             self.remainder = 0                  # The hours carried over from the preceding task
             self.maxhours = primary.hoursPerDay # The work hours in a day
-
+            # self.longest = 0
+            
             for task in bundle:
                 """For each task in the bundle, schedule in order."""
                 self.overhours = False

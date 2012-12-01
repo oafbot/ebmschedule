@@ -48,6 +48,13 @@ class Algorithm:
         Divide manhours cost with total available manhours.
         Schedule the complex conflict heavy task first.
         """
+        # h=0
+        # c=0
+        # for task in input.tasks:
+        #     h += self.totalhours(task, input.tasks)
+        #     c += (self.totalconflicts(task, input.tasks)*1.0 / self.totalTasks)
+        # ratio = h / c
+        # print ratio, h/ratio, c
         for task in input.tasks:
             # print self.weight * self.totalhours(task, input.tasks)*100, (1.0-self.weight)* (self.totalconflicts(task, input.tasks)*1.0 / self.totalTasks)*100 
             task.score = (self.weight * self.totalhours(task, input.tasks)) + ((1.0-self.weight)*
@@ -62,10 +69,16 @@ class Algorithm:
                     asset.score += (0.9**int(d))*(1)
         input.assets.sort(key=lambda asset:asset.score, reverse=order)
         
-        # for task in input.tasks: 
+        # h=0
+        # c=0
+        # for task in input.tasks:
+        #     h += self.totalhours(task, input.tasks)
+        #     c += (self.totalconflicts(task, input.tasks)*1.0 / self.totalTasks)
+        #     # ratio += self.totalhours(task, input.tasks) / (self.totalconflicts(task, input.tasks)*1.0 / self.totalTasks)
         #     # print task.score, task.name
-        #     print self.totalconflicts(task, input.tasks) 
-        #     print task.conflicts
+        #     # print self.totalconflicts(task, input.tasks) 
+        #     # print task.conflicts
+        #     # print self.totalhours(task, input.tasks)
                     
     def main(self, input):
         """Schedule tasks for each asset."""
@@ -119,8 +132,10 @@ class Algorithm:
     def taskcost(self, task):
         """Calculate the cost ratio for skills required for a task."""
         cost = 0
-        for manpower in task.manpowers:
-            cost += (1.0*manpower.hours)/(manpower.skill.hoursPerDay)
+        for skill in task.skills:
+            cost += (1.0*skill.hours)/skill.availableHours
+        # for manpower in task.manpowers:
+        #     cost += (1.0*manpower.hours)/(manpower.skill.hoursPerDay*manpower.skill.available)
         return cost
 
     def calc(self, task, start, end):
@@ -184,11 +199,10 @@ class Algorithm:
         
         if(date < self.endDate):
             self.drift.append(date - orig)
-            # if date - orig > timedelta(days=0): print date - orig, date.date(), asset.id, task.id if task.id != 0 else task.name
-            
+            # if date - orig > timedelta(days=0): print date - orig, date.date(), asset.id, task.id if task.id != 0 else task.name            
             if(date > orig):
                 for ground in DateRange(orig + timedelta(days=1), date).range():
-                    if((asset.id, ground) not in self.groundings):
-                        self.groundings.update({(asset.id, ground):1})
+                    if((asset.id, ground.date()) not in self.groundings):
+                        self.groundings.update({(asset.id, ground.date()):1})
                         # self.groundings.append((asset.id, ground))
                         # self.metrics.ActualGround += 1
