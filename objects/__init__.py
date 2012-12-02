@@ -12,7 +12,7 @@ class Asset:
                 return True
         return False
 
-class Skill:    
+class Skill:
     def __init__(self, id, name, available, hoursPerDay):
         self.id             = id
         self.name           = name

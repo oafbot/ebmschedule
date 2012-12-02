@@ -62,8 +62,8 @@ class Bundle(Task):
     def allocate(self):
         """Allocate days to the mapping arrays."""
         for day in range(0, self.days):            
-            if day not in self.SkillsMap:
-                self.SkillsMap.update({day:[]})
+            # if day not in self.SkillsMap:
+            #     self.SkillsMap.update({day:[]})
             if day not in self.SkillsPool:
                 self.SkillsPool.update({day:{}})
             if day not in self.TasksMap:

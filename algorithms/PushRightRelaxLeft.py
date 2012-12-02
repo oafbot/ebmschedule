@@ -48,9 +48,8 @@ class PushRightRelaxLeft(Algorithm):
             
             for task in bundle:
                 """For each task in the bundle, schedule in order."""
-                self.overhours = False
                 orig = task.interval
-
+                
                 if(task.interval + int(ceil(task.interval * self.relax)) > 0):
                     task.interval += int(ceil(task.interval * self.relax))
 
@@ -94,8 +93,7 @@ class PushRightRelaxLeft(Algorithm):
                 task.interval = interval
                 start += timedelta(days=1)
                 self.conflicts += 1
-                # print "push"
                 
         self.usageViolation(start, orig, asset)
-        self.recordInterval(start, orig, asset)
+        self.recordInterval(start, orig, asset, task)
         return start

@@ -7,6 +7,8 @@ from datetime import datetime, timedelta
 # = Automated runs of the EBM Scheduler with variable conditions =
 # ================================================================
 
+# USAGE: ./weights.py --algo 1 --start 0 --end 0 --lax 50
+
 if __name__ == "__main__":
     """Handle command line args."""
     parser = argparse.ArgumentParser(prog='crunch')
@@ -22,15 +24,16 @@ if __name__ == "__main__":
     algo  = args['algo' ] if args['algo' ] is not None else 0
     start = args['start'] if args['start'] is not None else 0
     end   = args['end'  ] if args['end'  ] is not None else 0
-    lax   = args['lax'  ] if args['lax'  ] is not None else 5
+    lax   = args['lax'  ] if args['lax'  ] is not None else 50
     plat  = args['plat' ] if args['plat' ] is not None else 1    
     trace = 1 if args['trace'] is True else 0
-    lax   = 1 + lax / 25 if algo == 1 else 2
+    lax   = lax / 25
     sort  = 'on'
     
-    weights = [0, 2, 4, 6, 8, 10]
+    weights = [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10]
+    # weights = [0, 2, 4, 6, 8, 10]
     count = 0
-    runs  = len(range(0, 1)) * len(range(start, end+1)) * len(weights) * len(range(1, lax))
+    runs  = len(range(start, end+1)) * len(weights)
     timer = datetime.now()
     
     if   sort == "on":      sorting = "+"
@@ -44,14 +47,14 @@ if __name__ == "__main__":
         """Load xml file with the matching number."""
         for data in range(start, end+1):
             """Load initial condition dataset corresponding to data."""
-            for relax in range(1, lax):
-                """Vary the relaxing 25 percent to (lax-1)*25 percent."""
-                for weight in weights:
-                    """Vary weight from 0 to 1.0. Increment by 0.5."""
-                    count += 1
-                    status = "Running " + str(count) + " out of " + str(runs) + " "
-                    print status + "-" * (110-len(status))
-                    subprocess.call(["../main.py", str(algo), str(data), str(weight), str(relax), 
-                                    sorting, str(plat), str(trace), str(proc)])
+            # for relax in range(1, lax):
+            #     """Vary the relaxing 25 percent to (lax-1)*25 percent."""
+            for weight in weights:
+                """Vary weight from 0 to 1.0. Increment by 0.5."""
+                count += 1
+                status = "Running " + str(count) + " out of " + str(runs) + " "
+                print status + "-" * (110-len(status))
+                subprocess.call(["../main.py", str(algo), str(data), str(weight), str(lax), 
+                                sorting, str(plat), str(trace), str(proc)])
 
     print "Executed", runs, "runs in", str(datetime.now()-timer)[:-4] + "\a\n"

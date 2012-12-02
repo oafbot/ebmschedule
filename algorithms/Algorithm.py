@@ -48,16 +48,16 @@ class Algorithm:
         Divide manhours cost with total available manhours.
         Schedule the complex conflict heavy task first.
         """
-        # h=0
-        # c=0
-        # for task in input.tasks:
-        #     h += self.totalhours(task, input.tasks)
-        #     c += (self.totalconflicts(task, input.tasks)*1.0 / self.totalTasks)
-        # ratio = h / c
-        # print ratio, h/ratio, c
+        n = 0
+        d = 0 
         for task in input.tasks:
-            # print self.weight * self.totalhours(task, input.tasks)*100, (1.0-self.weight)* (self.totalconflicts(task, input.tasks)*1.0 / self.totalTasks)*100 
-            task.score = (self.weight * self.totalhours(task, input.tasks)) + ((1.0-self.weight)*
+            n += self.totalhours(task, input.tasks)
+            d += (self.totalconflicts(task, input.tasks)*1.0 / self.totalTasks)
+        # bias = h / c
+        bias = 1.0
+        for task in input.tasks:
+            # print self.weight * self.totalhours(task, input.tasks)*100*r, (1.0-self.weight)* (self.totalconflicts(task, input.tasks)*1.0 / self.totalTasks)*100 
+            task.score = (self.weight * self.totalhours(task, input.tasks))*bias + ((1.0-self.weight)*
                          (self.totalconflicts(task, input.tasks)*1.0 / self.totalTasks))
         input.tasks.sort(key=lambda task:task.score, reverse=order)
 
@@ -69,13 +69,9 @@ class Algorithm:
                     asset.score += (0.9**int(d))*(1)
         input.assets.sort(key=lambda asset:asset.score, reverse=order)
         
-        # h=0
-        # c=0
         # for task in input.tasks:
-        #     h += self.totalhours(task, input.tasks)
-        #     c += (self.totalconflicts(task, input.tasks)*1.0 / self.totalTasks)
-        #     # ratio += self.totalhours(task, input.tasks) / (self.totalconflicts(task, input.tasks)*1.0 / self.totalTasks)
-        #     # print task.score, task.name
+            # print task.score, task.name
+            # print task.name
         #     # print self.totalconflicts(task, input.tasks) 
         #     # print task.conflicts
         #     # print self.totalhours(task, input.tasks)
@@ -193,7 +189,7 @@ class Algorithm:
         self.schedule.used_date = None
         self.schedule.used_asset = None
 
-    def recordInterval(self, date, orig, asset):
+    def recordInterval(self, date, orig, asset, task):
         """Record the drift in days from the optimal scheduling day."""
         from objects.DateRange import DateRange
         
@@ -204,5 +200,6 @@ class Algorithm:
                 for ground in DateRange(orig + timedelta(days=1), date).range():
                     if((asset.id, ground.date()) not in self.groundings):
                         self.groundings.update({(asset.id, ground.date()):1})
+                        # print asset.id, ground.date(), task.id if task.id != 0 else task.name
                         # self.groundings.append((asset.id, ground))
                         # self.metrics.ActualGround += 1

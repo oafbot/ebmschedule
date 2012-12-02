@@ -21,7 +21,7 @@ class Output:
             print "------------------------------------------------------------\n"        
         
             for asset in self.input.assets:        
-                print "Asset: ", asset.name 
+                print "Asset: ", asset.name, "ID:", asset.id 
                 print "Start: ", asset.start
                 print "------------------------------------------------------------\n"
         
@@ -116,8 +116,8 @@ class Output:
     def printSchedule(self, algorithm, asset, task, start, end):
         if self.schedout:
             if self.input.bigdata:
-                if algorithm.prev != asset.name: print ""
-                print str.ljust(asset.name, 8), str.ljust(task.name, 96), \
+                if algorithm.prev != asset.id: print ""
+                print str.ljust(str(asset.id), 8), str.ljust(task.name, 96), \
                 str.ljust(str(task.interval), 8), \
                 str.ljust(str(start)[:-9], 10), "--", \
                 str.ljust(str(end)[:-9], 10)
@@ -126,7 +126,7 @@ class Output:
                 # str.ljust(str(task.interval), 8),     \
                 # str.ljust(str(task.manhours), 8),     \
                 # str.ljust(str(task.id), 8),           \
-                algorithm.prev = asset.name
+                algorithm.prev = asset.id
    
             else:
                 if algorithm.prev != asset.name: print ""

@@ -129,16 +129,16 @@ class Task:
         for require in requirelist:
             for t in input.tasks:
                 if require.id == t.id:
-                    if(not self.requisiteSatisfied(input, asset, t)):
+                    if(not self.requisiteSatisfied(input.schedule, asset, t)):
                         bundle = self.bundle(bundle, self.prereq, asset, input)
         return bundle
 
-    def requisiteSatisfied(self, input, asset, task, date=None):
+    def requisiteSatisfied(self, schedule, asset, task, date=None):
         """Checks if a prerequisite has been performed within a designated timeframe."""
         if(date==None):
-            date = input.schedule.dateRange.start
-        last = input.schedule.last(asset, task)
-        start = self.next(asset, input.schedule.last(asset, self))
+            date = schedule.dateRange.start
+        last = schedule.last(asset, task)
+        start = self.next(asset, schedule.last(asset, self))
         start = max(start, date)
         if(last is None):
             return False
@@ -149,7 +149,7 @@ class Task:
     def concurrence(self, bundle, asset, input):
         """Negotiate the appropriate scheduling for concurrent tasks."""
         concurlist = []
-        tasks_set  = False
+        tasks_set  = True
 
         for t in input.tasks:
             for c in self.concur:
@@ -159,7 +159,7 @@ class Task:
         
         for concurrent in concurlist:
             """Check if tasks are already in the Bundle."""
-            tasks_set = True if concurrent in bundle else False
+            if concurrent not in bundle: tasks_set = False
         
         for concurrent in concurlist:
             """If all tasks are in the bundle return the bundle."""
