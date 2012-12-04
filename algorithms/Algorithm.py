@@ -33,48 +33,34 @@ class Algorithm:
             self.calendar(input)
         if sort == '+':
             self.sorting = 'On'
-            self.sort(input, True)
+            self.sort(input.tasks, input.assets, True)
         elif sort == '-':
             self.sorting = 'Off'
         elif sort == '!':
             self.sorting = 'Rev'
-            self.sort(input, False)
+            self.sort(input.tasks, input.assets, False)
         self.main(input)
 
-    def sort(self, input, order):
+    def sort(self, tasks, assets, order):
         """
         Prioritize the tasks that require higher percentage of resources.
         How many of the skills for the task are available.
         Divide manhours cost with total available manhours.
         Schedule the complex conflict heavy task first.
         """
-        n = 0
-        d = 0 
-        for task in input.tasks:
-            n += self.totalhours(task, input.tasks)
-            d += (self.totalconflicts(task, input.tasks)*1.0 / self.totalTasks)
-        # bias = h / c
-        bias = 1.0
-        for task in input.tasks:
-            # print self.weight * self.totalhours(task, input.tasks)*100*r, (1.0-self.weight)* (self.totalconflicts(task, input.tasks)*1.0 / self.totalTasks)*100 
-            task.score = (self.weight * self.totalhours(task, input.tasks))*bias + ((1.0-self.weight)*
-                         (self.totalconflicts(task, input.tasks)*1.0 / self.totalTasks))
-        input.tasks.sort(key=lambda task:task.score, reverse=order)
+        bias = self.bias(tasks)
+        for task in tasks:
+            task.score = (self.weight * self.totalhours(task, tasks)) / bias + ((1.0-self.weight)*
+                         (self.totalconflicts(task, tasks)*1.0 / self.totalTasks))
+        tasks.sort(key=lambda task:task.score, reverse=order)
 
-        for asset in input.assets:
+        for asset in assets:
             """Prioritize the assets that have usage constraints in the more imminent future."""
             for index in self.schedule.usage.dates:
                 if asset.id in index:
                     d = (index.Date - (self.startDate.date()-timedelta(days=1))).days
                     asset.score += (0.9**int(d))*(1)
-        input.assets.sort(key=lambda asset:asset.score, reverse=order)
-        
-        # for task in input.tasks:
-            # print task.score, task.name
-            # print task.name
-        #     # print self.totalconflicts(task, input.tasks) 
-        #     # print task.conflicts
-        #     # print self.totalhours(task, input.tasks)
+        assets.sort(key=lambda asset:asset.score, reverse=order)
                     
     def main(self, input):
         """Schedule tasks for each asset."""
@@ -96,6 +82,15 @@ class Algorithm:
                         self.regularSchedule(asset, task, input, start)
         self.analytics(input)
         self.results = input
+
+    def bias(self, tasks):
+        """Determine the natural bias found in the scoring of the tasks and normalize."""
+        numerator = 0
+        denominator = 0
+        for task in tasks:
+            numerator += self.totalhours(task, tasks)
+            denominator += (self.totalconflicts(task, tasks)*1.0 / self.totalTasks)
+        return numerator / denominator
 
     def totalhours(self, task, tasks):
         """Determine the total skill hours cost of a task and it's children."""
@@ -189,7 +184,7 @@ class Algorithm:
         self.schedule.used_date = None
         self.schedule.used_asset = None
 
-    def recordInterval(self, date, orig, asset, task):
+    def recordInterval(self, date, orig, asset):
         """Record the drift in days from the optimal scheduling day."""
         from objects.DateRange import DateRange
         

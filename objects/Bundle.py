@@ -48,16 +48,16 @@ class Bundle(Task):
         """Return the number of days a bundle of tasks takes to perform."""
         hours = []
         for task in bundle:
-            longest = self.longest(task)
+            longest = task.duration()
             hours.append(longest)
         self.days = int(ceil(sum(hours) / self.hoursPerDay))
     
-    def longest(self, task):
-        """Find the the most time-costly aspect of a task and return its duration."""
-        longest = 0
-        for manpower in task.manpowers:                
-            if manpower.hours > longest: longest = manpower.hours
-        return longest
+    # def longest(self, task):
+    #     """Find the the most time-costly aspect of a task and return its duration."""
+    #     longest = 0
+    #     for manpower in task.manpowers:                
+    #         if manpower.hours > longest: longest = manpower.hours
+    #     return longest
         
     def allocate(self):
         """Allocate days to the mapping arrays."""
@@ -83,7 +83,7 @@ class Bundle(Task):
         start = 0
         end = 0
         for task in tasks:           
-            hours = remainder + self.longest(task)
+            hours = remainder + task.duration()
             if hours >= self.workday:
                 end += int(hours / self.workday)
                 remainder = hours % self.workday
@@ -113,7 +113,7 @@ class Bundle(Task):
                     else:
                         self.SkillsPool[day][skill.id].hours = skill.availableHours
                         if day+1 not in self.SkillsPool:
-                            self.SkillsPool.update({day:{}})
+                            self.SkillsPool.update({day+1:{}})
                         if skill.id not in self.SkillsPool[day+1]:
                             _skill = skill.copy()
                             self.SkillsPool[day+1].update({_skill.id:_skill})

@@ -58,7 +58,7 @@ class PushRightRelaxLeft(Algorithm):
                     task.interval = orig
                     self.totalScheduled += 1
                     """Add to schedule."""
-                    end = self.schedule.add(asset, task, start)
+                    end = self.schedule.add(asset, task, start, self.remainder)
                     self.console(asset, task, input, start, end)
                     """Claculate the start and end dates."""
                     start, end = self.calc(task, start, end)
@@ -95,5 +95,5 @@ class PushRightRelaxLeft(Algorithm):
                 self.conflicts += 1
                 
         self.usageViolation(start, orig, asset)
-        self.recordInterval(start, orig, asset, task)
+        self.recordInterval(start, orig, asset)
         return start

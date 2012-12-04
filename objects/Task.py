@@ -84,6 +84,13 @@ class Task:
         newSkill.hours = manpower.hours
         self.skills.append(newSkill)
 
+    def duration(self):
+        """Find the the most time-costly aspect of a task and return its duration."""
+        longest = 0
+        for manpower in self.manpowers:                
+            if manpower.hours > longest: longest = manpower.hours
+        return longest
+
     def copy(self):
         from copy import deepcopy
         return deepcopy(self)
