@@ -19,14 +19,14 @@ class PushToRight(Algorithm):
             while(self.schedule.blocked(asset, task, start, self.stupid)):
                 """Shift to the right one day when blocked."""
                 start += timedelta(days=1)
-                self.conflicts += 1
+                self.adjust += 1
             
             self.usageViolation(start, origin, asset)
             self.recordInterval(start, origin, asset)
             
             if not task.withinInterval(self.schedule, asset, start, self.stupid): 
                 """Add to schedule."""
-                self.totalScheduled += 1
+                self.totalSched += 1
                 end = self.schedule.add(asset, task, start)
                 self.console(asset, task, input, start, end)
             else:
@@ -49,7 +49,7 @@ class PushToRight(Algorithm):
             while(self.schedule.blocked(asset, metatask, start, self.stupid)):
                 """Shift to the right one day when blocked."""
                 start += timedelta(days=1)
-                self.conflicts += 1
+                self.adjust += 1
             
             self.usageViolation(start, origin, asset)
             self.recordInterval(start, origin, asset)
@@ -64,7 +64,7 @@ class PushToRight(Algorithm):
                     """Concurrent task inherits the interval of its parent task."""
                     if task.concurrent: task.interval = primary.interval                        
                     """Add to schedule."""
-                    self.totalScheduled += 1
+                    self.totalSched += 1
                     end = self.schedule.add(asset, task, start)
                     self.console(asset, task, input, start, end)                   
                     """Claculate the start and end dates."""

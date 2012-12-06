@@ -2,24 +2,23 @@ class Schedule:
     
     def __init__(self, dataSource, dateRange, maxAssetsInWork, hours):
         from objects import Usage
-        self.dataSource      = dataSource
-        self.dateRange       = dateRange
-        self.hoursPerDay     = hours
-        self.maxAssetsInWork = maxAssetsInWork        
-        self._schedule       = {}	# assets >> tasks
-        self._assetsInWork   = {}   # date   >> assets
-        self._skillsInWork   = {}   # date   >> skills
-        self._scheduledTasks = {}   # assets >> date >> tasks
-        self._conflictTasks  = {}   # assets >> date >> conflicts
-        self.metrics         = {}
-        self.forced          = []
+        self.dataSource      = dataSource      # The model used for the scheduleing.
+        self.dateRange       = dateRange       # The daterange for the scheduling cycle.
+        self.hoursPerDay     = hours           # hours in a workday.
+        self.maxAssetsInWork = maxAssetsInWork # maximum number of assets that can be worked on.
+        self._schedule       = {}	           # assets >> tasks
+        self._assetsInWork   = {}              # date   >> assets
+        self._skillsInWork   = {}              # date   >> skills
+        self._scheduledTasks = {}              # assets >> date >> tasks
+        self._conflictTasks  = {}              # assets >> date >> conflicts
+        self.forced          = []              # forced schedulings
         self.usage           = Usage()
-        self.used            = False
-        self.used_date       = None
-        self.used_asset      = None
-        self.totalUsage      = 0
-        self.totalManhours   = 0        
-        self.cal             = None
+        self.used            = False           # flag to indicate usage
+        self.used_date       = None            # capture the date that is marked for usage
+        self.used_asset      = None            # capture the asset being marked for usage 
+        self.usageViolation  = 0               # count of usage violations
+        self.totalManhours   = 0               # count of manhours
+        self.cal             = None            # Google calendar object
         
     def force(self, asset, task, dateRange):
         """Force an asset to be scheduled for specified task to be performed."""
@@ -103,7 +102,8 @@ class Schedule:
                 for subtask in task.TasksMap[delta]:
                     if subtask in self._conflictTasks[asset.id][date]:
                         return True
-            elif task.id in self._conflictTasks[asset.id][date]:                    
+            elif task.id in self._conflictTasks[asset.id][date]:
+                """Check for conflicts for regularly scheduled tasks."""                    
                 return True
         return False
 
@@ -119,27 +119,30 @@ class Schedule:
 
     def checkSkills(self, date, delta, asset, task):
         """Check skills hours availability and usage."""        
-        usage = self.getUsage(date, asset)
-        skills = task.skills  if task.id != 0 else task.pooledSkills(delta)
-        lastday = task.days-1
-        # for skill in skills: 
-        #     print delta, asset.id, task.id if task.id != 0 else task.name, skill.name, skill.hours, skill.availableHours
-        # print ""       
+        usage = self.getUsage(date, asset) # get usage hours
+        skills = task.skills if task.id != 0 else task.pooledSkills(delta)
+        lastday = task.days-1 # last day of a multiday task
+     
         for skill in skills:
             if task.days > 1:
                 if skill.hours > skill.availableHours:
                     """If the pooled hours are more than available in a workday."""
                     if delta == lastday:
+                        """on the last day, the remainder is assigned to the hours variable."""
                         hours = skill.hours % skill.availableHours
                     else: 
+                        """Assign full hours for all other days."""
                         hours = skill.hours / task.days
                 elif delta < lastday:
+                    """If there are enough available hours and not the last day."""
                     hours = skill.hours
                 else:
+                    """If it is greater or equal to last day."""
                     hours = 0
             else:
+                """If the task is not longer than a day."""
                 hours = skill.hours
-
+                
             """Calculate the available hours for the skill."""
             available = skill.availableHours - (usage * skill.available)
             
@@ -153,45 +156,37 @@ class Schedule:
     def _addToSchedule(self, asset, task, remainder, forced=False):
         """Add a task to an asset in the schedule."""
         from datetime import datetime
+        """Keep a record of assets and tasks scheduled."""
         if asset.id not in self._schedule:
             self._schedule[asset.id] = []
         self._schedule[asset.id].append(task)
-        
+        """Keep a record of skills and their hours scheduled."""
         self.scheduleSkills(task, remainder, task.dateRange.start)
         
         for date in task.dateRange.range():                        
-            """Assign asset to the date."""               
-            # print date.date(), asset.id, task.id if task.id !=0 else task.name
-            
+            """Assign asset to the date."""            
             if date.date() not in self._assetsInWork.keys():
                 self._assetsInWork[date.date()] = [asset.id]
             elif asset.id not in self._assetsInWork[date.date()]:
                 self._assetsInWork[date.date()].append(asset.id)
-            
-            if asset.id not in self._scheduledTasks.keys():
-                """Assign asset, date, and task to list of scheduled tasks."""
+            """Assign asset, date, and task to list of scheduled tasks."""
+            if asset.id not in self._scheduledTasks.keys():                
                 self._scheduledTasks[asset.id] = { date: [task.id] }
             elif date not in self._scheduledTasks[asset.id]: 
                 self._scheduledTasks[asset.id][date] = [task.id]
             else:
                 self._scheduledTasks[asset.id][date].append(task.id)
-                            
+            """Assign conflict to list of conflicts."""                 
             if asset.id not in self._conflictTasks.keys():
-                """Assign conflict to list of conflicts.""" 
                 self._conflictTasks[asset.id] = { date: task.conflicts }
             elif date not in self._conflictTasks[asset.id]: 
                 self._conflictTasks[asset.id][date] = task.conflicts
             else:
                 self._conflictTasks[asset.id][date] = \
                 self._conflictTasks[asset.id][date].union(task.conflicts)
-
             """Tally manhours."""
             if date <= self.dateRange.end and date >= self.dateRange.start:
                 self.totalManhours += task.manhours
-                
-                # if (asset.id,task.id) not in self.metrics:                    
-                #     self.metrics.update({(asset.id,task.id):0})
-                # self.metrics[(asset.id,task.id)] += task.manhours
         
         """Call Google Calendar scheduler."""
         from inputs.Config import Config
@@ -207,22 +202,27 @@ class Schedule:
             for manpower in task.manpowers:
                 if manpower.skill.id == skill.id:
                     if manpower.hours + remainder <= task.hoursPerDay:
+                        """If the task fits within the day."""
                         hours = manpower.hours
                         last = 0
                         days = 1
                     else:
+                        """If the task goes over a day."""
                         last = (manpower.hours + remainder) % task.hoursPerDay
                         days =  int(ceil((manpower.hours + remainder) / task.hoursPerDay))
                         hours = task.hoursPerDay - remainder
                     
                     for d in range(0, days):
+                        """Iterate through the days."""
                         date = start + timedelta(days=d)
                         if days > 1:
                             if d == days-1:
+                                """If the day is last, apply the remainder."""
                                 hours = last  
                             elif d != 0:
+                                """If it's not the first day apply full workday."""
                                 hours = task.hoursPerDay
-                                
+                        """Record the hours for the skill."""        
                         if date not in self._skillsInWork.keys():
                             self._skillsInWork[date] = { skill.id:hours }
                         elif skill.id not in self._skillsInWork[date].keys():
@@ -240,7 +240,7 @@ class Schedule:
         if not self.cal: self.cal = Calendar()
         calendar = self.cal.Select(asset.name)        
         start = task.dateRange.start.strftime('%Y-%m-%dT%H:%M:%S.000Z')
-        end = task.dateRange.end + timedelta(minutes=1) #shift time for Google calendar display
+        end = task.dateRange.end + timedelta(minutes=1) # shift time for Google calendar display
         end = end.strftime('%Y-%m-%dT%H:%M:%S.000Z')
 
         if start == end:            

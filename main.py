@@ -1,5 +1,5 @@
 #!/usr/local/bin/python
-import inputs, algorithms, outputs, metrics
+import inputs, algorithms, metrics
 import sys
 from tests.Tests import Tests
 

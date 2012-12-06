@@ -1,4 +1,5 @@
 class Algos:
+    """Routing and instatiation for algorithms."""    
     def __init__(self, model, weight, relax, sort):
         import main
         from PushToRight import PushToRight

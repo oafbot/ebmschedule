@@ -3,29 +3,31 @@ from datetime import timedelta
 
 class Metrics:
     def __init__(self):
-        self.DataSource   = None
-        self.Algorithm    = None
-        self.Weight       = None
-        self.Data         = None
-        self.Manhours        = 0
-        self.Usage           = 0
-        self.UsageTotal      = 0
-        self.Imminent        = 0
-        self.UsageCount      = 0
-        self.ActualGround    = 0 # discrete count
-        self.Groundings      = 0 # raw count
-        self.GroundedSum     = 0 # raw count
-        self.Inefficiencies  = 0
-        self.Scheduled       = 0
-        self.Violations      = 0
-        self.Optimal         = 0
-        self.AverageGround   = 0        
-        self.ExtendedGround  = 0
-        self.NumberOfAssets  = 0
-        self.Forced          = 0
-        self.Available       = {}
+        self.DataSource   = None 
+        self.Algorithm    = None 
+        self.Weight       = None 
+        self.Data         = None # dataset number
+        self.Manhours        = 0 # total manhours.
+        self.Usage           = 0 # usage violation count
+        self.UsageTotal      = 0 # total planned usage for all assets.
+        self.Imminent        = 0 # usage violation in the first 14 days. 
+        self.Midterm         = 0 # usage violation in first 90 days.
+        self.UsageCount      = 0 # structure holding assets and their planned usage count.
+        self.ActualGround    = 0 # discrete count: summation of days grounded.
+        self.Groundings      = 0 # discrete count: events where groundings occurred.
+        self.GroundedSum     = 0 # raw count: summation of days grounded. Ovelaps unflitered.
+        self.Inefficiencies  = 0 # raw count: summation of days scheduled prior to optimal date.
+        self.Scheduled       = 0 # total number of scheduled tasks.
+        self.Violations      = 0 # number of days tasks were not scheduled on optimal date
+        self.Optimal         = 0 # number of days / events scheduled on optimal date.
+        self.AverageGround   = 0 # average length of day assets were grounded
+        self.ExtendedGround  = 0 # days that assets were grounded over 7 days.
+        self.NumberOfAssets  = 0 # total number of assets.
+        self.Forced          = 0 # count of forced schedulings.
+        self.Available       = {} # availability of assets through the calendar cycle.
         
-    def set(self, algorithm):                
+    def set(self, algorithm):
+        """Set the basic properties for the metrics object."""               
         self.algorithm = algorithm
         self.output    = self.algorithm.output
         self.model     = self.algorithm.results
@@ -40,16 +42,17 @@ class Metrics:
         self.Data       = self.model.count
         self.Sort       = self.algorithm.sorting
         self.Manhours   = self.schedule.totalManhours        
-        self.Scheduled  = self.algorithm.totalScheduled
+        self.Scheduled  = self.algorithm.totalSched
         self.Available  = self.schedule._assetsInWork
-        self.Usage      = self.schedule.totalUsage
+        self.Usage      = self.schedule.usageViolation
         self.UsageTotal = len(self.schedule.usage.dates)
         self.UsageCount = self.schedule.usage.count
         
         self.end = self.schedule.dateRange.end
         self.start = self.schedule.dateRange.start
     
-    def run(self, algorithm):        
+    def run(self, algorithm):
+        """Run metrics calculations."""
         self.set(algorithm)
         self.calc()
         self.console()
@@ -57,20 +60,20 @@ class Metrics:
             self.writeout()
     
     def calc(self):
-        over = []
-        under = []
-        optimal = []
+        """Calculate groundings, optimal, inefficiencies."""
+        over    = [] # groundings
+        under   = [] # ineffiencies
+        optimal = [] # optimal
         for drift in self.algorithm.drift:
             if drift > timedelta(days=0):
-                over.append(drift.days)
+                over.append(drift.days)    # scheduled after the optimal date
             elif drift < timedelta(days=0):
-                under.append(drift.days)
+                under.append(drift.days)   # scheduled before the optimal date
             else:
-                optimal.append(drift.days)
-
-        self.Groundings = len(over)
+                optimal.append(drift.days) # scheduled on the optimal date
+        # self.Groundings = len(over)
         self.GroundedSum = sum(over)
-        self.Inefficiencies = len(under)
+        self.Inefficiencies = abs(sum(under))
         self.Optimal = len(optimal)
         self.Violations = len(self.algorithm.drift)-len(optimal)
         self.ExtendedGround = sum(n > 7 for n in over)
@@ -80,6 +83,7 @@ class Metrics:
             self.ActualGround += self.algorithm.groundings[ground]
         
     def availability(self):
+        """Determine the availability of assets throughout the scheduling cycle."""
         from collections import Counter
         counts = []
         for date in self.Available:
@@ -92,37 +96,41 @@ class Metrics:
         return availables
 
     def console(self):
-        print str.ljust("Manhours:", 10), str.ljust(str(self.Manhours), 10), \
-              str.ljust("Grounding:", 10), str.ljust(str(self.ActualGround), 5), \
-              str.ljust("Usage:", 5), str.ljust(str(self.Usage), 5), \
+        """Print metrics to the screen."""        
+        print str.ljust("Scheduled:", 10), str.ljust(str(self.Scheduled), 10), \
+              str.ljust("Optimal:", 10), str.ljust(str(self.Optimal), 10), \
+              str.ljust("Violation:", 10), str.ljust(str(self.Violations), 10), \
+              str.ljust("Grounding:", 10), str.ljust(str(self.ActualGround), 10), \
+              str.ljust("Inefficiency:", 10), str.ljust(str(self.Inefficiencies), 10) + "\n" + \
+              str.ljust("Manhours:", 10), str.ljust(str(self.Manhours), 10), \
+              str.ljust("Average:", 10), str.ljust("{0:.1f}".format(self.AverageGround) + " days", 10), \
+              str.ljust("Usage:", 10), str.ljust(str(self.Usage), 10), \
+              str.ljust("Extended:", 10), str.ljust(str(self.ExtendedGround), 10), \
               str.ljust("Sort:", 5), str.ljust(self.Sort, 5) + "\n"
-        
-        # print str.ljust("Scheduled:", 10), str.ljust(str(self.Scheduled), 10), \
-        #       str.ljust("Optimal:", 10), str.ljust(str(self.Optimal), 10), \
-        #       str.ljust("Violation:", 10), str.ljust(str(self.Violations), 10), \
-        #       str.ljust("Grounding:", 10), str.ljust(str(self.ActualGround), 10), \
-        #       str.ljust("Inefficiency:", 10), str.ljust(str(self.Inefficiencies), 10) + "\n" + \
-        #       str.ljust("Manhours:", 10), str.ljust(str(self.Manhours), 10), \
-        #       str.ljust("Average:", 10), str.ljust("{0:.1f}".format(self.AverageGround) + " days", 10), \
-        #       str.ljust("Usage:", 10), str.ljust(str(self.Usage), 10), \
-        #       str.ljust("Extended:", 10), str.ljust(str(self.ExtendedGround), 10), \
+        # print str.ljust("Manhours:", 10), str.ljust(str(self.Manhours), 10), \
+        #       str.ljust("Grounding:", 10), str.ljust(str(self.ActualGround), 5), \
+        #       str.ljust("Usage:", 5), str.ljust(str(self.Usage), 5), \
         #       str.ljust("Sort:", 5), str.ljust(self.Sort, 5) + "\n"
     
     def writeout(self):
-        """Write out metrics to a file."""
+        """Write out metrics to a CSV file."""
         import os
+        """determine path and open file for writing."""
         path = "../metrics/" if 'tools' in os.getcwd() else "metrics/"
-        # percent = round((float(optimal) / float(self.total)) * 100, 2)
         fo = open(path + self.DataSource + ".csv", "ab+")
         if os.stat(path + self.DataSource + ".csv")[6]==0:
+            """If the file is new or empty, write out the header containing all field names."""
             header = ""
             for n in reversed(range(0, self.NumberOfAssets+1)):
+                """Create field names for availability depending on the number of assets."""
                 header += "," + str(self.NumberOfAssets - n) + " Avail."
-            csv = "Algorithm,Data,Weight,Sort,Manhours,Grounded Days,Ground Raw Count,Grounding Events,Inefficiencies,Scheduled," + \
-                  "Violations,Optimal,Average,Usage Viol.,Imminent Usg.,Planned Usg.,Extended Grnd" + \
+            """The field names for the CSV file."""
+            csv = "Algorithm,Data,Weight,Sort,Manhours,Grounded Days,Ground Raw Count," + \
+                  "Grounding Events,Inefficiencies,Scheduled,Violations,Optimal,Average," + \
+                  "Usage Viol.,Imminent Usg., Midterm Usg., Planned Usg.,Extended Grnd" + \
                   header + "\n"
-        else: 
-            csv = ""
+        else: csv = ""
+        """Write out to the file and close."""    
         csv += self.Algorithm                       + "," + \
                str(self.Data)                       + "," + \
                str(self.Weight)                     + "," + \
@@ -138,6 +146,7 @@ class Metrics:
                "{0:.2f}".format(self.AverageGround) + "," + \
                str(self.Usage)                      + "," + \
                str(self.Imminent)                   + "," + \
+               str(self.Midterm)                    + "," + \
                str(self.UsageTotal)                 + "," + \
                str(self.ExtendedGround)             + \
                self.availability()                  + "\n"

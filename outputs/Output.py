@@ -135,24 +135,14 @@ class Output:
                       str.ljust(str(start)[:-9], 10), "--", \
                       str.ljust(str(end)[:-9], 10)
                 algorithm.prev = asset.name
-    
-    def writeMetrics(self, input, conflicts, name, weight, exectime, now):
-        import os
-        if 'tools' in os.getcwd():
-            path = "../metrics/"
-        else: 
-            path = "metrics/"
-        line = "\n----------------------------------------"+ \
-               "-----------------------------------------\n"
-        fo = open(path + input.schedule.dataSource + ".txt", "ab+")
-        out = line+ name + ": " + input.schedule.dataSource + " " + str(input.count) + \
-              "\t[" + str(now)[:-7] + "]" + "\tExecution: " + exectime + line + \
-              "Weight: " + str(weight) + "\n" + \
-              str.ljust("Manhours: " + str(input.schedule.totalManhours), 25) + \
-              str.ljust("Adjustments: " + str(conflicts), 25) + "\n"
 
-        fo.write( out )
-        fo.close()
+    def analytics(self, algo, exectime, count):
+        """Print out partial analytics to the console."""
+        forced = "    Forced: " + str(algo.forced) if algo.forced else ""
+        weight = str(algo.weight)
+        data = (algo.name, algo.schedule.dataSource, count, algo.weight, algo.adjust, forced)
+        output = "%s: %s %s    Weight: %s    Adjustments: %s %s" % data
+        print "\n", str.ljust(output, 80), "Execution:", exectime, "\n"
         
     def strfdelta(self, tdelta, fmt):
         """Convert timedelta to days."""

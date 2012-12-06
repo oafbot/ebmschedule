@@ -14,14 +14,14 @@ from objects.DateRange import DateRange
 
 class InitialConditions:
     def __init__(self, name, count=0, config=Config(), batch=0):
-        self.name = name
-        self.config = config
-        self.reset = self.config.reset
-        self.cap = self.config.cap
+        self.name     = name
+        self.config   = config
+        self.reset    = self.config.reset
+        self.cap      = self.config.cap
         self.platform = self.config.platform
-        self.count = count
-        self.batch = batch
-        self.xml = etree.Element("Dataset")
+        self.count    = count
+        self.batch    = batch
+        self.xml      = etree.Element("Dataset")
         
         if 'tools' in os.getcwd():
             self.path = "../inputs/xml/" + str(self.platform) + "/"
@@ -73,11 +73,7 @@ class InitialConditions:
             
     def random_date(self, start, end):
         """This function will return a random datetime between two datetime objects."""
-        delta = end - start        
-        # delta_secs = (delta.days * 24 * 60 * 60) + delta.seconds
-        # random_second = randrange(delta_secs)
-        # print (start + timedelta(seconds=random_second))
-        # return (start + timedelta(seconds=random_second))       
+        delta = end - start     
         random_day = randrange(delta.days)
         print self.batch, self.count, start + timedelta(days=random_day, hours=8)
         return (start + timedelta(days=random_day, hours=8))

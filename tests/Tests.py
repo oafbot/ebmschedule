@@ -157,5 +157,5 @@ class Tests:
                   str.ljust("Inefficiency:", 10), str.ljust(str(ineff), 10) + "\n" + \
                   str.ljust("Manhours:", 10), str.ljust(str(self.schedule.totalManhours), 10), \
                   str.ljust("Average:", 10), str.ljust(str(average) + " days", 10), \
-                  str.ljust("Usage:", 10), str.ljust(str(self.schedule.totalUsage), 10) + "\n"
+                  str.ljust("Usage:", 10), str.ljust(str(self.schedule.usageViolation), 10) + "\n"
                   

@@ -30,7 +30,7 @@ class PushToLeft(Algorithm):
             self.recordInterval(start, original)
             
             if not task.withinInterval(input.schedule, asset, start, self.stupid):
-                self.totalScheduled += 1
+                self.totalSched += 1
                 end = input.schedule.add(asset, task, start)
                 self.console(asset, task, input, start, end)
             else:
@@ -71,7 +71,7 @@ class PushToLeft(Algorithm):
                 """For each task in the bundle, schedule in order."""
                 self.overhours = False
                 if task.concurrent or not task.withinInterval(input.schedule, asset, start, self.stupid):
-                    self.totalScheduled += 1
+                    self.totalSched += 1
                     end = input.schedule.add(asset, task, start)
                     self.console(asset, task, input, start, end)
                     """Claculate the start and end dates."""
