@@ -27,7 +27,7 @@ class Bundle(Task):
     def initialize(self, tasks):
         """Configure the basic properties of the bundle as a meta-task."""
         for task in tasks:
-            """Inherit from primary task."""
+            """Inherit properties from primary task."""
             if task.primary:
                 self.primary = task
                 self.interval = task.interval
@@ -92,7 +92,7 @@ class Bundle(Task):
             # self.mapSkills(start, day, remainder, task)
         return [end, end]        
             
-    def mapSkills(self, start, days, remainder, task):
+    def mapSkills(self, start, day, remainder, task):
         """Assign skill hours to appropriate days."""
         for skill in task.skills:
             for manpower in task.manpowers:
@@ -102,9 +102,9 @@ class Bundle(Task):
                     # if remainder + workhours >= self.workday:
                     #     print remainder, "+", workhours, "=", remainder + workhours
 
-                    # if skill.id == 17 or skill.id == 16:
-                    #     self.temp += workhours
-                    #     print day, remainder, workhours
+                    if skill.id == 17: #or skill.id == 16:
+                        self.temp += workhours
+                        print start, remainder, "+", workhours, "=", remainder + workhours
                                         
                     if remainder + workhours <= self.workday:
                         hours = workhours
@@ -118,10 +118,13 @@ class Bundle(Task):
                     for day in range(start, end+1):
                         """If longer than a day and not the last day, apply full workday."""           
                         if overhours:
-                            hours = self.workday if day < end else mod                             
+                            hours = workhours - mod if day < end else mod                             
                         elif day > start:
                             hours = 0
-                    
+                        
+                        if skill.id == 17:
+                            print day, hours
+                        
                         if skill.id in self.SkillsMap[day]:
                             if self.SkillsMap[day][skill.id].hours + hours <= skill.availableHours:
                                 self.SkillsMap[day][skill.id].hours += hours
@@ -137,3 +140,4 @@ class Bundle(Task):
                                 self.SkillsMap[day+1][skill.id].hours += hours
                         else:
                             self.SkillsMap[day][skill.id] = skill.copy()
+                            self.SkillsMap[day][skill.id].hours = hours
