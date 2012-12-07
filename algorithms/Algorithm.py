@@ -32,8 +32,6 @@ class Algorithm:
         """Push schedule to Google Calendar if true."""
         if(input.conf.pushcal): self.calendar(input)
         """Run sorting algorithms. Bypass for sorting off."""
-        # import random
-        # random.shuffle(input.tasks)
         if sort == '+':
             self.sorting = 'On'
             self.sort(input.tasks, input.assets, True)
@@ -42,8 +40,6 @@ class Algorithm:
         elif sort == '!':
             self.sorting = 'Rev'
             self.sort(input.tasks, input.assets, False)
-        # for task in input.tasks:
-        #     print task.score, task.name
         """Run main scheduling algorithm."""
         self.main(input)
 

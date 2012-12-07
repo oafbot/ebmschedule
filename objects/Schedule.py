@@ -120,7 +120,7 @@ class Schedule:
     def checkSkills(self, date, delta, asset, task):
         """Check skills hours availability and usage."""        
         usage = self.getUsage(date, asset) # get usage hours
-        skills = task.skills if task.id != 0 else task.pooledSkills(delta)
+        skills = task.skills if task.id != 0 else task.getSkills(delta)
         lastday = task.days-1 # last day of a multiday task
      
         for skill in skills:
