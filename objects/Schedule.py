@@ -13,7 +13,7 @@ class Schedule:
         self._conflictTasks  = {}              # assets >> date >> conflicts
         self.forced          = []              # forced schedulings
         self.usage           = Usage()
-        self.used            = False           # flag to indicate usage
+        self.used            = []              # flag to indicate usage
         self.used_date       = None            # capture the date that is marked for usage
         self.used_asset      = None            # capture the asset being marked for usage 
         self.usageViolation  = 0               # count of usage violations
@@ -84,15 +84,23 @@ class Schedule:
         """Check on Usage requirements."""
         if self.getUsage(date, asset) > self.hoursPerDay:
             """If usage hours are greater than a workday, the day is blocked."""
-            self.setUsageFlag(date, asset)
+            self.setUsage(date, asset)
             return True
         return False
 
-    def setUsageFlag(self, date, asset):
+    def setUsage(self, date, asset):
         """Set usage flags."""
-        self.used_date = date.date()
-        self.used_asset = asset.id
-        self.used = True
+        self.used.append(date.date())
+        # self.used_date = date.date()
+        # self.used_asset = asset.id
+        # self.used = True
+    
+    def unsetUsage(self):
+        """Set usage flags."""
+        self.used = []
+        # self.used_date = None
+        # self.used_asset = None
+        # self.used = False
     
     def checkConflicts(self, date, delta, asset, task):
         """Check conflicts."""
@@ -124,32 +132,34 @@ class Schedule:
         lastday = task.days-1 # last day of a multiday task
      
         for skill in skills:
-            if task.days > 1:
+            if task.days > 1 and task.id != 0:
+                """If the task is not a bundle and is over a day."""
                 if skill.hours > skill.availableHours:
                     """If the pooled hours are more than available in a workday."""
                     if delta == lastday:
-                        """on the last day, the remainder is assigned to the hours variable."""
+                        """On the last day, the remainder is assigned to the hours variable."""
                         hours = skill.hours % skill.availableHours
                     else: 
-                        """Assign full hours for all other days."""
-                        hours = skill.hours / task.days
-                elif delta < lastday:
-                    """If there are enough available hours and not the last day."""
+                        """Otherwise assign full hours on all other days."""
+                        hours = skill.availableHours
+                elif delta == 0:
+                    """If hours are available, then apply hours to the first day."""
                     hours = skill.hours
                 else:
-                    """If it is greater or equal to last day."""
+                    """Otherwise apply zero hours."""
                     hours = 0
             else:
                 """If the task is not longer than a day."""
                 hours = skill.hours
-                
+            
             """Calculate the available hours for the skill."""
             available = skill.availableHours - (usage * skill.available)
             
             if date in self._skillsInWork.keys() and skill.id in self._skillsInWork[date].keys():
                 """If the sum of scheduled and current skill hours exceed available hours."""
                 if self._skillsInWork[date][skill.id] + hours > available:
-                    if usage > 0: self.setUsageFlag(date, asset)
+                    if usage > 0: 
+                        self.setUsage(date, asset)
                     return True
         return False
                     
@@ -197,38 +207,39 @@ class Schedule:
         """Assign skills to the date."""
         from datetime import timedelta
         from math import ceil
+        
+        for manpower in task.manpowers:
+            if manpower.hours + remainder <= task.hoursPerDay:
+                """If the task fits within the day."""
+                hours = manpower.hours
+                last = 0
+                days = 1
+            else:
+                """If the task goes over a day."""
+                last  = (manpower.hours + remainder) % task.hoursPerDay # hours for the last day
+                days  = int(ceil((manpower.hours + remainder) / task.hoursPerDay)) + 1
+                hours = task.hoursPerDay - remainder # hours for the first day
+            
+            for d in range(0, days):
+                """Iterate through the days."""
+                date  = start + timedelta(days=d)
+                skill = manpower.skill.id
                 
-        for skill in task.skills:            
-            for manpower in task.manpowers:
-                if manpower.skill.id == skill.id:
-                    if manpower.hours + remainder <= task.hoursPerDay:
-                        """If the task fits within the day."""
-                        hours = manpower.hours
-                        last = 0
-                        days = 1
-                    else:
-                        """If the task goes over a day."""
-                        last = (manpower.hours + remainder) % task.hoursPerDay
-                        days =  int(ceil((manpower.hours + remainder) / task.hoursPerDay))
-                        hours = task.hoursPerDay - remainder
-                    
-                    for d in range(0, days):
-                        """Iterate through the days."""
-                        date = start + timedelta(days=d)
-                        if days > 1:
-                            if d == days-1:
-                                """If the day is last, apply the remainder."""
-                                hours = last  
-                            elif d != 0:
-                                """If it's not the first day apply full workday."""
-                                hours = task.hoursPerDay
-                        """Record the hours for the skill."""        
-                        if date not in self._skillsInWork.keys():
-                            self._skillsInWork[date] = { skill.id:hours }
-                        elif skill.id not in self._skillsInWork[date].keys():
-                            self._skillsInWork[date][skill.id] = hours
-                        else:
-                            self._skillsInWork[date][skill.id] += hours
+                if days > 1:
+                    if d == days-1:
+                        """If the day is last, apply the remainder."""
+                        hours = last 
+                    elif d != 0:
+                        """If it's not the first day apply full workday."""
+                        hours = task.hoursPerDay
+                """Record the hours for the skill."""
+                if date not in self._skillsInWork.keys():
+                    self._skillsInWork[date] = {skill : hours}
+                elif skill not in self._skillsInWork[date].keys():
+                    self._skillsInWork[date][skill] = hours
+                else:
+                    self._skillsInWork[date][skill] += hours
+
     
     def scheduleCalendar(self, task, asset):
         """Schedule to Google Calendar."""        

@@ -155,23 +155,22 @@ class Algorithm:
 
     def usageViolation(self, date, original, asset):
         """Record usage violations."""
-        used_date = self.schedule.used_date # the date that usage is occuring
+        # used_date = self.schedule.used_date # the date that usage is occuring
         
-        if(date > original and self.schedule.used and used_date is not None):
-            if(original.date() <= used_date and used_date not in asset.violation):
-                """If the date occurs later than optimal date, and usage date is not already counted."""
-                asset.violation.update([used_date])
-                self.schedule.usageViolation += 1
-                """Keep a record of imminent usage violations."""
-                if(date <= self.startDate + timedelta(days=14)):              
-                    self.metrics.Imminent += 1
-                """Keep a record of midterm usage violations."""
-                if(date <= self.startDate + timedelta(days=90)):              
-                    self.metrics.Midterm += 1
+        if(date > original and self.schedule.used):
+            for used_date in self.schedule.used:
+                if(original.date() <= used_date and used_date not in asset.violation):
+                    """If the date occurs later than optimal date, and usage date is not already counted."""
+                    asset.violation.update([used_date])
+                    self.schedule.usageViolation += 1
+                    """Keep a record of imminent usage violations."""
+                    if(used_date <= self.startDate.date() + timedelta(days=14)):              
+                        self.metrics.Imminent += 1
+                    """Keep a record of midterm usage violations."""
+                    if(used_date <= self.startDate.date() + timedelta(days=90)):              
+                        self.metrics.Midterm += 1
         """Reset usage flags."""
-        self.schedule.used = False
-        self.schedule.used_date = None
-        self.schedule.used_asset = None
+        self.schedule.unsetUsage()
 
     def recordInterval(self, date, orig, asset):
         """Record the drift in days from the optimal scheduling day."""

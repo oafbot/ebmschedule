@@ -17,12 +17,12 @@ class Bundle(Task):
         self.allocate()
         self.distribute(tasks)
  
-        print self.name, self.manhours, len(self.manpowers)
-        for day in self.SkillsMap:
-           for skill_id in self.SkillsMap[day]:
-               skill = self.SkillsMap[day][skill_id]
-               print day, ":", skill.name, skill.hours
-        print ""
+        # print self.name, self.manhours, len(self.manpowers)
+        # for day in self.SkillsMap:
+        #    for skill_id in self.SkillsMap[day]:
+        #        skill = self.SkillsMap[day][skill_id]
+        #        print day, ":", skill.name, skill.hours
+        # print ""
 
     def initialize(self, tasks):
         """Configure the basic properties of the bundle as a meta-task."""
@@ -102,9 +102,9 @@ class Bundle(Task):
                     # if remainder + workhours >= self.workday:
                     #     print remainder, "+", workhours, "=", remainder + workhours
 
-                    if skill.id == 17: #or skill.id == 16:
-                        self.temp += workhours
-                        print start, remainder, "+", workhours, "=", remainder + workhours
+                    # if skill.id == 17: #or skill.id == 16:
+                    #     self.temp += workhours
+                    #     print start, remainder, "+", workhours, "=", remainder + workhours
                                         
                     if remainder + workhours <= self.workday:
                         hours = workhours
@@ -122,8 +122,8 @@ class Bundle(Task):
                         elif day > start:
                             hours = 0
                         
-                        if skill.id == 17:
-                            print day, hours
+                        # if skill.id == 17:
+                        #     print day, hours
                         
                         if skill.id in self.SkillsMap[day]:
                             if self.SkillsMap[day][skill.id].hours + hours <= skill.availableHours:
