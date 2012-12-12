@@ -6,33 +6,32 @@ class Task:
     def __init__(self, id, name, workhours, threshold, interval, manpowers, 
                  conflicts=list(), prep=list(), prereq=list(), subseq=list(), concur=list()):
 
-        self.id                  = id
-        self.name                = name
-        self.threshold           = threshold
-        self.interval            = interval
-        self.manpowers           = manpowers
-        self.conflicts           = set(conflicts)
-        self.prep                = set(prep)
-        self.prereq              = set(prereq)
-        self.subseq              = set(subseq)
-        self.concur              = set(concur)
-        self.locked              = False
-        self.hoursPerDay         = workhours
-        self.skills              = []
-        self.days                = 0
-        self.manhours            = 0
-        self.totalAvailableHours = 0
-        self.child               = False
-        self.required            = False
-        self.preparatory         = False
-        self.concurrent          = False
-        self.primary             = False
-        self.subsequent          = False
-        self.relax               = timedelta(days=int(ceil(self.interval/4)))
-        self.requisite_interval  = int(ceil(self.interval/2))
+        self.id           = id
+        self.name         = name
+        self.threshold    = threshold
+        self.interval     = interval
+        self.manpowers    = manpowers      # array holding the manpower required
+        self.conflicts    = set(conflicts) # set holding IDs of conflict tasks.
+        self.prep         = set(prep)      # prepatory tasks
+        self.prereq       = set(prereq)    # prerequisite tasks
+        self.subseq       = set(subseq)    # subsequent tasks
+        self.concur       = set(concur)    # concurrent tasks
+        self.locked       = False
+        self.hoursPerDay  = workhours      # hours in a workday
+        self.skills       = []             # array holding all the required skills
+        self.days         = 0              # duration of a task in days
+        self.manhours     = 0              # total manpower hours.
+        self.score        = 0              # score given by the sorting algorithm
+        self.child        = False          # flag for child tasks
+        self.required     = False          # flag for required tasks
+        self.preparatory  = False          # flag for prep tasks
+        self.concurrent   = False          # flag for concurrent tasks
+        self.primary      = False          # flag for primary tasks
+        self.subsequent   = False          # flag for subsequent tasks
+        self.reqInterval  = int(ceil(self.interval/2)) # interval for required tasks.
+        self.relax        = timedelta(days=int(ceil(self.interval/4))) # easing for 'stupidity'-checking. Implementation off.
 
         if len(manpowers): self.precal() #TODO: Should come from sequencing
-
 
     def next(self, asset, date):
         """
@@ -149,7 +148,7 @@ class Task:
         start = max(start, date)
         if(last is None):
             return False
-        elif(last < start - timedelta(days=self.requisite_interval)):
+        elif(last < start - timedelta(days=self.reqInterval)):
             return False
         return True
 

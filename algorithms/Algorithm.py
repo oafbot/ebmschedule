@@ -24,7 +24,7 @@ class Algorithm:
         self.startDate  = self.schedule.dateRange.start
         self.endDate    = self.schedule.dateRange.end
         self.stopwatch  = datetime.now()
-                
+
         """Set the name of the algorithm."""
         if(self.relax < 0): self.name += "["+"{0:.2f}".format(abs(self.relax))+"]"
         """Output scheduling to screen if trace is on.""" 
@@ -63,7 +63,7 @@ class Algorithm:
                     d = (index.Date - (self.startDate.date()-timedelta(days=1))).days
                     asset.score += (0.9**int(d))*(1)
         assets.sort(key=lambda asset:asset.score, reverse=order)
-            
+
     def main(self, input):
         """Schedule tasks for each asset."""
         for task in input.tasks:
@@ -141,9 +141,9 @@ class Algorithm:
         longest = 0
         """Inherit the duration of a task from its most time-intensive procedure."""
         for manpower in task.manpowers:
-            if manpower.hours > longest: longest = manpower.hours        
-        hours = self.remainder + longest
-                
+            if manpower.hours > longest: longest = manpower.hours
+        hours = round(self.remainder + longest, 2)
+
         if hours >= self.maxhours:
             """If the tasks take longer than the workday, determine end date and remainder hours."""
             end = start + timedelta(days=int(hours / self.maxhours))
@@ -154,9 +154,7 @@ class Algorithm:
         return [end, end]
 
     def usageViolation(self, date, original, asset):
-        """Record usage violations."""
-        # used_date = self.schedule.used_date # the date that usage is occuring
-        
+        """Record usage violations."""        
         if(date > original and self.schedule.used):
             for used_date in self.schedule.used:
                 if(original.date() <= used_date and used_date not in asset.violation):
