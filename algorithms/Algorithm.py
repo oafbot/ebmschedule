@@ -133,7 +133,8 @@ class Algorithm:
         cost = 0
         for skill in task.skills:
             """Divide manhours with total available manhours."""
-            cost += (1.0*skill.hours)/skill.availableHours
+            # cost += (1.0*skill.hours)/skill.availableHours
+            cost += (skill.availableHours - 1.0*skill.hours)/skill.availableHours
         return cost
 
     def calc(self, task, start, end):

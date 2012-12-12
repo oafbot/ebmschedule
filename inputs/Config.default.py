@@ -28,7 +28,7 @@ class Config:
         self.algo     = 0     # [0: PushRight], [1: PushRight-RelaxLeft], [2: PushLeft]
         self.platform = 1
 
-        self.hours    = 8
+        self.hours    = 8.0
         self.duration = "Y"   # Y : Year, M : Month, C : Custom
         
         self.trace    = False
