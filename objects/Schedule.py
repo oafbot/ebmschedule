@@ -121,7 +121,6 @@ class Schedule:
 
     def checkSkills(self, date, delta, asset, task):
         """Check skills hours availability and usage."""
-        from math import floor
         from copy import deepcopy
         usage  = self.getUsage(date, asset) # get usage hours
         skills = task.SkillsMap[delta]        
@@ -140,13 +139,9 @@ class Schedule:
                      """Are there enough resources."""
                      if remaining >= skill.hours:
                          availability.append(True)
+                         break
                      else:
                          availability.append(False)                
-                
-                # from datetime import datetime
-                # if date.date() == datetime(2013,7,11):
-                #    print delta, date.date(), index, inWork[(date, skill.id)], skill.hours, skill.id, "--check" 
-                
                 if not any(availability):
                     """"If all availability evaluates to False."""
                     if usage > 0: self.setUsage(date, asset)
@@ -154,15 +149,9 @@ class Schedule:
                 else:
                     """If any availability evaluates to True. Retrieve index.""" 
                     index = self.isAvailable(skill.hours, (date, skill.id), inWork)
-                    # print delta, date.date(), index, inWork[(date, skill.id)], skill.hours, skill.id, "--check"
-                    # if index is None:
-                    #     raise RuntimeError("Skill Hours Distribution Mismatch Error")
-                    # else:                   
-                    # print delta, date.date(), index, inWork[(date, skill.id)], skill.hours, skill.id, "--check"
                     """Subtract hours."""
                     inWork[(date, skill.id)][index] -= skill.hours
                     inWork[(date, skill.id)][index] = round(inWork[(date, skill.id)][index], 2)
-                    # print delta, date.date(), index, inWork[(date, skill.id)]                    
             elif available < skill.hours:
                 """If there were not enough resources."""
                 if usage > 0: self.setUsage(date, asset)
@@ -221,7 +210,6 @@ class Schedule:
         """Assign skills and their hours to the date."""
         from datetime import timedelta
         from math import ceil
-        # from math import floor
         # skills = task.SkillsMap[delta]
 
         for manpower in task.manpowers:

@@ -69,9 +69,8 @@ class Task:
         """Round to the next interger day for required skill."""
         from math import ceil
         for manpower in self.manpowers:
-            #TODO: Don't hard-code
             self.days = int(max(self.days, ceil(manpower.hours / manpower.skill.hoursPerDay))) 
-            self.sumSkills(manpower)
+            # self.sumSkills(manpower)
             self.manhours += manpower.hours
         self.allocate()
         self.mapSkills()

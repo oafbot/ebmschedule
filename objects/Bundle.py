@@ -15,7 +15,7 @@ class Bundle(Task):
         self.calculateDays(tasks)
         self.allocate()
         self.distribute(tasks)        
-        self.tostring()
+        # self.tostring()
         
     def initialize(self, tasks):
         """Configure the basic properties of the bundle as a meta-task."""
