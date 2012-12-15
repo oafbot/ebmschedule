@@ -18,7 +18,8 @@ class Task:
         self.concur       = set(concur)    # concurrent tasks
         self.locked       = False
         self.hoursPerDay  = workhours      # hours in a workday
-        self.skills       = []             # array holding all the required skills
+        self.skills       = []             # array holding all the required skills. Hours pooled
+        self.SkillsMap    = {}             # Mappings of skill hours to days.
         self.days         = 0              # duration of a task in days
         self.manhours     = 0              # total manpower hours.
         self.score        = 0              # score given by the sorting algorithm
@@ -32,7 +33,7 @@ class Task:
         self.relax        = timedelta(days=int(ceil(self.interval/4))) # easing for 'stupidity'-checking. Implementation off.
 
         if len(manpowers): self.precal() #TODO: Should come from sequencing
-
+        
     def next(self, asset, date):
         """
         If date is not set, return the start date plus the number of days 
@@ -72,6 +73,16 @@ class Task:
             self.days = int(max(self.days, ceil(manpower.hours / manpower.skill.hoursPerDay))) 
             self.sumSkills(manpower)
             self.manhours += manpower.hours
+        self.allocate()
+        self.mapSkills()
+
+    def tostring(self):
+        """Output to console."""
+        print self.name, self.manhours
+        for day in self.SkillsMap:
+           for skill in self.SkillsMap[day]:
+               print day, ":", skill.name, skill.hours
+        print ""
 
     def sumSkills(self, manpower):
         """If the skill is in the list of required skills add manpower hours."""
@@ -212,3 +223,31 @@ class Task:
                     if after.within(date):
                         return True
         return False
+
+    def allocate(self):
+        """Allocate days to the mapping arrays."""
+        for day in range(0, self.days):
+            if day not in self.SkillsMap:
+                self.SkillsMap[day] = []    
+
+    def mapSkills(self):
+        for manpower in self.manpowers:
+            if manpower.hours > self.hoursPerDay:
+                mod = manpower.hours % self.hoursPerDay
+                hrs = self.hoursPerDay
+                over = True
+            else:
+                hrs = manpower.hours
+                over = False
+            
+            for day in range(0, self.days):
+                if over:
+                    """If longer than a day and last day, apply remainder."""
+                    hours = hrs if day < self.days-1 else mod
+                else:
+                    """Apply 0 hours to all days after the first if shorter than a day."""
+                    hours = 0 if day > 0 else hrs
+                
+                _skill = manpower.skill.copy()
+                _skill.hours = round(hours, 2)
+                self.SkillsMap[day].append(_skill)

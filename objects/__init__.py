@@ -19,7 +19,14 @@ class Skill:
         self.available      = available
         self.hoursPerDay    = hoursPerDay
         self.availableHours = available * hoursPerDay
-        
+            
+    def resources(self, usage=0):
+        """Return hours for each resource available."""
+        r = []
+        for index in range(0, self.available):
+            r.append(round(self.hoursPerDay - usage, 2) if self.hoursPerDay - usage > 0 else 0)
+        return r
+             
     def copy(self):
         from copy import deepcopy
         return deepcopy(self)

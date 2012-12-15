@@ -83,6 +83,7 @@ class Algorithm:
                     if len(bundle) > 1 and task.id not in self.skip:
                         self.bundleSchedule(bundle, asset, input, task, start)
                     elif task.id not in self.skip:
+                        task.tostring()
                         self.regularSchedule(asset, task, input, start)
         self.analytics(input)
         """Save scheduling results."""
@@ -133,8 +134,8 @@ class Algorithm:
         cost = 0
         for skill in task.skills:
             """Divide manhours with total available manhours."""
-            # cost += (1.0*skill.hours)/skill.availableHours
-            cost += (skill.availableHours - 1.0*skill.hours)/skill.availableHours
+            cost += (1.0*skill.hours)/skill.availableHours
+            # cost += (skill.availableHours - 1.0*skill.hours)/skill.availableHours
         return cost
 
     def calc(self, task, start, end):
