@@ -122,9 +122,10 @@ class Schedule:
     def checkSkills(self, date, delta, asset, task):
         """Check skills hours availability and usage."""
         from math import floor
-        usage = self.getUsage(date, asset) # get usage hours
+        from copy import deepcopy
+        usage  = self.getUsage(date, asset) # get usage hours
         skills = task.SkillsMap[delta]        
-        inWork = self._skillsInWork.copy()
+        inWork = deepcopy(self._skillsInWork)
         
         for skill in skills:
             if skill.hours > skill.availableHours:
@@ -149,7 +150,6 @@ class Schedule:
                 if not any(availability):
                     """"If all availability evaluates to False."""
                     if usage > 0: self.setUsage(date, asset)
-                    print "FAILED"
                     return True
                 else:
                     """If any availability evaluates to True. Retrieve index.""" 
@@ -158,20 +158,19 @@ class Schedule:
                     # if index is None:
                     #     raise RuntimeError("Skill Hours Distribution Mismatch Error")
                     # else:                   
+                    # print delta, date.date(), index, inWork[(date, skill.id)], skill.hours, skill.id, "--check"
                     """Subtract hours."""
                     inWork[(date, skill.id)][index] -= skill.hours
                     inWork[(date, skill.id)][index] = round(inWork[(date, skill.id)][index], 2)
-                    print delta, date.date(), index, inWork[(date, skill.id)], skill.hours, skill.id, "--check"                    
+                    # print delta, date.date(), index, inWork[(date, skill.id)]                    
             elif available < skill.hours:
                 """If there were not enough resources."""
                 if usage > 0: self.setUsage(date, asset)
-                print "FAILED"
                 return True
             else:
                 inWork[(date, skill.id)] = skill.resources(usage)
                 inWork[(date, skill.id)][0] -= skill.hours
                 inWork[(date, skill.id)][0] = round(inWork[(date, skill.id)][0], 2)
-        print "OK"
         return False
 
     def _addToSchedule(self, asset, task, remainder, forced=False):
@@ -181,10 +180,12 @@ class Schedule:
         if asset.id not in self._schedule:
             self._schedule[asset.id] = []
         self._schedule[asset.id].append(task)
+        """Keep a record of skills and their hours scheduled."""
+        self.scheduleSkills(task, asset, remainder, task.dateRange.start)
         
         for delta, date in enumerate(task.dateRange.range()):                        
             """Keep a record of skills and their hours scheduled."""
-            self.scheduleSkills(task, asset, date, delta)
+            # self.scheduleSkills(task, asset, date, delta)
             """Assign asset to the date."""            
             if date.date() not in self._assetsInWork.keys():
                 self._assetsInWork[date.date()] = [asset.id]
@@ -215,29 +216,76 @@ class Schedule:
         if(Config().pushcal and not forced):
             self.scheduleCalendar(task,asset)
 
-    def scheduleSkills(self, task, asset, date, delta):
+    # def scheduleSkills(self, task, asset, date, delta):
+    def scheduleSkills(self, task, asset, remainder, start):
         """Assign skills and their hours to the date."""
-        skills = task.SkillsMap[delta]
-                
-        for skill in skills:
-            """"get usage hours"""
-            usage = self.getUsage(date, asset)
-        
-            if (date, skill.id) not in self._skillsInWork.keys():                    
-                """Allocate the full available hours to the day.""" 
-                self._skillsInWork[(date, skill.id)] = skill.resources(usage)
-            """Check hours availability and retrieve index."""
-            index = self.isAvailable(skill.hours, (date, skill.id), self._skillsInWork)
-            if index is not None:
-                """Subtract hours from the available hours.""" 
-                # print index, date.date(), self._skillsInWork[(date, skill.id)]
-                self._skillsInWork[(date, skill.id)][index] -= skill.hours
-                self._skillsInWork[(date, skill.id)][index] = round(self._skillsInWork[(date, skill.id)][index], 2)
-                print delta, date.date(), index, self._skillsInWork[(date, skill.id)], skill.hours,skill.id
+        from datetime import timedelta
+        from math import ceil
+        # from math import floor
+        # skills = task.SkillsMap[delta]
+
+        for manpower in task.manpowers:
+            if manpower.hours + remainder <= task.hoursPerDay:
+                """If the task fits within the day."""
+                hours = manpower.hours
+                last = 0
+                days = 1
             else:
-                """If resources are unavailable, there is a miscalculation. Raise error."""
-                print "\n", delta, date.date(), index, self._skillsInWork[(date, skill.id)], skill.hours, task.id
-                raise RuntimeError("Skill Hours Distribution Mismatch Error")
+                """If the task goes over a day."""
+                last  = round((manpower.hours + remainder) % task.hoursPerDay, 2) # hours for the last day
+                days  = int(ceil((manpower.hours + remainder) / task.hoursPerDay))
+                hours = round(task.hoursPerDay - remainder, 2) # hours for the first day
+            
+            for delta in range(0, days):
+                """Iterate through the days."""
+                date  = start + timedelta(days=delta)
+                skill = manpower.skill
+                
+                if days > 1:
+                    if delta == days-1:
+                        """If the day is last, apply the remainder."""
+                        hours = last 
+                    elif delta != 0:
+                        """If it's not the first day apply full workday."""
+                        hours = task.hoursPerDay
+
+                    usage = self.getUsage(date, asset)
+
+                    if (date, skill.id) not in self._skillsInWork.keys():                    
+                        """Allocate the full available hours to the day.""" 
+                        self._skillsInWork[(date, skill.id)] = skill.resources(usage)
+                    """Check hours availability and retrieve index."""
+                    index = self.isAvailable(hours, (date, skill.id), self._skillsInWork)
+                    if index is not None:
+                        """Subtract hours from the available hours.""" 
+                        # print index, date.date(), self._skillsInWork[(date, skill.id)]
+                        self._skillsInWork[(date, skill.id)][index] -= hours
+                        self._skillsInWork[(date, skill.id)][index] = round(self._skillsInWork[(date, skill.id)][index], 2)
+                        # print delta, date.date(), index, self._skillsInWork[(date, skill.id)], hours, skill.id
+                    else:
+                        """If resources are unavailable, there is a miscalculation. Raise error."""
+                        print "\n", delta, date.date(), index, self._skillsInWork[(date, skill.id)], hours, task.id
+                        raise RuntimeError("Skill Hours Distribution Mismatch Error")
+                
+        # for skill in skills:
+        #     """"get usage hours"""
+        #     usage = self.getUsage(date, asset)
+        # 
+        #     if (date, skill.id) not in self._skillsInWork.keys():                    
+        #         """Allocate the full available hours to the day.""" 
+        #         self._skillsInWork[(date, skill.id)] = skill.resources(usage)
+        #     """Check hours availability and retrieve index."""
+        #     index = self.isAvailable(skill.hours, (date, skill.id), self._skillsInWork)
+        #     if index is not None:
+        #         """Subtract hours from the available hours.""" 
+        #         # print index, date.date(), self._skillsInWork[(date, skill.id)]
+        #         self._skillsInWork[(date, skill.id)][index] -= skill.hours
+        #         self._skillsInWork[(date, skill.id)][index] = round(self._skillsInWork[(date, skill.id)][index], 2)
+        #         print delta, date.date(), index, self._skillsInWork[(date, skill.id)], skill.hours,skill.id
+        #     else:
+        #         """If resources are unavailable, there is a miscalculation. Raise error."""
+        #         print "\n", delta, date.date(), index, self._skillsInWork[(date, skill.id)], skill.hours, task.id
+        #         raise RuntimeError("Skill Hours Distribution Mismatch Error")
 
             # if date >= self.dateRange.start and date <= self.dateRange.end:
             #     print self._skillsInWork[(date, skill.id)], skill.id, date.date(), d, skill.hours
