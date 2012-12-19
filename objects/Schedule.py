@@ -90,7 +90,8 @@ class Schedule:
 
     def setUsage(self, date, asset):
         """Set usage flags."""
-        self.used.append(date.date())
+        if date.date() not in self.used:
+            self.used.append(date.date())
     
     def unsetUsage(self):
         """Clear usage flags."""

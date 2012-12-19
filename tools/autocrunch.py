@@ -17,7 +17,7 @@ if __name__ == "__main__":
                 
     start = "--start 0"
     end   = "--end 9"
-    algos = ["--algo 0", "--algo 1"]
+    algos = ["--algo 0", "--algo 1", "--algo 2"]
     sorts = ["--sort on", "--sort off", "--sort reverse"]
     
     stages = len(algos) * len(sorts)
