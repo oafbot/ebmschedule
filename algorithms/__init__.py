@@ -4,7 +4,8 @@ class Algos:
         import main
         from PushToRight import PushToRight
         from PushRightRelaxLeft import PushRightRelaxLeft
-        from PushToLeft import PushToLeft
+        from RelaxLeftOnUsage import RelaxLeftOnUsage
+        # from PushToLeft import PushToLeft
 
         for input in model:
             if(input.conf.algo == 0):
@@ -12,4 +13,5 @@ class Algos:
             elif(input.conf.algo == 1):
                 self.algorithm = PushRightRelaxLeft(input, float(weight), float(relax), sort)
             elif(input.conf.algo == 2):
-                self.algorithm = PushToLeft(input, float(weight))
+                self.algorithm = RelaxLeftOnUsage(input, float(weight), float(relax), sort)
+                #self.algorithm = PushToLeft(input, float(weight))

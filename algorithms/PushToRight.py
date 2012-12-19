@@ -65,7 +65,7 @@ class PushToRight(Algorithm):
                     if task.concurrent: task.interval = primary.interval                        
                     """Add to schedule."""
                     self.totalSched += 1
-                    end = self.schedule.add(asset, task, start)
+                    end = self.schedule.add(asset, task, start, self.remainder)
                     self.console(asset, task, input, start, end)                   
                     """Claculate the start and end dates."""
                     dates = self.calc(task, start, end)
