@@ -44,7 +44,6 @@ class RelaxLeftOnUsage(Algorithm):
 
             self.remainder = 0                  # The hours carried over from the preceding task
             self.maxhours = primary.hoursPerDay # The work hours in a day
-            # self.longest = 0
             
             for task in bundle:
                 """For each task in the bundle, schedule in order."""
@@ -75,28 +74,23 @@ class RelaxLeftOnUsage(Algorithm):
         relax = orig + timedelta(days=int(ceil(interval * self.relax))) + timedelta(days=1) 
         last  = orig - timedelta(days=interval) + timedelta(days=1)       
         floor = relax if relax > last else last + timedelta(days=1)
-        push  = True #if not self.schedule.used else False
-        clear = []
+        push  = True
         reset = False
                 
         if floor < self.startDate:
             floor = self.startDate + timedelta(days=1)
                     
-        while(self.schedule.blocked(asset, task, start, self.stupid)):
-            
+        while(self.schedule.blocked(asset, task, start, self.stupid)):            
             if start.date() in self.schedule.used and not reset:
                 push = False
-                # self.schedule.used = [used for used in self.schedule.used if used != start.date()]
-                # print "clear", self.schedule.used, start.date(), orig #, task.name
 
             if start > floor and not push:
                 """Adjust the interval so it doesn't stumble on the interval check."""
                 task.interval = interval + int(ceil(interval * self.relax))
                 start -= timedelta(days=1)
                 self.adjust += 1
-                # print "shove", self.schedule.used, start.date(), floor #, task.name
             else:
-                if start == floor:    
+                if start <= floor:    
                     reset = True
                 if start < orig:
                     start = orig
@@ -104,7 +98,6 @@ class RelaxLeftOnUsage(Algorithm):
                 task.interval = interval
                 start += timedelta(days=1)
                 self.adjust += 1
-                # print "push", self.schedule.used, start.date() #, task.name                 
         
         self.usageViolation(start, orig, asset)
         self.recordInterval(start, orig, asset)

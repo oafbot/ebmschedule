@@ -29,7 +29,6 @@ if __name__ == "__main__":
     trace = 1 if args['trace'] is True else 0
     lax   = 5 if algo > 0 else 2
     
-    # weights = [0, 5, 10] if algo != 2 else [0]
     weights = [0, 2, 4, 6, 8, 10] if sort != "off" else [0]
     count = 0
     runs  = len(range(0, batch+1)) * len(range(start, end+1)) * len(weights) * len(range(1, lax))

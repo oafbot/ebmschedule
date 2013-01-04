@@ -58,14 +58,7 @@ class Bundle(Task):
                 self.SkillsMap[day] = []
             if day not in self.TasksMap:
                 self.TasksMap[day] = []
-            
-    def getSkills(self, day):
-        """Return the pooled skill hours for designated day."""
-        pool = []
-        for i in self.SkillsMap[day]:
-            pool.append(self.SkillsMap[day][i])
-        return pool
-        
+
     def distribute(self, tasks):
         """Distribute conflicts and manpower hours to the corresponding days."""        
         remainder = 0 # remainder hours from the previous task
@@ -124,5 +117,4 @@ class Bundle(Task):
                 
                 _skill = skill.copy()
                 _skill.hours = round(hours, 2)
-                # if _skill.hours > 0:
                 self.SkillsMap[day].append(_skill)
